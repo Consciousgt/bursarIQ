@@ -1,0 +1,2940 @@
+/**
+ * RichVine College - Complete Data Schema v5 (Cleaned & Reset)
+ * 2026/2027 Academic Session
+ * Fresh start: Zero dummy students, zero dummy payments, zero dummy expenses.
+ * Clean, production-ready schema with:
+ * - Expected Term School Fee per learner
+ * - Arrears-first payment deduction
+ * - Outstanding calculation per learner (arrears, term fee, and total)
+ * - Flexible amounts with decimal kobo and thousands separators
+ */
+
+// ─── School Section & Class Definitions ───────────────────────────────────
+const SCHOOL_SECTIONS = {
+  primary: {
+    id: "primary",
+    name: "Primary School",
+    icon: "fas fa-child",
+    color: "emerald",
+    classes: [
+      "Day Care", "Creche", "Kindergarten",
+      "Nursery 1", "Nursery 2",
+      "Primary 1", "Primary 2", "Primary 3",
+      "Primary 4", "Primary 5", "Primary 6"
+    ]
+  },
+  junior: {
+    id: "junior",
+    name: "Junior College",
+    icon: "fas fa-school",
+    color: "sky",
+    classes: [
+      "JSS 1A", "JSS 1B",
+      "JSS 2A", "JSS 2B",
+      "JSS 3A", "JSS 3B"
+    ]
+  },
+  senior: {
+    id: "senior",
+    name: "Senior College",
+    icon: "fas fa-graduation-cap",
+    color: "purple",
+    classes: [
+      "SSS 1 Science", "SSS 1 Art", "SSS 1 Commercial",
+      "SSS 2 Science", "SSS 2 Art", "SSS 2 Commercial",
+      "SSS 3 Science", "SSS 3 Art", "SSS 3 Commercial"
+    ]
+  }
+};
+
+const ALL_CLASSES = [
+  ...SCHOOL_SECTIONS.primary.classes,
+  ...SCHOOL_SECTIONS.junior.classes,
+  ...SCHOOL_SECTIONS.senior.classes
+];
+
+function getSectionByClass(className) {
+  for (const [key, sec] of Object.entries(SCHOOL_SECTIONS)) {
+    if (sec.classes.includes(className)) return sec;
+  }
+  return null;
+}
+
+// ─── Expense Accounts ───────────────────────────────────────────────────
+const EXPENSE_ACCOUNTS = [
+  { id: "general", name: "General / Central Account", icon: "fas fa-university", color: "#475569" },
+  { id: "primary", name: "Primary School Account", icon: "fas fa-child", color: "#d97706" },
+  { id: "junior",  name: "Junior College Account", icon: "fas fa-book-reader", color: "#0284c7" },
+  { id: "senior",  name: "Senior College Account", icon: "fas fa-graduation-cap", color: "#7c3aed" }
+];
+if (typeof window !== "undefined") window.EXPENSE_ACCOUNTS = EXPENSE_ACCOUNTS;
+
+// ─── Clean Initial State (Zero Dummy Data) ────────────────────────────────
+const _bursarCfg = (typeof window !== "undefined" && window.BURSARIQ_CONFIG) ? window.BURSARIQ_CONFIG : {};
+
+const DEFAULT_DATA = {
+  config: {
+    schoolName: _bursarCfg.schoolName || "EXCELLENCE MODEL COLLEGE",
+    motto: _bursarCfg.motto || "Knowledge, Character & Leadership",
+    address: _bursarCfg.address || "12 Education Boulevard, Victoria Island / Ikeja, Lagos State, Nigeria",
+    contactEmail: _bursarCfg.contactEmail || "admin@excellencemodel.edu.ng",
+    phone: _bursarCfg.phone || "08012345678",
+    adminContact: _bursarCfg.adminContact || "08012345678",
+    currentSession: _bursarCfg.currentSession || "2026/2027",
+    currentTerm: _bursarCfg.currentTerm || "1st Term",
+    currency: _bursarCfg.currencySymbol || "₦",
+    bankDetails: _bursarCfg.bankDetails || {
+      bankName: "Zenith Bank Plc",
+      accountName: "BURSARY COLLECTION ACCOUNT",
+      accountNumber: "1012345678"
+    }
+  },
+
+  classes: ALL_CLASSES,
+
+  feeCategories: [
+    { id: "school_fees", name: "School Fees / Tuition", hasMeta: false },
+    { id: "daycare_fee", name: "Day Care / Creche Monthly Fee", hasMeta: true, metaType: "daycare", forClass: null, daycare: true },
+    { id: "uniform", name: "School Uniform", hasMeta: false },
+    { id: "sport", name: "Sport Wear", hasMeta: true, metaType: "sport" },
+    { id: "friday_wear", name: "Friday Wear", hasMeta: false },
+    { id: "exercise_books", name: "Exercise Books", hasMeta: true, metaType: "exercise_books" },
+    { id: "stationery", name: "Stationery (Pencil, Biro, Books, etc.)", hasMeta: true, metaType: "stationery" },
+    { id: "textbook", name: "Textbooks", hasMeta: true, metaType: "textbook" },
+    { id: "misc_1", name: "Miscellaneous 1 (Development / PTA)", hasMeta: false },
+    { id: "misc_2", name: "Miscellaneous 2 (ICT / Computer Lab)", hasMeta: false },
+    // JSS 3 Special Examination Fees
+    { id: "bece_fee", name: "BECE Examination Fee", hasMeta: false, forClass: "JSS 3" },
+    { id: "bece_lesson_fee", name: "BECE Lesson Fee", hasMeta: false, forClass: "JSS 3" },
+    // SS3 Special Senior School Fees & Official Pricing
+    { id: "waec_fee", name: "WAEC Examination Fee", defaultAmount: 65000, hasMeta: false, forClass: "SSS 3" },
+    { id: "neco_fee", name: "NECO Examination Fee", defaultAmount: 60000, hasMeta: false, forClass: "SSS 3" },
+    { id: "waec_logistics", name: "WAEC Logistics Fee", defaultAmount: 20000, hasMeta: false, forClass: "SSS 3" },
+    { id: "neco_logistics", name: "NECO Logistics Fee", defaultAmount: 20000, hasMeta: false, forClass: "SSS 3" },
+    { id: "waec_id_card", name: "WAEC ID Card Fee", defaultAmount: 4000, hasMeta: false, forClass: "SSS 3" },
+    { id: "neco_id_card", name: "NECO ID Card Fee", defaultAmount: 4000, hasMeta: false, forClass: "SSS 3" },
+    { id: "lessons_fee", name: "Morning & Afternoon Extension Lesson Fee", defaultAmount: 25000, hasMeta: false, forClass: "SSS 3" },
+    { id: "mock_exams_fee", name: "3 Mock Exams Fee", defaultAmount: 10000, hasMeta: false, forClass: "SSS 3" },
+    { id: "practical_fee", name: "BOTH WAEC & NECO Practical Fee", defaultAmount: 10000, hasMeta: false, forClass: "SSS 3" },
+    { id: "camping_fee", name: "Monthly Intensive Camping Fee", hasMeta: false, forClass: "SSS 3" },
+    { id: "other_special_fee", name: "Other SS3 Special / Optional Fees", hasMeta: true, metaType: "other_special", forClass: "SSS 3" }
+  ],
+
+  // Fresh, empty collections
+    students: [
+    {
+      id: "EMC-2026-001",
+      regNo: "EMC/2026/001",
+      name: "Adeleke Chukwuemeka",
+      class: "Primary 1",
+      section: "primary",
+      gender: "Male",
+      parentName: "Engr. & Mrs. Adeleke",
+      parentPhone: "08023456781",
+      address: "14 Palm Avenue, Lagos",
+      termFee: 55000,
+      pastArrears: 0,
+      status: "Active",
+      createdAt: 1718000000000
+    },
+    {
+      id: "EMC-2026-002",
+      regNo: "EMC/2026/002",
+      name: "Ibrahim Zainab Folashade",
+      class: "Primary 4",
+      section: "primary",
+      gender: "Female",
+      parentName: "Alhaji Ibrahim",
+      parentPhone: "08034567892",
+      address: "8 Unity Close, Lagos",
+      termFee: 65000,
+      pastArrears: 12500,
+      status: "Active",
+      createdAt: 1718000001000
+    },
+    {
+      id: "EMC-2026-003",
+      regNo: "EMC/2026/003",
+      name: "Okon Blessing Mary",
+      class: "Nursery 2",
+      section: "primary",
+      gender: "Female",
+      parentName: "Mr. D. Okon",
+      parentPhone: "08045678903",
+      address: "21 Heritage Estate, Lagos",
+      termFee: 45000,
+      pastArrears: 0,
+      status: "Active",
+      createdAt: 1718000002000
+    },
+    {
+      id: "EMC-2026-004",
+      regNo: "EMC/2026/004",
+      name: "Danjuma Emmanuel",
+      class: "JSS 1A",
+      section: "junior",
+      gender: "Male",
+      parentName: "Pastor Danjuma",
+      parentPhone: "08056789014",
+      address: "5 Victory Way, Lagos",
+      termFee: 85000,
+      pastArrears: 25000,
+      status: "Active",
+      createdAt: 1718000003000
+    },
+    {
+      id: "EMC-2026-005",
+      regNo: "EMC/2026/005",
+      name: "Babatunde Olamide",
+      class: "JSS 2B",
+      section: "junior",
+      gender: "Male",
+      parentName: "Chief Babatunde",
+      parentPhone: "08067890125",
+      address: "17 Commercial Road, Lagos",
+      termFee: 85000,
+      pastArrears: 0,
+      status: "Active",
+      createdAt: 1718000004000
+    },
+    {
+      id: "EMC-2026-006",
+      regNo: "EMC/2026/006",
+      name: "Eze Chisom David",
+      class: "JSS 3A",
+      section: "junior",
+      gender: "Male",
+      parentName: "Dr. Eze",
+      parentPhone: "08078901236",
+      address: "9 Lekki Expressway, Lagos",
+      termFee: 95000,
+      pastArrears: 0,
+      status: "Active",
+      createdAt: 1718000005000
+    },
+    {
+      id: "EMC-2026-007",
+      regNo: "EMC/2026/007",
+      name: "Yusuf Aminat Sadiya",
+      class: "SSS 1 Science",
+      section: "senior",
+      gender: "Female",
+      parentName: "Barrister Yusuf",
+      parentPhone: "08089012347",
+      address: "3 Coral View, Lagos",
+      termFee: 110000,
+      pastArrears: 30000,
+      status: "Active",
+      createdAt: 1718000006000
+    },
+    {
+      id: "EMC-2026-008",
+      regNo: "EMC/2026/008",
+      name: "Williams Victor Ayomide",
+      class: "SSS 2 Commercial",
+      section: "senior",
+      gender: "Male",
+      parentName: "Mrs. Williams",
+      parentPhone: "08090123458",
+      address: "11 Admiralty Way, Lagos",
+      termFee: 110000,
+      pastArrears: 0,
+      status: "Active",
+      createdAt: 1718000007000
+    },
+    {
+      id: "EMC-2026-009",
+      regNo: "EMC/2026/009",
+      name: "Nwachukwu Somtochukwu",
+      class: "SSS 3 Science",
+      section: "senior",
+      gender: "Male",
+      parentName: "Sir & Lady Nwachukwu",
+      parentPhone: "08011223344",
+      address: "24 Marina Boulevard, Lagos",
+      termFee: 135000,
+      pastArrears: 0,
+      status: "Active",
+      createdAt: 1718000008000
+    },
+    {
+      id: "EMC-2026-010",
+      regNo: "EMC/2026/010",
+      name: "Aliyu Farouk Mohammed",
+      class: "SSS 3 Art",
+      section: "senior",
+      gender: "Male",
+      parentName: "Senator Aliyu",
+      parentPhone: "08022334455",
+      address: "7 Bourdillon Road, Ikoyi, Lagos",
+      termFee: 135000,
+      pastArrears: 45000,
+      status: "Active",
+      createdAt: 1718000009000
+    }
+  ],
+
+  payments: [
+    {
+      id: "PAY-DEMO-001",
+      receiptNo: "REC-2026-001",
+      studentId: "EMC-2026-001",
+      studentName: "Adeleke Chukwuemeka",
+      class: "Primary 1",
+      section: "primary",
+      amount: 55000,
+      termFeePaid: 55000,
+      arrearsDeducted: 0,
+      otherFeesPaid: 0,
+      category: "school_fees",
+      method: "Bank Transfer",
+      date: new Date(Date.now() - 14 * 86400000).toISOString().split('T')[0],
+      session: "2026/2027",
+      term: "1st Term",
+      notes: "Full 1st term tuition settlement",
+      createdAt: Date.now() - 14 * 86400000
+    },
+    {
+      id: "PAY-DEMO-002",
+      receiptNo: "REC-2026-002",
+      studentId: "EMC-2026-002",
+      studentName: "Ibrahim Zainab Folashade",
+      class: "Primary 4",
+      section: "primary",
+      amount: 30000,
+      termFeePaid: 17500,
+      arrearsDeducted: 12500,
+      otherFeesPaid: 0,
+      category: "school_fees",
+      method: "POS Card",
+      date: new Date(Date.now() - 10 * 86400000).toISOString().split('T')[0],
+      session: "2026/2027",
+      term: "1st Term",
+      notes: "₦12,500 arrears cleared first; ₦17,500 credited to 1st Term",
+      createdAt: Date.now() - 10 * 86400000
+    },
+    {
+      id: "PAY-DEMO-003",
+      receiptNo: "REC-2026-003",
+      studentId: "EMC-2026-003",
+      studentName: "Okon Blessing Mary",
+      class: "Nursery 2",
+      section: "primary",
+      amount: 45000,
+      termFeePaid: 45000,
+      arrearsDeducted: 0,
+      otherFeesPaid: 0,
+      category: "school_fees",
+      method: "Cash Deposit",
+      date: new Date(Date.now() - 8 * 86400000).toISOString().split('T')[0],
+      session: "2026/2027",
+      term: "1st Term",
+      notes: "Early bird term payment",
+      createdAt: Date.now() - 8 * 86400000
+    },
+    {
+      id: "PAY-DEMO-004",
+      receiptNo: "REC-2026-004",
+      studentId: "EMC-2026-005",
+      studentName: "Babatunde Olamide",
+      class: "JSS 2B",
+      section: "junior",
+      amount: 85000,
+      termFeePaid: 85000,
+      arrearsDeducted: 0,
+      otherFeesPaid: 0,
+      category: "school_fees",
+      method: "Bank Transfer",
+      date: new Date(Date.now() - 6 * 86400000).toISOString().split('T')[0],
+      session: "2026/2027",
+      term: "1st Term",
+      notes: "Full junior secondary fee payment",
+      createdAt: Date.now() - 6 * 86400000
+    },
+    {
+      id: "PAY-DEMO-005",
+      receiptNo: "REC-2026-005",
+      studentId: "EMC-2026-006",
+      studentName: "Eze Chisom David",
+      class: "JSS 3A",
+      section: "junior",
+      amount: 130000,
+      termFeePaid: 95000,
+      arrearsDeducted: 0,
+      otherFeesPaid: 35000,
+      category: "school_fees",
+      items: [
+        { name: "School Fees / Tuition", amount: 95000, category: "school_fees" },
+        { name: "BECE Examination Fee", amount: 35000, category: "bece_fee" }
+      ],
+      method: "Bank Transfer",
+      date: new Date(Date.now() - 5 * 86400000).toISOString().split('T')[0],
+      session: "2026/2027",
+      term: "1st Term",
+      notes: "Tuition + BECE National Exam Fee",
+      createdAt: Date.now() - 5 * 86400000
+    },
+    {
+      id: "PAY-DEMO-006",
+      receiptNo: "REC-2026-006",
+      studentId: "EMC-2026-008",
+      studentName: "Williams Victor Ayomide",
+      class: "SSS 2 Commercial",
+      section: "senior",
+      amount: 110000,
+      termFeePaid: 110000,
+      arrearsDeducted: 0,
+      otherFeesPaid: 0,
+      category: "school_fees",
+      method: "Bank Transfer",
+      date: new Date(Date.now() - 4 * 86400000).toISOString().split('T')[0],
+      session: "2026/2027",
+      term: "1st Term",
+      notes: "Senior secondary cleared",
+      createdAt: Date.now() - 4 * 86400000
+    },
+    {
+      id: "PAY-DEMO-007",
+      receiptNo: "REC-2026-007",
+      studentId: "EMC-2026-009",
+      studentName: "Nwachukwu Somtochukwu",
+      class: "SSS 3 Science",
+      section: "senior",
+      amount: 200000,
+      termFeePaid: 135000,
+      arrearsDeducted: 0,
+      otherFeesPaid: 65000,
+      category: "school_fees",
+      items: [
+        { name: "School Fees / Tuition", amount: 135000, category: "school_fees" },
+        { name: "WAEC Examination Registration", amount: 65000, category: "waec_fee" }
+      ],
+      method: "Bank Transfer",
+      date: new Date(Date.now() - 3 * 86400000).toISOString().split('T')[0],
+      session: "2026/2027",
+      term: "1st Term",
+      notes: "Final year tuition + WAEC registration fee",
+      createdAt: Date.now() - 3 * 86400000
+    },
+    {
+      id: "PAY-DEMO-008",
+      receiptNo: "REC-2026-008",
+      studentId: "EMC-2026-010",
+      studentName: "Aliyu Farouk Mohammed",
+      class: "SSS 3 Art",
+      section: "senior",
+      amount: 50000,
+      termFeePaid: 5000,
+      arrearsDeducted: 45000,
+      otherFeesPaid: 0,
+      category: "school_fees",
+      method: "Bank Transfer",
+      date: new Date(Date.now() - 1 * 86400000).toISOString().split('T')[0],
+      session: "2026/2027",
+      term: "1st Term",
+      notes: "₦45,000 arrears recovered first; ₦5,000 credited to term balance",
+      createdAt: Date.now() - 1 * 86400000
+    }
+  ],
+
+  expenses: [
+    {
+      id: "EXP-DEMO-001",
+      title: "Diesel Generator Fuel Purchase (500L)",
+      amount: 650000,
+      category: "Diesel & Fuel",
+      account: "general",
+      period: "monthly",
+      date: new Date(Date.now() - 12 * 86400000).toISOString().split('T')[0],
+      method: "Bank Transfer",
+      notes: "500 litres diesel @ ₦1,300/L for school backup plant",
+      createdAt: Date.now() - 12 * 86400000
+    },
+    {
+      id: "EXP-DEMO-002",
+      title: "Science Lab Consumables & Reagents",
+      amount: 185000,
+      category: "Academic Materials",
+      account: "senior",
+      period: "termly",
+      date: new Date(Date.now() - 9 * 86400000).toISOString().split('T')[0],
+      method: "Bank Transfer",
+      notes: "Titration reagents, specimen slides, pipette kits for Chemistry/Biology",
+      createdAt: Date.now() - 9 * 86400000
+    },
+    {
+      id: "EXP-DEMO-003",
+      title: "Customized Continuous Assessment & Report Booklets",
+      amount: 95000,
+      category: "Stationery",
+      account: "general",
+      period: "termly",
+      date: new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0],
+      method: "Cash",
+      notes: "Bulk printing of termly learner dossier sheets",
+      createdAt: Date.now() - 7 * 86400000
+    },
+    {
+      id: "EXP-DEMO-004",
+      title: "Dedicated Fiber Internet Broadband",
+      amount: 65000,
+      category: "Utilities",
+      account: "general",
+      period: "monthly",
+      date: new Date(Date.now() - 4 * 86400000).toISOString().split('T')[0],
+      method: "Bank Transfer",
+      notes: "Monthly unlimited fiber broadband for computer laboratory & admin",
+      createdAt: Date.now() - 4 * 86400000
+    },
+    {
+      id: "EXP-DEMO-005",
+      title: "Kindergarten & Primary Playground Upkeep",
+      amount: 45000,
+      category: "Repairs & Maintenance",
+      account: "primary",
+      period: "one_time",
+      date: new Date(Date.now() - 2 * 86400000).toISOString().split('T')[0],
+      method: "POS",
+      notes: "Swings and turf maintenance",
+      createdAt: Date.now() - 2 * 86400000
+    }
+  ],
+
+  stocks: [
+    {
+      id: "STK-DEMO-001",
+      name: "College Blazer (Senior Navy Blue)",
+      category: "Uniform",
+      unit: "piece",
+      costPrice: 9500,
+      sellingPrice: 14000,
+      quantity: 45,
+      minThreshold: 10,
+      description: "Gold-embroidered breast pocket insignia",
+      createdAt: 1718000000000
+    },
+    {
+      id: "STK-DEMO-002",
+      name: "Junior Secondary Uniform Complete Set",
+      category: "Uniform",
+      unit: "set",
+      costPrice: 7000,
+      sellingPrice: 10500,
+      quantity: 60,
+      minThreshold: 15,
+      description: "Sky-blue shirt with charcoal trousers/skirt",
+      createdAt: 1718000001000
+    },
+    {
+      id: "STK-DEMO-003",
+      name: "Primary School Uniform Set",
+      category: "Uniform",
+      unit: "set",
+      costPrice: 5500,
+      sellingPrice: 8500,
+      quantity: 50,
+      minThreshold: 12,
+      description: "Gingham checkered fabric with school badge",
+      createdAt: 1718000002000
+    },
+    {
+      id: "STK-DEMO-004",
+      name: "Inter-House Sports Wear Kit",
+      category: "Sport Wear",
+      unit: "set",
+      costPrice: 3800,
+      sellingPrice: 6000,
+      quantity: 75,
+      minThreshold: 20,
+      description: "Four house colors: Sapphire, Ruby, Emerald, Topaz",
+      createdAt: 1718000003000
+    },
+    {
+      id: "STK-DEMO-005",
+      name: "60-Leaves Branded Exercise Books (Pack of 10)",
+      category: "Exercise Books",
+      unit: "pack",
+      costPrice: 3200,
+      sellingPrice: 5000,
+      quantity: 120,
+      minThreshold: 30,
+      description: "Laminated full-color school cover",
+      createdAt: 1718000004000
+    },
+    {
+      id: "STK-DEMO-006",
+      name: "Senior Secondary New General Mathematics",
+      category: "Textbooks",
+      unit: "piece",
+      costPrice: 4500,
+      sellingPrice: 6500,
+      quantity: 35,
+      minThreshold: 10,
+      description: "Revised National Edition",
+      createdAt: 1718000005000
+    },
+    {
+      id: "STK-DEMO-007",
+      name: "White Science Laboratory Coat",
+      category: "Uniform",
+      unit: "piece",
+      costPrice: 4000,
+      sellingPrice: 6000,
+      quantity: 28,
+      minThreshold: 8,
+      description: "Heavy cotton laboratory protective wear",
+      createdAt: 1718000006000
+    }
+  ],
+
+  stockSales: [],
+  stockRestocks: [],
+
+  staff: [
+    {
+      id: "STF-DEMO-001",
+      staffId: "STF/001",
+      name: "Dr. Anthony Balogun",
+      role: "Principal Administrator",
+      section: "general",
+      phone: "08031112233",
+      email: "principal@excellencemodel.edu.ng",
+      salary: 220000,
+      loanBalance: 0,
+      totalLoanTaken: 0,
+      totalLoanRepaid: 0,
+      status: "Active",
+      createdAt: 1718000000000
+    },
+    {
+      id: "STF-DEMO-002",
+      staffId: "STF/002",
+      name: "Mrs. Olufunke Adeleke",
+      role: "Headmistress (Primary Section)",
+      section: "primary",
+      phone: "08032223344",
+      email: "primary.lead@excellencemodel.edu.ng",
+      salary: 145000,
+      loanBalance: 0,
+      totalLoanTaken: 0,
+      totalLoanRepaid: 0,
+      status: "Active",
+      createdAt: 1718000001000
+    },
+    {
+      id: "STF-DEMO-003",
+      staffId: "STF/003",
+      name: "Mr. Chukwudi Nnamdi",
+      role: "Senior Physics & Mathematics Lead",
+      section: "senior",
+      phone: "08033334455",
+      email: "c.nnamdi@excellencemodel.edu.ng",
+      salary: 135000,
+      loanBalance: 30000,
+      totalLoanTaken: 50000,
+      totalLoanRepaid: 20000,
+      status: "Active",
+      createdAt: 1718000002000
+    },
+    {
+      id: "STF-DEMO-004",
+      staffId: "STF/004",
+      name: "Miss Amina Sanni",
+      role: "English Language & Literature Teacher",
+      section: "junior",
+      phone: "08034445566",
+      email: "a.sanni@excellencemodel.edu.ng",
+      salary: 115000,
+      loanBalance: 15000,
+      totalLoanTaken: 25000,
+      totalLoanRepaid: 10000,
+      status: "Active",
+      createdAt: 1718000003000
+    },
+    {
+      id: "STF-DEMO-005",
+      staffId: "STF/005",
+      name: "Mr. Tunde Bakare",
+      role: "Chief Bursary & Accounts Officer",
+      section: "general",
+      phone: "08035556677",
+      email: "bursar@excellencemodel.edu.ng",
+      salary: 130000,
+      loanBalance: 0,
+      totalLoanTaken: 0,
+      totalLoanRepaid: 0,
+      status: "Active",
+      createdAt: 1718000004000
+    }
+  ],
+
+  salaries: [
+    {
+      id: "SAL-DEMO-001",
+      staffId: "STF-DEMO-001",
+      staffName: "Dr. Anthony Balogun",
+      section: "general",
+      role: "Principal Administrator",
+      month: "October",
+      year: 2026,
+      amount: 220000,
+      grossAmount: 220000,
+      loanDeduction: 0,
+      netAmount: 220000,
+      method: "Bank Transfer",
+      date: "2026-10-28",
+      notes: "October payroll settlement",
+      createdAt: 1729000000000
+    },
+    {
+      id: "SAL-DEMO-002",
+      staffId: "STF-DEMO-003",
+      staffName: "Mr. Chukwudi Nnamdi",
+      section: "senior",
+      role: "Senior Physics & Mathematics Lead",
+      month: "October",
+      year: 2026,
+      amount: 125000,
+      grossAmount: 135000,
+      loanDeduction: 10000,
+      netAmount: 125000,
+      method: "Bank Transfer",
+      date: "2026-10-28",
+      notes: "Gross ₦135,000 less ₦10,000 loan repayment deduction = Net ₦125,000",
+      createdAt: 1729000001000
+    }
+  ],
+
+  staffLoans: [
+    {
+      id: "LOAN-DEMO-001",
+      staffId: "STF-DEMO-003",
+      staffName: "Mr. Chukwudi Nnamdi",
+      type: "disbursement",
+      amount: 50000,
+      balanceAfter: 50000,
+      date: "2026-09-15",
+      method: "Bank Transfer",
+      notes: "Personal emergency loan",
+      createdAt: 1726400000000
+    },
+    {
+      id: "LOAN-DEMO-002",
+      staffId: "STF-DEMO-003",
+      staffName: "Mr. Chukwudi Nnamdi",
+      type: "repayment",
+      amount: 10000,
+      balanceAfter: 40000,
+      date: "2026-09-28",
+      method: "Salary Deduction",
+      notes: "September salary automated deduction",
+      createdAt: 1727500000000
+    },
+    {
+      id: "LOAN-DEMO-003",
+      staffId: "STF-DEMO-003",
+      staffName: "Mr. Chukwudi Nnamdi",
+      type: "repayment",
+      amount: 10000,
+      balanceAfter: 30000,
+      date: "2026-10-28",
+      method: "Salary Deduction",
+      notes: "October salary automated deduction",
+      createdAt: 1729000000000
+    }
+  ],
+
+  cbtSubmissions: [
+    {
+      id: "CBT-DEMO-001",
+      studentId: "EMC-2026-009",
+      regNo: "EMC/2026/009",
+      studentName: "Nwachukwu Somtochukwu",
+      class: "SSS 3 Science",
+      subject: "General Mathematics (Senior Mock)",
+      score: 38,
+      totalQuestions: 40,
+      percentage: 95,
+      grade: "A1",
+      timeTaken: "28 mins",
+      date: "2026-10-25",
+      createdAt: 1729800000000
+    },
+    {
+      id: "CBT-DEMO-002",
+      studentId: "EMC-2026-008",
+      regNo: "EMC/2026/008",
+      studentName: "Williams Victor Ayomide",
+      class: "SSS 2 Commercial",
+      subject: "General Mathematics (Senior Mock)",
+      score: 34,
+      totalQuestions: 40,
+      percentage: 85,
+      grade: "B2",
+      timeTaken: "34 mins",
+      date: "2026-10-25",
+      createdAt: 1729800001000
+    }
+  ],
+  auditLogs: [
+    {
+      id: "LOG-INIT",
+      timestamp: Date.now(),
+      date: new Date().toLocaleString("en-GB"),
+      action: "DATABASE_RESET",
+      user: "System",
+      details: "RichVine College Database Reset Clean. Ready for live records."
+    }
+  ]
+};
+
+// ─── LocalStorage + Firebase DB Manager (High-Performance In-Memory Caching) ──
+class RichVineDB {
+  static KEY = "BURSARIQ_SCHOOL_DB_V1";
+  static _cache = null;
+
+  static init() {
+    try {
+      ["RICHVINE_COLLEGE_DB_V2026", "RICHVINE_COLLEGE_DB_V3", "RICHVINE_COLLEGE_DB_V4_FRESH", "RICHVINE_COLLEGE_DB_V5_LIVE"].forEach(k => {
+        if (localStorage.getItem(k)) localStorage.removeItem(k);
+      });
+    } catch(e) {}
+
+    if (!localStorage.getItem(this.KEY)) {
+      localStorage.setItem(this.KEY, JSON.stringify(DEFAULT_DATA));
+    }
+  }
+
+  static invalidateCache() {
+    this._cache = null;
+  }
+
+  static get() {
+    if (this._cache) return this._cache;
+    this.init();
+    try {
+      const raw = localStorage.getItem(this.KEY);
+      const data = raw ? JSON.parse(raw) : JSON.parse(JSON.stringify(DEFAULT_DATA));
+      if (!data.students) data.students = [];
+      if (!data.payments) data.payments = [];
+      if (!data.expenses) data.expenses = [];
+      if (!data.stocks) data.stocks = [];
+      if (!data.stockSales) data.stockSales = [];
+      if (!data.stockRestocks) data.stockRestocks = [];
+      if (!data.cbtSubmissions) data.cbtSubmissions = [];
+      if (!data.staff) data.staff = [];
+      if (!data.salaries) data.salaries = [];
+      if (!data.staffLoans) data.staffLoans = [];
+
+      // Auto-purge any legacy test student profiles (RVC-2026-001 through 006)
+      const testStudentIds = new Set(["RVC-2026-001", "RVC-2026-002", "RVC-2026-003", "RVC-2026-004", "RVC-2026-005", "RVC-2026-006"]);
+      let needsSave = false;
+      if (Array.isArray(data.students) && data.students.some(s => testStudentIds.has(s.id))) {
+        data.students = data.students.filter(s => !testStudentIds.has(s.id));
+        needsSave = true;
+      }
+
+      // Auto-migrate legacy "Catering" expense category to "Entertainment"
+      if (Array.isArray(data.expenses)) {
+        data.expenses.forEach(e => {
+          if (e && e.category === "Catering") {
+            e.category = "Entertainment";
+            needsSave = true;
+          }
+        });
+      }
+
+      if (needsSave) {
+        localStorage.setItem(this.KEY, JSON.stringify(data));
+      }
+
+      // Clean up legacy deleted trackers so old delete lists never poison sync
+      if (data._deleted) {
+        delete data._deleted;
+      }
+      if (!data._pendingDeletes) data._pendingDeletes = [];
+
+      data.classes = ALL_CLASSES;
+
+      // Ensure updated school credentials are reflected across all sessions
+      if (!data.config) data.config = {};
+      if (!data.config.motto || data.config.motto.includes("Wisdom") || data.config.motto !== "Soaring High") {
+        data.config.motto = "Soaring High";
+      }
+      if (!data.config.address || data.config.address.includes("Lekki") || !data.config.address.includes("Olukayode")) {
+        data.config.address = "5-7 Olukayode Street, Imoro, Ogijo, Shagamu - Ikorodu Road, Shagamu, Ogun State";
+      }
+      if (!data.config.phone || data.config.phone.includes("803 123") || data.config.phone !== "09053126809") {
+        data.config.phone = "09053126809";
+      }
+      data.config.adminContact = "09053126809";
+
+      if (!data.feeCategories || !data.feeCategories.some(c => c.id === "stationery")) {
+        data.feeCategories = DEFAULT_DATA.feeCategories;
+      }
+
+      this._cache = data;
+      return data;
+    } catch (e) {
+      console.error("DB read error, reinitializing fresh state:", e);
+      const fallback = JSON.parse(JSON.stringify(DEFAULT_DATA));
+      try { localStorage.setItem(this.KEY, JSON.stringify(fallback)); } catch (_) {}
+      this._cache = fallback;
+      return this._cache;
+    }
+  }
+
+  static save(data) {
+    this._cache = data;
+    try {
+      if (data && Array.isArray(data.auditLogs) && data.auditLogs.length > 500) {
+        data.auditLogs = data.auditLogs.slice(0, 500);
+      }
+      if (data && data._pendingDeletes && data._pendingDeletes.length > 200) {
+        data._pendingDeletes = data._pendingDeletes.slice(-200);
+      }
+      localStorage.setItem(this.KEY, JSON.stringify(data));
+    } catch (e) {
+      console.warn("Storage save error, attempting pruned retry:", e);
+      try {
+        if (data.auditLogs) data.auditLogs = data.auditLogs.slice(0, 100);
+        localStorage.setItem(this.KEY, JSON.stringify(data));
+      } catch (inner) {
+        console.error("Critical storage failure:", inner);
+      }
+    }
+  }
+
+  static clearAllData() {
+    localStorage.setItem(this.KEY, JSON.stringify(DEFAULT_DATA));
+    if (window.RichVineApp && window.RichVineApp.refreshCurrentTab) {
+      window.RichVineApp.refreshCurrentTab();
+    }
+  }
+
+  // ── Config ──────────────────────────────────────────────────────────────
+  static getConfig() { return this.get().config; }
+  static updateConfig(newConfig) {
+    const db = this.get();
+    db.config = { ...db.config, ...newConfig };
+    this.save(db);
+  }
+
+  // ── Classes & Sections ──────────────────────────────────────────────────
+  static getClasses() { return ALL_CLASSES; }
+  static getSections() { return SCHOOL_SECTIONS; }
+  static getSectionByClass(cls) { return getSectionByClass(cls); }
+  static getFeeCategories(className = "") {
+    const all = this.get().feeCategories;
+    if (!className) return all;
+    const isSS3 = className.includes("SSS 3");
+    const isJSS3 = className.includes("JSS 3");
+    return all.filter(c => {
+      if (!c.forClass) return true;
+      if (c.forClass === "SSS 3") return isSS3;
+      if (c.forClass === "JSS 3") return isJSS3;
+      return false;
+    });
+  }
+
+  // ── Tuition vs Other Fee Classification ─────────────────────────────────
+  static isTuitionCategory(category, categoryName = "") {
+    if (!category && !categoryName) return false;
+    if (category === "school_fees" || category === "daycare_fee") return true;
+    if (category === "multi") return false;
+    return /school fee|tuition|day care|creche|term fee/i.test(categoryName || category);
+  }
+
+  // ── Payment Breakdown Helper ───────────────────────────────────────────
+  static getPaymentBreakdown(payment) {
+    if (!payment) return { arrearsRecovered: 0, termFeePaid: 0, otherFeesPaid: 0, totalAmount: 0 };
+    const totalAmount = Number(payment.amount) || 0;
+
+    // Multi-item payment
+    if (Array.isArray(payment.items) && payment.items.length > 0) {
+      let tuitionSum = 0;
+      let otherSum = 0;
+      payment.items.forEach(it => {
+        const itAmt = Number(it.amount) || 0;
+        if (this.isTuitionCategory(it.category, it.categoryName)) {
+          tuitionSum += itAmt;
+        } else {
+          otherSum += itAmt;
+        }
+      });
+      tuitionSum = Math.round(tuitionSum * 100) / 100;
+      otherSum = Math.round(otherSum * 100) / 100;
+
+      const arrearsRecovered = Math.min(tuitionSum, Math.max(0, Number(payment.arrearsDeducted) || 0));
+      const termFeePaid = Math.max(0, Math.round((tuitionSum - arrearsRecovered) * 100) / 100);
+      const otherFeesPaid = otherSum;
+      return {
+        arrearsRecovered: Math.round(arrearsRecovered * 100) / 100,
+        termFeePaid: Math.round(termFeePaid * 100) / 100,
+        otherFeesPaid: Math.round(otherFeesPaid * 100) / 100,
+        totalAmount
+      };
+    }
+
+    // Single item / legacy payment
+    if (this.isTuitionCategory(payment.category, payment.categoryName)) {
+      const arrearsRecovered = Math.min(totalAmount, Math.max(0, Number(payment.arrearsDeducted) || 0));
+      const termFeePaid = Math.max(0, Math.round((totalAmount - arrearsRecovered) * 100) / 100);
+      return {
+        arrearsRecovered: Math.round(arrearsRecovered * 100) / 100,
+        termFeePaid: Math.round(termFeePaid * 100) / 100,
+        otherFeesPaid: 0,
+        totalAmount
+      };
+    }
+
+    // Pure Non-tuition payment (Uniform, Books, Sport wear, Lessons, Exam fees, etc.)
+    return {
+      arrearsRecovered: 0,
+      termFeePaid: 0,
+      otherFeesPaid: totalAmount,
+      totalAmount
+    };
+  }
+
+  // ── Universal Payment Category Matching ──────────────────────────────────
+  static matchPaymentCategory(itemOrPayment, cat) {
+    if (!itemOrPayment || !cat) return false;
+    const catId = typeof cat === "string" ? cat : (cat.id || "");
+    const catName = typeof cat === "string" ? "" : (cat.name || "");
+    const cId = (itemOrPayment.category || "").trim().toLowerCase();
+    const cName = (itemOrPayment.categoryName || "").trim().toLowerCase();
+    const targetId = catId.trim().toLowerCase();
+    const targetName = catName.trim().toLowerCase();
+
+    if (cId === targetId) return true;
+    if (targetName && cName.includes(targetName)) return true;
+    if (targetName && targetName.includes(cName) && cName.length > 5) return true;
+
+    // Specific aliases for senior and junior exam fees:
+    if (targetId === "waec_fee") {
+      return (cId.includes("waec") || cName.includes("waec")) &&
+        !cId.includes("logistics") && !cName.includes("logistics") &&
+        !cId.includes("card") && !cName.includes("card") &&
+        !cId.includes("practical") && !cName.includes("practical");
+    }
+    if (targetId === "neco_fee") {
+      return (cId.includes("neco") || cName.includes("neco")) &&
+        !cId.includes("logistics") && !cName.includes("logistics") &&
+        !cId.includes("card") && !cName.includes("card") &&
+        !cId.includes("practical") && !cName.includes("practical");
+    }
+    if (targetId === "bece_fee") {
+      return (cId.includes("bece") || cName.includes("bece")) &&
+        !cId.includes("lesson") && !cName.includes("lesson");
+    }
+    if (targetId === "bece_lesson_fee") {
+      return (cId.includes("bece") || cName.includes("bece")) &&
+        (cId.includes("lesson") || cName.includes("lesson"));
+    }
+    if (targetId === "mock_exams_fee") {
+      return cId.includes("mock") || cName.includes("mock");
+    }
+    if (targetId === "practical_fee") {
+      return cId.includes("practical") || cName.includes("practical");
+    }
+    if (targetId === "lessons_fee") {
+      return cId.includes("lessons_fee") || cName.includes("extension lesson") ||
+        (cName.includes("lesson") && !cName.includes("bece"));
+    }
+    if (targetId === "waec_logistics") {
+      return (cId.includes("waec") || cName.includes("waec")) &&
+        (cId.includes("logistics") || cName.includes("logistics"));
+    }
+    if (targetId === "neco_logistics") {
+      return (cId.includes("neco") || cName.includes("neco")) &&
+        (cId.includes("logistics") || cName.includes("logistics"));
+    }
+    if (targetId === "waec_id_card") {
+      return (cId.includes("waec") || cName.includes("waec")) &&
+        (cId.includes("id_card") || cName.includes("id card") || cName.includes("id-card"));
+    }
+    if (targetId === "neco_id_card") {
+      return (cId.includes("neco") || cName.includes("neco")) &&
+        (cId.includes("id_card") || cName.includes("id card") || cName.includes("id-card"));
+    }
+    return false;
+  }
+
+  static getStudentCatPaidTotal(paymentsList, cat) {
+    let total = 0;
+    if (!Array.isArray(paymentsList)) return 0;
+    paymentsList.forEach(p => {
+      if (!p) return;
+      if (Array.isArray(p.items) && p.items.length > 0) {
+        p.items.forEach(it => {
+          if (this.matchPaymentCategory(it, cat)) {
+            total += Number(it.amount) || 0;
+          }
+        });
+      } else if (this.matchPaymentCategory(p, cat)) {
+        total += Number(p.amount) || 0;
+      }
+    });
+    return Math.round(total * 100) / 100;
+  }
+
+  // ── Outstanding Balance Calculator for a Student ────────────────────────
+  static getStudentBalance(studentId) {
+    const student = this.getStudentById(studentId);
+    if (!student) return null;
+
+    const parse = (v) => {
+      if (typeof v === 'number') return isNaN(v) ? 0 : v;
+      if (!v) return 0;
+      const num = parseFloat(String(v).replace(/,/g, '').trim());
+      return isNaN(num) ? 0 : num;
+    };
+
+    const termFee = parse(student.termFee);
+
+    const allStudentPayments = this.getPayments({ studentId });
+    let termPaid = 0;
+    let arrearsPaid = 0;
+
+    allStudentPayments.forEach(p => {
+      const b = this.getPaymentBreakdown(p);
+      termPaid += b.termFeePaid;
+      arrearsPaid += b.arrearsRecovered;
+    });
+
+    termPaid = Math.round(termPaid * 100) / 100;
+    arrearsPaid = Math.round(arrearsPaid * 100) / 100;
+
+    const openingArrears = (student.openingArrears !== undefined && student.openingArrears !== null)
+      ? parse(student.openingArrears)
+      : Math.round((parse(student.arrears) + arrearsPaid) * 100) / 100;
+
+    const arrearsBalance = Math.max(0, Math.round((openingArrears - arrearsPaid) * 100) / 100);
+    const termFeeBalance = Math.max(0, Math.round((termFee - termPaid) * 100) / 100);
+    const totalOutstanding = Math.max(0, Math.round((arrearsBalance + termFeeBalance) * 100) / 100);
+    const totalPaidAll = allStudentPayments.reduce((sum, p) => sum + parse(p.amount), 0);
+
+    return {
+      studentId: student.id,
+      name: `${student.firstName} ${student.lastName}`,
+      class: student.currentClass,
+      termFeeExpected: termFee,
+      termFeePaid: termPaid,
+      termFeeBalance: termFeeBalance,
+      openingArrears: openingArrears,
+      arrearsBalance: arrearsBalance,
+      arrearsPaid: arrearsPaid,
+      totalOutstanding: totalOutstanding,
+      totalPaidAll: totalPaidAll
+    };
+  }
+
+  // ── Automatic Deduplication & Balance Reconciliation ────────────────────
+  static _cleanAndRebalance(db) {
+    if (!db || !Array.isArray(db.payments)) return;
+    let changed = false;
+
+    // 1. Purge duplicate payment records
+    const dupRes = this.cleanDuplicatePayments(db);
+    if (dupRes && dupRes.removedCount > 0) changed = true;
+
+    // 2. Rebalance all student balances and payment breakdown allocations
+    this.recalculateAllStudentBalances(db);
+
+    if (changed) {
+      localStorage.setItem(this.KEY, JSON.stringify(db));
+    }
+  }
+
+  static cleanDuplicatePayments(db = null) {
+    db = db || this.get();
+    if (!Array.isArray(db.payments) || db.payments.length <= 1) return { removedCount: 0, removedAmount: 0, removedIds: [] };
+
+    const valid = [];
+    const seenIds = new Set();
+    const seenReceipts = new Set();
+    const seenFingerprints = new Set();
+    const removedIds = [];
+    let removedCount = 0;
+    let removedAmount = 0;
+
+    for (const p of db.payments) {
+      if (!p || !p.id) continue;
+      const receipt = (p.receiptNo || "").trim().toUpperCase();
+      const student = (p.studentName || "").trim().toLowerCase();
+      const amount = Number(p.amount) || 0;
+      const category = (p.category || "").trim().toLowerCase();
+      const date = (p.date || "").trim();
+      const fingerprint = (student && amount > 0 && date) ? `${student}_${amount}_${category}_${date}` : "";
+
+      const isDup = seenIds.has(p.id) ||
+                    (receipt && seenReceipts.has(receipt)) ||
+                    (fingerprint && seenFingerprints.has(fingerprint));
+
+      if (isDup) {
+        removedCount++;
+        removedAmount += amount;
+        removedIds.push(p.id);
+        continue;
+      }
+
+      seenIds.add(p.id);
+      if (receipt) seenReceipts.add(receipt);
+      if (fingerprint) seenFingerprints.add(fingerprint);
+      valid.push(p);
+    }
+
+    if (removedCount > 0) {
+      db.payments = valid;
+      if (!db._pendingDeletes) db._pendingDeletes = [];
+      if (!db._tombstones) db._tombstones = {};
+      removedIds.forEach(pId => {
+        db._pendingDeletes.push({ col: "payments", id: pId });
+        db._tombstones[pId] = Date.now();
+        if (window.RichVineFirebase && window.RichVineFirebase.deletePayment) {
+          window.RichVineFirebase.deletePayment(pId);
+        }
+      });
+      console.warn(`[RichVineDB] Purged ${removedCount} duplicate payment(s) totalling ₦${removedAmount.toLocaleString()}`);
+    }
+
+    return { removedCount, removedAmount, removedIds };
+  }
+
+  static recalculateAllStudentBalances(db = null) {
+    const isLocal = !db;
+    db = db || this.get();
+    if (!db || !Array.isArray(db.students)) return;
+    const allPayments = Array.isArray(db.payments) ? db.payments : [];
+
+    db.students.forEach(student => {
+      // Find all payments for this student, sorted chronologically
+      const studentPayments = allPayments
+        .filter(p => p.studentId === student.id)
+        .sort((a, b) => (Number(a.timestamp) || 0) - (Number(b.timestamp) || 0));
+
+      // Calculate opening arrears:
+      let previouslyDeductedTotal = 0;
+      studentPayments.forEach(p => {
+        previouslyDeductedTotal += Number(p.arrearsDeducted) || 0;
+      });
+
+      let openingArrears = 0;
+      if (student.openingArrears !== undefined && student.openingArrears !== null) {
+        openingArrears = Number(student.openingArrears) || 0;
+      } else {
+        openingArrears = Math.round(((Number(student.arrears) || 0) + previouslyDeductedTotal) * 100) / 100;
+        student.openingArrears = openingArrears;
+      }
+
+      let remainingArrears = openingArrears;
+
+      // Replay payments in order to allocate arrearsDeducted and termFeePaid
+      studentPayments.forEach(p => {
+        const totalAmount = Number(p.amount) || 0;
+        let tuitionAmount = 0;
+        let otherFees = 0;
+
+        if (Array.isArray(p.items) && p.items.length > 0) {
+          p.items.forEach(it => {
+            const itAmt = Number(it.amount) || 0;
+            if (this.isTuitionCategory(it.category, it.categoryName)) {
+              tuitionAmount += itAmt;
+            } else {
+              otherFees += itAmt;
+            }
+          });
+        } else if (this.isTuitionCategory(p.category, p.categoryName)) {
+          tuitionAmount = totalAmount;
+        } else {
+          otherFees = totalAmount;
+        }
+
+        tuitionAmount = Math.round(tuitionAmount * 100) / 100;
+        otherFees = Math.round(otherFees * 100) / 100;
+
+        let arrearsDeducted = 0;
+        let termFeePaid = 0;
+
+        if (tuitionAmount > 0) {
+          if (remainingArrears > 0) {
+            arrearsDeducted = Math.min(remainingArrears, tuitionAmount);
+            remainingArrears = Math.round((remainingArrears - arrearsDeducted) * 100) / 100;
+            termFeePaid = Math.round((tuitionAmount - arrearsDeducted) * 100) / 100;
+          } else {
+            arrearsDeducted = 0;
+            termFeePaid = tuitionAmount;
+          }
+        }
+
+        p.arrearsDeducted = Math.round(arrearsDeducted * 100) / 100;
+        p.termFeePaid = Math.round(termFeePaid * 100) / 100;
+        p.otherFeesPaid = Math.round(otherFees * 100) / 100;
+      });
+
+      // Update student's current arrears balance
+      student.arrears = Math.max(0, Math.round(remainingArrears * 100) / 100);
+    });
+
+    if (isLocal) {
+      this.save(db);
+    }
+  }
+
+  // ── Students ────────────────────────────────────────────────────────────
+  static getStudents(filter = {}) {
+    const db = this.get();
+    let students = [...db.students];
+    if (filter.class && filter.class !== "All") {
+      students = students.filter(s => s.currentClass === filter.class);
+    }
+    if (filter.section && filter.section !== "All") {
+      students = students.filter(s => s.section === filter.section);
+    }
+    if (filter.status) {
+      students = students.filter(s => s.status === filter.status);
+    }
+    return students;
+  }
+
+  static getStudentById(id) {
+    return this.get().students.find(s => s.id === id) || null;
+  }
+
+  static addStudent(student) {
+    const db = this.get();
+    const year = 2026;
+    let maxNum = 0;
+    (db.students || []).forEach(s => {
+      const match = s.regNo && String(s.regNo).match(/\/(\d+)$/);
+      if (match) {
+        const val = parseInt(match[1], 10);
+        if (val > maxNum) maxNum = val;
+      }
+    });
+    const nextNum = Math.max((db.students || []).length + 1, maxNum + 1);
+    const numStr = String(nextNum).padStart(3, "0");
+    student.id = student.id || `RVC-${year}-${numStr}-${Date.now().toString(36)}`;
+    student.regNo = student.regNo || `RVC/${year}/${numStr}`;
+    student.section = getSectionByClass(student.currentClass)?.id || "junior";
+    student.termFee = Number(student.termFee) || 0;
+    student.openingArrears = Number(student.arrears) || 0;
+    student.arrears = student.openingArrears;
+    student.dob = student.dob || "";
+    student.parentName = student.parentName || "";
+    student.parentPhone = student.parentPhone || "";
+    student.parentEmail = student.parentEmail || "";
+    student.address = student.address || "";
+    student.gender = student.gender || "Male";
+    student.status = student.status || "Active";
+    const initialPaid = Number(student.initialPaid) || 0;
+    const initialPaymentDate = student.initialPaymentDate || student.enrolledDate || new Date().toISOString().split("T")[0];
+    delete student.initialPaid; // Do not store transient enrollment field on student doc
+    delete student.initialPaymentDate;
+    student.enrolledDate = student.enrolledDate || new Date().toISOString().split("T")[0];
+
+    student._pendingUpload = true;
+    db.students.unshift(student);
+
+    const log = this._buildLog("STUDENT_ENROLLED",
+      `Enrolled ${student.firstName} ${student.lastName} into ${student.currentClass} | Term Fee: ₦${student.termFee.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}` +
+      (student.arrears > 0 ? ` | Opening Arrears: ₦${student.arrears.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : "") +
+      (initialPaid > 0 ? ` | Initial School Fee Paid: ₦${initialPaid.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} [Paid on ${initialPaymentDate}]` : "")
+    );
+    db.auditLogs.unshift(log);
+    this.save(db);
+
+    if (window.RichVineFirebase) {
+      window.RichVineFirebase.saveStudent(student);
+      window.RichVineFirebase.saveLog(log);
+    }
+
+    // Automatically create the initial payment transaction if initialPaid > 0
+    if (initialPaid > 0) {
+      this.addPayment({
+        studentId: student.id,
+        studentName: `${student.firstName} ${student.lastName}`,
+        studentClass: student.currentClass,
+        category: "school_fees",
+        categoryName: "School Fees / Tuition",
+        amount: initialPaid,
+        paymentMethod: "Bank Transfer",
+        reference: `ENROLL-${student.regNo.replace(/[^A-Za-z0-9]/g, "")}`,
+        session: db.config.currentSession || "2026/2027",
+        term: db.config.currentTerm || "1st Term",
+        date: initialPaymentDate,
+        status: "Confirmed",
+        details: { description: `Initial school fee payment recorded at enrollment (Backdated payment: ${initialPaymentDate})` }
+      });
+    }
+
+    return student;
+  }
+
+  static updateStudent(id, fields) {
+    const db = this.get();
+    const idx = db.students.findIndex(s => s.id === id);
+    if (idx === -1) return null;
+    const prev = db.students[idx];
+    db.students[idx] = { ...prev, ...fields };
+    if (fields.currentClass) {
+      db.students[idx].section = getSectionByClass(fields.currentClass)?.id || prev.section;
+    }
+    if (fields.hasOwnProperty("arrears") || fields.hasOwnProperty("openingArrears")) {
+      const arrVal = Number(fields.openingArrears !== undefined ? fields.openingArrears : fields.arrears) || 0;
+      db.students[idx].openingArrears = arrVal;
+      db.students[idx].arrears = arrVal;
+    }
+    if (fields.hasOwnProperty("termFee")) {
+      db.students[idx].termFee = Number(fields.termFee) || 0;
+    }
+    this.recalculateAllStudentBalances(db);
+    const log = this._buildLog("STUDENT_UPDATED",
+      `Updated record for ${db.students[idx].firstName} ${db.students[idx].lastName}`
+    );
+    db.auditLogs.unshift(log);
+    this.save(db);
+    if (window.RichVineFirebase) {
+      window.RichVineFirebase.saveStudent(db.students[idx]);
+      window.RichVineFirebase.saveLog(log);
+    }
+    return db.students[idx];
+  }
+
+  static deleteStudent(id) {
+    const db = this.get();
+    const student = db.students.find(s => s.id === id);
+    if (!student) return false;
+
+    // Ensure _pendingDeletes tracking object exists
+    if (!db._pendingDeletes) db._pendingDeletes = [];
+
+    const studentFullName = `${student.firstName} ${student.lastName}`.trim().toLowerCase();
+    const regNo = (student.regNo || "").trim().toLowerCase();
+
+    // Gather and remove ALL payments belonging to this student (by id, by studentName, or by regNo)
+    const studentPayments = (db.payments || []).filter(p =>
+      p.studentId === id ||
+      (p.studentName && p.studentName.trim().toLowerCase() === studentFullName) ||
+      (regNo && p.studentRegNo && p.studentRegNo.trim().toLowerCase() === regNo) ||
+      (regNo && p.receiptNo && p.receiptNo.toLowerCase().includes(regNo))
+    );
+    const deletedPaymentIds = studentPayments.map(p => p.id);
+    const deletedRevenue = studentPayments.reduce((s, p) => s + Number(p.amount), 0);
+
+    // Remove payments locally
+    db.payments = (db.payments || []).filter(p => !deletedPaymentIds.includes(p.id) && p.studentId !== id);
+
+    // Track pending deletes for cloud sync
+    deletedPaymentIds.forEach(pId => {
+      db._pendingDeletes.push({ col: "payments", id: pId });
+    });
+    db._pendingDeletes.push({ col: "students", id });
+
+    // Remove student locally
+    db.students = (db.students || []).filter(s => s.id !== id);
+
+    // Purge any past audit logs that reference this deleted student
+    if (db.auditLogs && Array.isArray(db.auditLogs)) {
+      db.auditLogs = db.auditLogs.filter(log => {
+        const text = (log.details || "").toLowerCase();
+        const mentionsName = studentFullName && text.includes(studentFullName);
+        const mentionsReg = regNo && text.includes(regNo);
+        const mentionsId = text.includes(id.toLowerCase());
+        return !(mentionsName || mentionsReg || mentionsId);
+      });
+    }
+
+    const revenueNote = deletedRevenue > 0
+      ? ` | ${deletedPaymentIds.length} payment(s) purged — ₦${deletedRevenue.toLocaleString(undefined, {minimumFractionDigits:2})} deducted from revenue`
+      : '';
+
+    const log = this._buildLog("STUDENT_DELETED",
+      `Deleted learner (error correction): ${student.firstName} ${student.lastName} (${student.regNo})${revenueNote}`
+    );
+    db.auditLogs.unshift(log);
+    this.save(db);
+
+    if (window.RichVineFirebase) {
+      // Delete student from cloud
+      window.RichVineFirebase.deleteStudent(id);
+      // Delete each payment from cloud
+      for (const pId of deletedPaymentIds) {
+        window.RichVineFirebase.deletePayment(pId);
+      }
+      window.RichVineFirebase.saveLog(log);
+    }
+    return true;
+  }
+
+  // ── Payments ────────────────────────────────────────────────────────────
+  static getPayments(filter = {}) {
+    const db = this.get();
+    let payments = Array.isArray(db.payments) ? [...db.payments] : [];
+    if (filter.studentId) payments = payments.filter(p => p.studentId === filter.studentId);
+    if (filter.class && filter.class !== "All") payments = payments.filter(p => p.studentClass === filter.class);
+    if (filter.section && filter.section !== "All") {
+      payments = payments.filter(p => p.section === filter.section || (typeof getSectionByClass === "function" && getSectionByClass(p.studentClass)?.id === filter.section));
+    }
+    if (filter.category && filter.category !== "All") {
+      const targetCat = (DEFAULT_DATA.feeCategories || []).find(c => c.id === filter.category) || { id: filter.category, name: filter.category };
+      payments = payments.filter(p =>
+        p.category === filter.category ||
+        (Array.isArray(p.items) && p.items.some(it => it.category === filter.category)) ||
+        this.matchPaymentCategory(p, targetCat) ||
+        (Array.isArray(p.items) && p.items.some(it => this.matchPaymentCategory(it, targetCat)))
+      );
+    }
+    if (filter.session && filter.session !== "All") payments = payments.filter(p => p.session === filter.session);
+    if (filter.term && filter.term !== "All") payments = payments.filter(p => p.term === filter.term);
+    if (filter.startDate) payments = payments.filter(p => p.date >= filter.startDate);
+    if (filter.endDate) payments = payments.filter(p => p.date <= filter.endDate);
+    return payments.sort((a, b) => b.timestamp - a.timestamp);
+  }
+
+  static deletePayment(id) {
+    const db = this.get();
+    const idx = (db.payments || []).findIndex(p => p.id === id);
+    if (idx === -1) return false;
+    const payment = db.payments[idx];
+    const studentId = payment.studentId;
+
+    db.payments.splice(idx, 1);
+
+    if (!db._pendingDeletes) db._pendingDeletes = [];
+    db._pendingDeletes.push({ col: "payments", id });
+
+    // Rebalance all student balances and restore arrears cleanly
+    this.recalculateAllStudentBalances(db);
+    const updatedStudent = (db.students || []).find(s => s.id === studentId);
+
+    const log = this._buildLog("PAYMENT_DELETED",
+      `Deleted payment record ${payment.receiptNo} for ${payment.studentName}: ₦${Number(payment.amount).toLocaleString(undefined, {minimumFractionDigits:2})} (${payment.categoryName})`
+    );
+    db.auditLogs.unshift(log);
+    this.save(db);
+
+    if (window.RichVineFirebase) {
+      window.RichVineFirebase.deletePayment(id);
+      if (updatedStudent) window.RichVineFirebase.saveStudent(updatedStudent);
+      window.RichVineFirebase.saveLog(log);
+    }
+    return true;
+  }
+
+  static addPayment(payment) {
+    const db = this.get();
+
+    // Accidental double-submission guard: block identical payment submitted within 20s
+    const isDup = (db.payments || []).find(p =>
+      p.studentId === payment.studentId &&
+      Number(p.amount) === Number(payment.amount) &&
+      p.date === payment.date &&
+      p.category === payment.category &&
+      Math.abs(Date.now() - (Number(p.timestamp) || 0)) < 20000
+    );
+    if (isDup) {
+      console.warn("Blocked duplicate payment submission:", payment);
+      return isDup;
+    }
+
+    const year = 2026;
+    payment.id = payment.id || ("PAY-" + Date.now() + "-" + Math.floor(Math.random() * 1000));
+    let maxReceipt = 0;
+    (db.payments || []).forEach(p => {
+      const match = p.receiptNo && String(p.receiptNo).match(/\/(\d+)$/);
+      if (match) {
+        const val = parseInt(match[1], 10);
+        if (val > maxReceipt) maxReceipt = val;
+      }
+    });
+    const nextReceipt = Math.max((db.payments || []).length + 1, maxReceipt + 1);
+    payment.receiptNo = payment.receiptNo || `RVCPAY/${year}/${String(nextReceipt).padStart(4, "0")}`;
+    payment.timestamp = payment.timestamp || Date.now();
+    payment.session = payment.session || "2026/2027";
+    payment.recordedBy = sessionStorage.getItem("richvine_admin_username") || "Super Admin";
+    payment.section = getSectionByClass(payment.studentClass)?.id || "junior";
+
+    // ── Multi-item handling & validation ───────────────────────────────
+    if (Array.isArray(payment.items) && payment.items.length > 0) {
+      payment.items = payment.items.map(it => ({
+        category: it.category || "misc_1",
+        categoryName: it.categoryName || "Miscellaneous",
+        description: (it.description || "").trim(),
+        amount: Number(it.amount) || 0,
+        details: it.details || {}
+      }));
+      payment.itemCount = payment.items.length;
+      payment.amount = Math.round(payment.items.reduce((sum, it) => sum + it.amount, 0) * 100) / 100;
+
+      if (payment.items.length === 1) {
+        payment.category = payment.items[0].category;
+        payment.categoryName = payment.items[0].categoryName;
+        payment.description = payment.items[0].description || payment.description || payment.items[0].categoryName;
+      } else {
+        payment.category = "multi";
+        const distinctCats = [...new Set(payment.items.map(it => it.categoryName))];
+        payment.categoryName = distinctCats.join(", ");
+        payment.description = payment.description || payment.items.map(it =>
+          `${it.categoryName}${it.description ? ' (' + it.description + ')' : ''}: ₦${Number(it.amount).toLocaleString(undefined, {minimumFractionDigits:2})}`
+        ).join("; ");
+      }
+    } else {
+      payment.amount = Number(payment.amount) || 0;
+      payment.description = (payment.description || payment.details?.description || "").trim();
+      payment.items = [{
+        category: payment.category,
+        categoryName: payment.categoryName,
+        description: payment.description,
+        amount: payment.amount,
+        details: payment.details || {}
+      }];
+      payment.itemCount = 1;
+    }
+
+    const paymentAmount = Number(payment.amount);
+
+    // ── STRICT ARREARS-FIRST DEDUCTION ALGORITHM ────────────────────────
+    let tuitionAmount = 0;
+    if (payment.items && payment.items.length) {
+      tuitionAmount = payment.items.filter(it => this.isTuitionCategory(it.category, it.categoryName))
+        .reduce((sum, it) => sum + Number(it.amount), 0);
+    } else if (this.isTuitionCategory(payment.category, payment.categoryName)) {
+      tuitionAmount = paymentAmount;
+    }
+
+    let arrearsDeducted = 0;
+    let termFeePaid = 0;
+
+    if (tuitionAmount > 0) {
+      const studentIdx = db.students.findIndex(s => s.id === payment.studentId);
+      if (studentIdx !== -1) {
+        const currentArrears = Number(db.students[studentIdx].arrears) || 0;
+        if (currentArrears > 0) {
+          arrearsDeducted = Math.min(currentArrears, tuitionAmount);
+          termFeePaid = Math.round((tuitionAmount - arrearsDeducted) * 100) / 100;
+          db.students[studentIdx].arrears = Math.round((currentArrears - arrearsDeducted) * 100) / 100;
+        } else {
+          arrearsDeducted = 0;
+          termFeePaid = tuitionAmount;
+        }
+        if (window.RichVineFirebase) {
+          window.RichVineFirebase.saveStudent(db.students[studentIdx]);
+        }
+      } else {
+        termFeePaid = tuitionAmount;
+      }
+    } else {
+      arrearsDeducted = 0;
+      termFeePaid = 0;
+    }
+
+    payment.arrearsDeducted = Math.round(arrearsDeducted * 100) / 100;
+    payment.termFeePaid = Math.round(termFeePaid * 100) / 100;
+    payment.otherFeesPaid = Math.max(0, Math.round((paymentAmount - arrearsDeducted - termFeePaid) * 100) / 100);
+
+    payment._pendingUpload = true;
+    db.payments.unshift(payment);
+    this.recalculateAllStudentBalances(db);
+    const updatedStudent = (db.students || []).find(s => s.id === payment.studentId);
+
+    const arrearsNote = arrearsDeducted > 0 ? ` [Arrears cleared: ₦${arrearsDeducted.toLocaleString(undefined, {minimumFractionDigits:2})}, Term Fee: ₦${termFeePaid.toLocaleString(undefined, {minimumFractionDigits:2})}]` : "";
+    const otherNote = payment.otherFeesPaid > 0 ? ` [Other fees: ₦${payment.otherFeesPaid.toLocaleString(undefined, {minimumFractionDigits:2})}]` : "";
+    const log = this._buildLog("PAYMENT_RECORDED",
+      `Payment of ₦${paymentAmount.toLocaleString(undefined, {minimumFractionDigits:2})} (${payment.categoryName}) for ${payment.studentName} [${payment.studentClass}]${arrearsNote}${otherNote}`
+    );
+    db.auditLogs.unshift(log);
+    this.save(db);
+
+    if (window.RichVineFirebase) {
+      window.RichVineFirebase.savePayment(payment);
+      if (updatedStudent) window.RichVineFirebase.saveStudent(updatedStudent);
+      window.RichVineFirebase.saveLog(log);
+    }
+    return payment;
+  }
+
+  static updatePayment(id, fields) {
+    const db = this.get();
+    const idx = db.payments.findIndex(p => p.id === id);
+    if (idx === -1) return null;
+    const prev = db.payments[idx];
+
+    // Allow editing: amount, category, categoryName, paymentMethod, date, reference, details, term, description, items
+    const allowed = ['amount', 'categoryName', 'category', 'paymentMethod', 'date', 'reference', 'details', 'term', 'description', 'items'];
+    allowed.forEach(key => {
+      if (fields.hasOwnProperty(key)) prev[key] = fields[key];
+    });
+    // Ensure amount is always a Number (prevents string concat in revenue sums)
+    if (fields.hasOwnProperty('amount')) prev.amount = Number(fields.amount);
+
+    // Recalculate breakdown & arrears deduction
+    const studentIdx = db.students.findIndex(s => s.id === prev.studentId);
+    const isTuition = this.isTuitionCategory(prev.category, prev.categoryName);
+    if (studentIdx !== -1) {
+      // First restore previously deducted arrears
+      const oldArrears = Number(db.students[studentIdx].arrears) || 0;
+      const restoredArrears = Math.round((oldArrears + Number(prev.arrearsDeducted || 0)) * 100) / 100;
+      db.students[studentIdx].arrears = restoredArrears;
+
+      let tuitionAmount = 0;
+      if (Array.isArray(prev.items) && prev.items.length) {
+        tuitionAmount = prev.items.filter(it => this.isTuitionCategory(it.category, it.categoryName))
+          .reduce((sum, it) => sum + Number(it.amount), 0);
+      } else if (isTuition) {
+        tuitionAmount = Number(prev.amount) || 0;
+      }
+
+      let newArrearsDeducted = 0;
+      let newTermFeePaid = 0;
+      if (tuitionAmount > 0) {
+        newArrearsDeducted = Math.min(restoredArrears, tuitionAmount);
+        newTermFeePaid = Math.round((tuitionAmount - newArrearsDeducted) * 100) / 100;
+        db.students[studentIdx].arrears = Math.round((restoredArrears - newArrearsDeducted) * 100) / 100;
+      }
+      prev.arrearsDeducted = Math.round(newArrearsDeducted * 100) / 100;
+      prev.termFeePaid = Math.round(newTermFeePaid * 100) / 100;
+      prev.otherFeesPaid = Math.max(0, Math.round(((Number(prev.amount) || 0) - newArrearsDeducted - newTermFeePaid) * 100) / 100);
+
+      if (window.RichVineFirebase) window.RichVineFirebase.saveStudent(db.students[studentIdx]);
+    } else {
+      const b = this.getPaymentBreakdown(prev);
+      prev.arrearsDeducted = b.arrearsRecovered;
+      prev.termFeePaid = b.termFeePaid;
+      prev.otherFeesPaid = b.otherFeesPaid;
+    }
+
+    prev.updatedAt = new Date().toISOString();
+    db.payments[idx] = prev;
+    this.recalculateAllStudentBalances(db);
+    const updatedStudent = (db.students || []).find(s => s.id === prev.studentId);
+
+    const log = this._buildLog('PAYMENT_UPDATED',
+      `Corrected payment ${prev.receiptNo} for ${prev.studentName}: ₦${Number(prev.amount).toLocaleString(undefined,{minimumFractionDigits:2})} (${prev.categoryName})`
+    );
+    db.auditLogs.unshift(log);
+    this.save(db);
+    if (window.RichVineFirebase) {
+      window.RichVineFirebase.savePayment(prev);
+      if (updatedStudent) window.RichVineFirebase.saveStudent(updatedStudent);
+      window.RichVineFirebase.saveLog(log);
+    }
+    return prev;
+  }
+
+  // ── Expenses ────────────────────────────────────────────────────────────
+  static getExpenses(filter = {}) {
+    const db = this.get();
+    let expenses = [...(db.expenses || [])];
+    if (filter.period && filter.period !== "All") expenses = expenses.filter(e => e.period === filter.period);
+    if (filter.category && filter.category !== "All") expenses = expenses.filter(e => e.category === filter.category);
+    if (filter.section && filter.section !== "All") {
+      expenses = expenses.filter(e => (e.section || "general") === filter.section || e.account === filter.section);
+    }
+    if (filter.session && filter.session !== "All") expenses = expenses.filter(e => e.session === filter.session);
+    if (filter.term && filter.term !== "All") expenses = expenses.filter(e => e.term === filter.term);
+    if (filter.startDate) expenses = expenses.filter(e => e.date >= filter.startDate);
+    if (filter.endDate) expenses = expenses.filter(e => e.date <= filter.endDate);
+    return expenses.sort((a, b) => (Number(b.timestamp) || 0) - (Number(a.timestamp) || 0));
+  }
+
+  static addExpenses(expensesList) {
+    if (!Array.isArray(expensesList) || !expensesList.length) return [];
+    const db = this.get();
+    if (!db.expenses) db.expenses = [];
+
+    const session = db.config?.currentSession || "2026/2027";
+    const recordedBy = sessionStorage.getItem("richvine_admin_username") || "Super Admin";
+
+    const accountsMap = {
+      general: "General / Central Account",
+      primary: "Primary School Account",
+      junior: "Junior College Account",
+      senior: "Senior College Account"
+    };
+
+    const now = Date.now();
+    const savedExpenses = [];
+
+    expensesList.forEach((expense, idx) => {
+      // Always generate a fresh unique ID — never reuse, avoid any millisecond collisions
+      expense.id = `EXP-${now}-${idx}-${Math.floor(Math.random() * 9999999)}`;
+      expense.timestamp = now + idx;
+      expense.session = expense.session || session;
+      expense.recordedBy = expense.recordedBy || recordedBy;
+      expense.section = expense.section || "general";
+      expense.account = expense.section;
+      expense.accountName = expense.accountName || accountsMap[expense.section] || "General / Central Account";
+      expense.amount = Math.round((Number(expense.amount) || 0) * 100) / 100;
+      expense._pendingUpload = true;
+      if (!expense.date) {
+        expense.date = new Date().toISOString().split("T")[0];
+      }
+      
+      db.expenses.unshift(expense);
+      savedExpenses.push(expense);
+    });
+
+    // Ensure db.expenses is fully deduplicated by id
+    const seen = new Set();
+    db.expenses = db.expenses.filter(e => {
+      if (!e || !e.id || seen.has(e.id)) return false;
+      seen.add(e.id);
+      return true;
+    });
+
+    const total = Math.round(savedExpenses.reduce((s, e) => s + (Number(e.amount) || 0), 0) * 100) / 100;
+    const summary = savedExpenses.length === 1
+      ? `${savedExpenses[0].description} — ₦${savedExpenses[0].amount.toLocaleString(undefined, {minimumFractionDigits:2})} (${savedExpenses[0].accountName})`
+      : `${savedExpenses.length} expenses totalling ₦${total.toLocaleString(undefined, {minimumFractionDigits:2})}`;
+
+    const log = this._buildLog("EXPENSE_LOGGED", `Logged expense: ${summary}`);
+    db.auditLogs.unshift(log);
+    this.save(db);
+
+    if (window.RichVineFirebase) {
+      if (window.RichVineFirebase.saveExpenses) {
+        window.RichVineFirebase.saveExpenses(savedExpenses);
+      } else {
+        savedExpenses.forEach(expense => {
+          window.RichVineFirebase.saveExpense && window.RichVineFirebase.saveExpense(expense);
+        });
+      }
+      window.RichVineFirebase.saveLog && window.RichVineFirebase.saveLog(log);
+    }
+    return savedExpenses;
+  }
+
+  static addExpense(expense) {
+    return this.addExpenses([expense])[0];
+  }
+
+  static updateExpense(id, fields) {
+    const db = this.get();
+    if (!db.expenses) db.expenses = [];
+    const idx = db.expenses.findIndex(e => e.id === id);
+    if (idx === -1) return null;
+    const prev = db.expenses[idx];
+
+    const accountsMap = {
+      general: "General / Central Account",
+      primary: "Primary School Account",
+      junior: "Junior College Account",
+      senior: "Senior College Account"
+    };
+
+    const allowed = ['description', 'category', 'amount', 'period', 'section', 'date', 'term', 'paymentMethod', 'notes'];
+    allowed.forEach(key => {
+      if (fields.hasOwnProperty(key)) {
+        if (key === 'amount') {
+          prev[key] = Math.round((Number(fields[key]) || 0) * 100) / 100;
+        } else {
+          prev[key] = fields[key];
+        }
+      }
+    });
+
+    if (fields.section) {
+      prev.section = fields.section;
+      prev.account = fields.section;
+      prev.accountName = accountsMap[fields.section] || "General / Central Account";
+    }
+
+    prev.updatedAt = new Date().toISOString();
+    db.expenses[idx] = prev;
+
+    const log = this._buildLog("EXPENSE_UPDATED",
+      `Corrected expense ${prev.id}: ${prev.description} — ₦${Number(prev.amount).toLocaleString(undefined, {minimumFractionDigits:2})} (${prev.category})`
+    );
+    db.auditLogs.unshift(log);
+    this.save(db);
+
+    if (window.RichVineFirebase) {
+      window.RichVineFirebase.saveExpense && window.RichVineFirebase.saveExpense(prev);
+      window.RichVineFirebase.saveLog && window.RichVineFirebase.saveLog(log);
+    }
+    return prev;
+  }
+
+  static deleteExpense(id) {
+    const db = this.get();
+    const exp = (db.expenses || []).find(e => e.id === id);
+    if (!exp) return false;
+    db.expenses = db.expenses.filter(e => e.id !== id);
+
+    if (!db._pendingDeletes) db._pendingDeletes = [];
+    db._pendingDeletes.push({ col: "expenses", id });
+
+    const log = this._buildLog("EXPENSE_DELETED",
+      `Deleted expense: ${exp.description} — ₦${Number(exp.amount).toLocaleString(undefined, {minimumFractionDigits:2})} (${exp.accountName || exp.section || 'General'})`
+    );
+    db.auditLogs.unshift(log);
+    this.save(db);
+    if (window.RichVineFirebase) {
+      window.RichVineFirebase.deleteExpense && window.RichVineFirebase.deleteExpense(id);
+      window.RichVineFirebase.saveLog(log);
+    }
+    return true;
+  }
+
+  // ── Staff & Salary Management ────────────────────────────────────────────
+
+  static getStaff(filter = {}) {
+    const db = this.get();
+    let staff = [...(db.staff || [])];
+    if (filter.section && filter.section !== "All") {
+      staff = staff.filter(s => s.section === filter.section);
+    }
+    if (filter.search) {
+      const q = filter.search.toLowerCase();
+      staff = staff.filter(s => (s.name && s.name.toLowerCase().includes(q)) || (s.role && s.role.toLowerCase().includes(q)));
+    }
+    return staff.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+  }
+
+  static getStaffById(id) {
+    const db = this.get();
+    return (db.staff || []).find(s => s.id === id) || null;
+  }
+
+  static addStaff(fields) {
+    const db = this.get();
+    if (!db.staff) db.staff = [];
+    const now = Date.now();
+    const staff = {
+      id: `STF-${now}-${Math.floor(Math.random() * 9999)}`,
+      name: (fields.name || "").trim(),
+      section: fields.section || "general",
+      role: (fields.role || "").trim(),
+      baseSalary: Math.round((Number(fields.baseSalary) || 0) * 100) / 100,
+      bank: (fields.bank || "").trim(),
+      accountNo: (fields.accountNo || "").trim(),
+      phone: (fields.phone || "").trim(),
+      loanBalance: Math.round((Number(fields.loanBalance) || 0) * 100) / 100,
+      totalLoanTaken: Math.round((Number(fields.totalLoanTaken) || 0) * 100) / 100,
+      totalLoanRepaid: Math.round((Number(fields.totalLoanRepaid) || 0) * 100) / 100,
+      createdAt: new Date().toISOString()
+    };
+    db.staff.push(staff);
+
+    const log = this._buildLog("STAFF_ADDED", `Added staff: ${staff.name} (${staff.role} — ${staff.section})`);
+    db.auditLogs.unshift(log);
+    this.save(db);
+
+    if (window.RichVineFirebase && window.RichVineFirebase.saveStaff) {
+      window.RichVineFirebase.saveStaff(staff);
+      window.RichVineFirebase.saveLog && window.RichVineFirebase.saveLog(log);
+    }
+    return staff;
+  }
+
+  static updateStaff(id, fields) {
+    const db = this.get();
+    if (!db.staff) db.staff = [];
+    const idx = db.staff.findIndex(s => s.id === id);
+    if (idx === -1) return null;
+    const prev = db.staff[idx];
+
+    const allowed = ['name', 'section', 'role', 'baseSalary', 'bank', 'accountNo', 'phone', 'loanBalance', 'totalLoanTaken', 'totalLoanRepaid'];
+    allowed.forEach(k => {
+      if (fields.hasOwnProperty(k)) {
+        if (k === 'baseSalary') {
+          prev[k] = Math.round((Number(fields[k]) || 0) * 100) / 100;
+        } else {
+          prev[k] = typeof fields[k] === 'string' ? fields[k].trim() : fields[k];
+        }
+      }
+    });
+    prev.updatedAt = new Date().toISOString();
+    db.staff[idx] = prev;
+
+    const log = this._buildLog("STAFF_UPDATED", `Updated staff: ${prev.name}`);
+    db.auditLogs.unshift(log);
+    this.save(db);
+
+    if (window.RichVineFirebase && window.RichVineFirebase.saveStaff) {
+      window.RichVineFirebase.saveStaff(prev);
+      window.RichVineFirebase.saveLog && window.RichVineFirebase.saveLog(log);
+    }
+    return prev;
+  }
+
+  static deleteStaff(id) {
+    const db = this.get();
+    const stf = (db.staff || []).find(s => s.id === id);
+    if (!stf) return false;
+    db.staff = db.staff.filter(s => s.id !== id);
+
+    if (!db._pendingDeletes) db._pendingDeletes = [];
+    db._pendingDeletes.push({ col: "staff", id });
+
+    const log = this._buildLog("STAFF_DELETED", `Deleted staff: ${stf.name} (${stf.section})`);
+    db.auditLogs.unshift(log);
+    this.save(db);
+
+    if (window.RichVineFirebase && window.RichVineFirebase.deleteStaff) {
+      window.RichVineFirebase.deleteStaff(id);
+      window.RichVineFirebase.saveLog && window.RichVineFirebase.saveLog(log);
+    }
+    return true;
+  }
+
+  static getSalaryPayments(filter = {}) {
+    const db = this.get();
+    let payments = [...(db.salaries || [])];
+    if (filter.section && filter.section !== "All") {
+      payments = payments.filter(p => p.section === filter.section);
+    }
+    if (filter.month && filter.month !== "All") {
+      payments = payments.filter(p => Number(p.month) === Number(filter.month));
+    }
+    if (filter.year && filter.year !== "All") {
+      payments = payments.filter(p => Number(p.year) === Number(filter.year));
+    }
+    if (filter.staffId) {
+      payments = payments.filter(p => p.staffId === filter.staffId);
+    }
+    if (filter.search) {
+      const q = filter.search.toLowerCase();
+      payments = payments.filter(p => (p.staffName && p.staffName.toLowerCase().includes(q)) || (p.role && p.role.toLowerCase().includes(q)));
+    }
+    return payments.sort((a, b) => (Number(b.timestamp) || 0) - (Number(a.timestamp) || 0));
+  }
+
+  static addSalaryPayment(fields) {
+    const db = this.get();
+    if (!db.salaries) db.salaries = [];
+    if (!db.expenses) db.expenses = [];
+
+    const now = Date.now();
+    const month = Number(fields.month);
+    const year = Number(fields.year) || new Date().getFullYear();
+    const amount = Math.round((Number(fields.amount) || 0) * 100) / 100;
+    const section = fields.section || "general";
+    const staffName = (fields.staffName || "").trim();
+    const staffId = fields.staffId || "";
+    const role = (fields.role || "").trim();
+    const method = fields.method || "Bank Transfer";
+    const date = fields.date || new Date().toISOString().split("T")[0];
+    const notes = (fields.notes || "").trim();
+
+    const MONTH_NAMES = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const monthName = MONTH_NAMES[month] || `Month ${month}`;
+
+    const accountsMap = {
+      general: "General / Central Account",
+      primary: "Primary School Account",
+      junior: "Junior College Account",
+      senior: "Senior College Account"
+    };
+
+    const salaryId = `SAL-${now}-${Math.floor(Math.random() * 9999)}`;
+    const expenseId = `EXP-SAL-${now}-${Math.floor(Math.random() * 9999)}`;
+
+    // 1. Create linked expense so it is immediately deducted from section revenue in P&L
+    const linkedExpense = {
+      id: expenseId,
+      timestamp: now,
+      date,
+      category: "Salaries & Wages",
+      description: `Staff Salary: ${staffName} (${role ? role + ' — ' : ''}${monthName} ${year})`,
+      amount,
+      period: "monthly",
+      section,
+      account: section,
+      accountName: accountsMap[section] || "General / Central Account",
+      paymentMethod: method,
+      notes: notes || `Monthly salary payment for ${staffName}`,
+      isSalaryLinked: true,
+      salaryId,
+      staffId,
+      recordedBy: sessionStorage.getItem("richvine_admin_username") || "Super Admin",
+      session: db.config?.currentSession || "2026/2027"
+    };
+    db.expenses.unshift(linkedExpense);
+
+    const loanDeduction = Math.max(0, Math.round((Number(fields.loanDeduction) || 0) * 100) / 100);
+    const netAmount = Math.max(0, amount - loanDeduction);
+
+    // 2. Create salary payment record
+    const salary = {
+      id: salaryId,
+      staffId,
+      staffName,
+      section,
+      role,
+      month,
+      monthName,
+      year,
+      amount,
+      loanDeduction,
+      netAmount,
+      method,
+      date,
+      notes,
+      expenseId,
+      timestamp: now,
+      createdAt: new Date().toISOString()
+    };
+    db.salaries.unshift(salary);
+
+    // 2b. Auto-log loan repayment if deduction was requested
+    if (loanDeduction > 0 && staffId) {
+      try {
+        this.logStaffLoanRepayment({
+          staffId,
+          amount: loanDeduction,
+          date,
+          method: "Salary Deduction",
+          notes: `Monthly loan deduction for ${monthName} ${year} salary`,
+          salaryPaymentId: salaryId
+        });
+      } catch (loanErr) {
+        console.warn("Could not auto-deduct loan:", loanErr);
+      }
+    }
+
+    const log = this._buildLog("SALARY_PAID", `Paid salary: ${staffName} (₦${amount.toLocaleString(undefined, {minimumFractionDigits:2})}) for ${monthName} ${year} [${section.toUpperCase()}]`);
+    db.auditLogs.unshift(log);
+    this.save(db);
+
+    if (window.RichVineFirebase) {
+      if (window.RichVineFirebase.saveExpense) window.RichVineFirebase.saveExpense(linkedExpense);
+      if (window.RichVineFirebase.saveSalary) window.RichVineFirebase.saveSalary(salary);
+      window.RichVineFirebase.saveLog && window.RichVineFirebase.saveLog(log);
+    }
+    return salary;
+  }
+
+  static deleteSalaryPayment(id) {
+    const db = this.get();
+    const sal = (db.salaries || []).find(s => s.id === id);
+    if (!sal) return false;
+
+    db.salaries = db.salaries.filter(s => s.id !== id);
+
+    // Also remove the linked expense
+    if (sal.expenseId) {
+      db.expenses = (db.expenses || []).filter(e => e.id !== sal.expenseId && e.salaryId !== id);
+      if (!db._pendingDeletes) db._pendingDeletes = [];
+      db._pendingDeletes.push({ col: "expenses", id: sal.expenseId });
+      if (window.RichVineFirebase && window.RichVineFirebase.deleteExpense) {
+        window.RichVineFirebase.deleteExpense(sal.expenseId);
+      }
+    }
+
+    if (!db._pendingDeletes) db._pendingDeletes = [];
+    db._pendingDeletes.push({ col: "salaries", id });
+
+    const log = this._buildLog("SALARY_DELETED", `Deleted salary payment: ${sal.staffName} (${sal.monthName || sal.month} ${sal.year}) — ₦${Number(sal.amount).toLocaleString(undefined, {minimumFractionDigits:2})}`);
+    db.auditLogs.unshift(log);
+    this.save(db);
+
+    if (window.RichVineFirebase) {
+      if (window.RichVineFirebase.deleteSalary) window.RichVineFirebase.deleteSalary(id);
+      window.RichVineFirebase.saveLog && window.RichVineFirebase.saveLog(log);
+    }
+    return true;
+  }
+
+  static getSalarySummary(filter = {}) {
+    const payments = this.getSalaryPayments(filter);
+    const total = Math.round(payments.reduce((s, p) => s + (Number(p.amount) || 0), 0) * 100) / 100;
+    const primary = Math.round(payments.filter(p => p.section === 'primary').reduce((s, p) => s + (Number(p.amount) || 0), 0) * 100) / 100;
+    const junior = Math.round(payments.filter(p => p.section === 'junior').reduce((s, p) => s + (Number(p.amount) || 0), 0) * 100) / 100;
+    const senior = Math.round(payments.filter(p => p.section === 'senior').reduce((s, p) => s + (Number(p.amount) || 0), 0) * 100) / 100;
+    const general = Math.round(payments.filter(p => p.section === 'general').reduce((s, p) => s + (Number(p.amount) || 0), 0) * 100) / 100;
+    return {
+      total,
+      primary,
+      junior,
+      senior,
+      general,
+      count: payments.length
+    };
+  }
+
+  // ── Stocks ──────────────────────────────────────────────────────────────
+
+  static getStocks(filter = {}) {
+    const db = this.get();
+    let items = [...(db.stocks || [])];
+    if (filter.category && filter.category !== 'All') items = items.filter(s => s.category === filter.category);
+    if (filter.status && filter.status !== 'All') items = items.filter(s => s.status === filter.status);
+    return items.sort((a, b) => (Number(b.timestamp) || 0) - (Number(a.timestamp) || 0));
+  }
+
+  static getStockById(id) {
+    const db = this.get();
+    return (db.stocks || []).find(s => s.id === id) || null;
+  }
+
+  // Recompute quantityLeft from opening + restocks - sales
+  static recalculateStockQuantities(db = null) {
+    if (!db) db = this.get();
+    const stocks = db.stocks || [];
+    const restocks = db.stockRestocks || [];
+    const sales = db.stockSales || [];
+    stocks.forEach(item => {
+      const totalRestocked = restocks.filter(r => r.stockId === item.id).reduce((s, r) => s + (Number(r.quantity) || 0), 0);
+      const totalSold = sales.filter(s => s.stockId === item.id).reduce((s, sl) => s + (Number(sl.quantity) || 0), 0);
+      item.totalReceived = (Number(item.openingQty) || 0) + totalRestocked;
+      item.quantityRestocked = totalRestocked;
+      item.quantitySold = totalSold;
+      item.quantityLeft = Math.max(0, item.totalReceived - totalSold);
+      item.lowStockThreshold = Math.ceil(item.totalReceived * 0.2);
+      if (item.quantityLeft === 0) {
+        item.stockStatus = 'out_of_stock';
+      } else if (item.quantityLeft <= item.lowStockThreshold) {
+        item.stockStatus = 'low_stock';
+      } else {
+        item.stockStatus = 'in_stock';
+      }
+    });
+    return db;
+  }
+
+  static addStockItem(fields) {
+    const db = this.get();
+    if (!db.stocks) db.stocks = [];
+    const now = Date.now();
+    const recordedBy = sessionStorage.getItem('richvine_admin_username') || 'Admin';
+    const openingQty = Math.max(0, Math.round(Number(fields.openingQty) || 0));
+    const item = {
+      id: `STK-${now}-${Math.floor(Math.random() * 999999)}`,
+      name: String(fields.name || '').trim(),
+      description: String(fields.description || '').trim(),
+      category: String(fields.category || 'Others'),
+      unit: String(fields.unit || 'piece'),
+      costPrice: Math.round((Number(fields.costPrice) || 0) * 100) / 100,
+      sellingPrice: Math.round((Number(fields.sellingPrice) || 0) * 100) / 100,
+      openingQty: openingQty,
+      totalReceived: openingQty,
+      quantityRestocked: 0,
+      quantitySold: 0,
+      quantityLeft: openingQty,
+      lowStockThreshold: Math.ceil(openingQty * 0.2),
+      status: fields.status || 'active',
+      stockStatus: openingQty === 0 ? 'out_of_stock' : (openingQty <= Math.ceil(openingQty * 0.2) ? 'low_stock' : 'in_stock'),
+      session: db.config?.currentSession || '2026/2027',
+      term: fields.term || db.config?.currentTerm || '1st Term',
+      recordedBy,
+      timestamp: now,
+      updatedAt: new Date().toISOString()
+    };
+    db.stocks.unshift(item);
+    this.recalculateStockQuantities(db);
+    const log = this._buildLog('STOCK_ADDED', `Added stock item: ${item.name} — ${item.openingQty} ${item.unit}(s) @ ₦${item.sellingPrice.toLocaleString(undefined, {minimumFractionDigits:2})} each`);
+    db.auditLogs.unshift(log);
+    this.save(db);
+    if (window.RichVineFirebase) {
+      window.RichVineFirebase.saveStockItem && window.RichVineFirebase.saveStockItem(item);
+      window.RichVineFirebase.saveLog && window.RichVineFirebase.saveLog(log);
+    }
+    return item;
+  }
+
+  static updateStockItem(id, fields) {
+    const db = this.get();
+    if (!db.stocks) db.stocks = [];
+    const idx = db.stocks.findIndex(s => s.id === id);
+    if (idx === -1) return null;
+    const item = db.stocks[idx];
+    const allowed = ['name', 'description', 'category', 'unit', 'costPrice', 'sellingPrice', 'openingQty', 'status'];
+    allowed.forEach(key => {
+      if (fields.hasOwnProperty(key)) {
+        if (key === 'costPrice' || key === 'sellingPrice') {
+          item[key] = Math.round((Number(fields[key]) || 0) * 100) / 100;
+        } else if (key === 'openingQty') {
+          item[key] = Math.max(0, Math.round(Number(fields[key]) || 0));
+        } else {
+          item[key] = fields[key];
+        }
+      }
+    });
+    item.updatedAt = new Date().toISOString();
+    db.stocks[idx] = item;
+    this.recalculateStockQuantities(db);
+    const log = this._buildLog('STOCK_UPDATED', `Updated stock item: ${item.name} — selling price ₦${item.sellingPrice.toLocaleString(undefined,{minimumFractionDigits:2})}`);
+    db.auditLogs.unshift(log);
+    this.save(db);
+    if (window.RichVineFirebase) {
+      window.RichVineFirebase.saveStockItem && window.RichVineFirebase.saveStockItem(item);
+      window.RichVineFirebase.saveLog && window.RichVineFirebase.saveLog(log);
+    }
+    return item;
+  }
+
+  static deleteStockItem(id) {
+    const db = this.get();
+    const item = (db.stocks || []).find(s => s.id === id);
+    if (!item) return false;
+    db.stocks = db.stocks.filter(s => s.id !== id);
+    db.stockSales = (db.stockSales || []).filter(s => s.stockId !== id);
+    db.stockRestocks = (db.stockRestocks || []).filter(r => r.stockId !== id);
+    if (!db._pendingDeletes) db._pendingDeletes = [];
+    db._pendingDeletes.push({ col: "stocks", id });
+    const log = this._buildLog('STOCK_DELETED', `Deleted stock item: ${item.name}`);
+    db.auditLogs.unshift(log);
+    this.save(db);
+    if (window.RichVineFirebase) {
+      window.RichVineFirebase.deleteStockItem && window.RichVineFirebase.deleteStockItem(id);
+      window.RichVineFirebase.saveLog && window.RichVineFirebase.saveLog(log);
+    }
+    return true;
+  }
+
+  static recordStockSale(fields) {
+    const db = this.get();
+    if (!db.stockSales) db.stockSales = [];
+    const item = (db.stocks || []).find(s => s.id === fields.stockId);
+    if (!item) return { error: 'Stock item not found' };
+    const qty = Math.max(1, Math.round(Number(fields.quantity) || 1));
+    if (item.quantityLeft < qty) return { error: `Insufficient stock. Only ${item.quantityLeft} ${item.unit}(s) left.` };
+    const now = Date.now();
+    const recordedBy = sessionStorage.getItem('richvine_admin_username') || 'Admin';
+    const costPrice = Number(fields.costPrice !== undefined ? fields.costPrice : item.costPrice) || 0;
+    const sellingPrice = Number(fields.sellingPrice !== undefined ? fields.sellingPrice : item.sellingPrice) || 0;
+    const totalCost = Math.round(costPrice * qty * 100) / 100;
+    const totalRevenue = Math.round(sellingPrice * qty * 100) / 100;
+    const sale = {
+      id: `STKSALE-${now}-${Math.floor(Math.random() * 999999)}`,
+      stockId: item.id,
+      stockName: item.name,
+      stockCategory: item.category,
+      unit: item.unit,
+      studentId: fields.studentId || '',
+      studentName: fields.studentName || 'Walk-in Customer',
+      studentClass: fields.studentClass || '',
+      quantity: qty,
+      costPrice: Math.round(costPrice * 100) / 100,
+      sellingPrice: Math.round(sellingPrice * 100) / 100,
+      totalCost,
+      totalRevenue,
+      profit: Math.round((totalRevenue - totalCost) * 100) / 100,
+      date: fields.date || new Date().toISOString().split('T')[0],
+      term: fields.term || db.config?.currentTerm || '1st Term',
+      session: db.config?.currentSession || '2026/2027',
+      paymentMethod: fields.paymentMethod || 'Cash',
+      notes: fields.notes || '',
+      isPaymentLinked: Boolean(fields.isPaymentLinked),
+      paymentId: fields.paymentId || '',
+      recordedBy,
+      timestamp: now
+    };
+    db.stockSales.unshift(sale);
+    this.recalculateStockQuantities(db);
+    const log = this._buildLog('STOCK_SALE', `Sold ${qty} ${item.unit}(s) of ${item.name} to ${sale.studentName} — Revenue: ₦${totalRevenue.toLocaleString(undefined,{minimumFractionDigits:2})}`);
+    db.auditLogs.unshift(log);
+    this.save(db);
+    if (window.RichVineFirebase) {
+      const updatedItem = (db.stocks || []).find(s => s.id === item.id);
+      window.RichVineFirebase.saveStockItem && updatedItem && window.RichVineFirebase.saveStockItem(updatedItem);
+      window.RichVineFirebase.saveStockSale && window.RichVineFirebase.saveStockSale(sale);
+      window.RichVineFirebase.saveLog && window.RichVineFirebase.saveLog(log);
+    }
+    return sale;
+  }
+
+  static restockItem(stockId, fields) {
+    const db = this.get();
+    if (!db.stockRestocks) db.stockRestocks = [];
+    const item = (db.stocks || []).find(s => s.id === stockId);
+    if (!item) return null;
+    const now = Date.now();
+    const recordedBy = sessionStorage.getItem('richvine_admin_username') || 'Admin';
+    const qty = Math.max(1, Math.round(Number(fields.quantity) || 1));
+    const costPrice = Math.round((Number(fields.costPrice) || Number(item.costPrice) || 0) * 100) / 100;
+    const restock = {
+      id: `STKRESTOCK-${now}-${Math.floor(Math.random() * 999999)}`,
+      stockId: item.id,
+      stockName: item.name,
+      quantity: qty,
+      costPrice,
+      totalCost: Math.round(costPrice * qty * 100) / 100,
+      date: fields.date || new Date().toISOString().split('T')[0],
+      supplier: fields.supplier || '',
+      invoiceNo: fields.invoiceNo || '',
+      term: fields.term || db.config?.currentTerm || '1st Term',
+      session: db.config?.currentSession || '2026/2027',
+      notes: fields.notes || '',
+      recordedBy,
+      timestamp: now
+    };
+    if (fields.costPrice && Number(fields.costPrice) > 0) {
+      item.costPrice = costPrice;
+      item.updatedAt = new Date().toISOString();
+    }
+    db.stockRestocks.unshift(restock);
+    this.recalculateStockQuantities(db);
+    const log = this._buildLog('STOCK_RESTOCKED', `Restocked ${qty} ${item.unit}(s) of ${item.name} — Cost: ₦${restock.totalCost.toLocaleString(undefined,{minimumFractionDigits:2})}`);
+    db.auditLogs.unshift(log);
+    this.save(db);
+    if (window.RichVineFirebase) {
+      const updatedItem = (db.stocks || []).find(s => s.id === stockId);
+      window.RichVineFirebase.saveStockItem && updatedItem && window.RichVineFirebase.saveStockItem(updatedItem);
+      window.RichVineFirebase.saveStockRestock && window.RichVineFirebase.saveStockRestock(restock);
+      window.RichVineFirebase.saveLog && window.RichVineFirebase.saveLog(log);
+    }
+    return restock;
+  }
+
+  static getStockSales(filter = {}) {
+    const db = this.get();
+    let sales = [...(db.stockSales || [])];
+    if (filter.stockId) sales = sales.filter(s => s.stockId === filter.stockId);
+    if (filter.startDate) sales = sales.filter(s => s.date >= filter.startDate);
+    if (filter.endDate) sales = sales.filter(s => s.date <= filter.endDate);
+    return sales.sort((a, b) => (Number(b.timestamp) || 0) - (Number(a.timestamp) || 0));
+  }
+
+  static getStockRestocks(filter = {}) {
+    const db = this.get();
+    let restocks = [...(db.stockRestocks || [])];
+    if (filter.stockId) restocks = restocks.filter(r => r.stockId === filter.stockId);
+    if (filter.startDate) restocks = restocks.filter(r => r.date >= filter.startDate);
+    if (filter.endDate) restocks = restocks.filter(r => r.date <= filter.endDate);
+    return restocks.sort((a, b) => (Number(b.timestamp) || 0) - (Number(a.timestamp) || 0));
+  }
+
+  static getStockAlerts() {
+    const db = this.get();
+    this.recalculateStockQuantities(db);
+    const items = db.stocks || [];
+    return {
+      outOfStock: items.filter(s => s.status === 'active' && s.quantityLeft === 0),
+      lowStock: items.filter(s => s.status === 'active' && s.quantityLeft > 0 && s.quantityLeft <= s.lowStockThreshold)
+    };
+  }
+
+  static getStockSummary(filter = {}) {
+    const db = this.get();
+    this.recalculateStockQuantities(db);
+    const sales = this.getStockSales(filter);
+    const restocks = this.getStockRestocks(filter);
+    const items = db.stocks || [];
+    const totalSaleRevenue = Math.round(sales.reduce((s, sl) => s + (Number(sl.totalRevenue) || 0), 0) * 100) / 100;
+    const totalSaleCost = Math.round(sales.reduce((s, sl) => s + (Number(sl.totalCost) || 0), 0) * 100) / 100;
+    const totalRestockCost = Math.round(restocks.reduce((s, r) => s + (Number(r.totalCost) || 0), 0) * 100) / 100;
+    const totalStockValuation = Math.round(items.reduce((s, it) => s + ((Number(it.quantityLeft) || 0) * (Number(it.costPrice) || 0)), 0) * 100) / 100;
+    return {
+      totalItems: items.filter(s => s.status === 'active').length,
+      totalSaleRevenue,
+      totalSaleCost,
+      totalRestockCost,
+      totalStockValuation,
+      grossProfit: Math.round((totalSaleRevenue - totalSaleCost) * 100) / 100,
+      totalItemsSold: sales.reduce((s, sl) => s + (Number(sl.quantity) || 0), 0),
+      outOfStockCount: items.filter(s => s.status === 'active' && s.quantityLeft === 0).length,
+      lowStockCount: items.filter(s => s.status === 'active' && s.quantityLeft > 0 && s.quantityLeft <= s.lowStockThreshold).length
+    };
+  }
+
+  // ── Financial Summary ───────────────────────────────────────────────────
+  // ── STAFF LOAN & REPAYMENT ACCOUNTING ─────────────────────────────────────
+  static getStaffLoans(staffId = null) {
+    const db = this.get();
+    let loans = [...(db.staffLoans || [])];
+    if (staffId) {
+      loans = loans.filter(l => l.staffId === staffId);
+    }
+    return loans.sort((a, b) => (Number(b.timestamp) || 0) - (Number(a.timestamp) || 0));
+  }
+
+  static getStaffLoanSummary(staffId = null) {
+    const loans = this.getStaffLoans(staffId);
+    const db = this.get();
+    const staffList = db.staff || [];
+
+    if (staffId) {
+      const stf = staffList.find(s => s.id === staffId);
+      const disbursed = Math.round(loans.filter(l => l.type === "disbursement").reduce((s, l) => s + (Number(l.amount) || 0), 0) * 100) / 100;
+      const repaid = Math.round(loans.filter(l => l.type === "repayment").reduce((s, l) => s + (Number(l.amount) || 0), 0) * 100) / 100;
+      const balance = stf ? (Number(stf.loanBalance) || 0) : Math.max(0, disbursed - repaid);
+      return {
+        totalDisbursed: disbursed,
+        totalRepaid: repaid,
+        loanBalance: balance,
+        transactionsCount: loans.length
+      };
+    }
+
+    const totalDisbursed = Math.round(loans.filter(l => l.type === "disbursement").reduce((s, l) => s + (Number(l.amount) || 0), 0) * 100) / 100;
+    const totalRepaid = Math.round(loans.filter(l => l.type === "repayment").reduce((s, l) => s + (Number(l.amount) || 0), 0) * 100) / 100;
+    const totalOutstanding = Math.round(staffList.reduce((s, stf) => s + (Number(stf.loanBalance) || 0), 0) * 100) / 100;
+    const activeBorrowers = staffList.filter(stf => (Number(stf.loanBalance) || 0) > 0).length;
+
+    return {
+      totalDisbursed,
+      totalRepaid,
+      totalOutstanding,
+      activeBorrowers,
+      transactionsCount: loans.length
+    };
+  }
+
+  static disburseStaffLoan(fields) {
+    const db = this.get();
+    if (!db.staffLoans) db.staffLoans = [];
+    if (!db.staff) db.staff = [];
+    if (!db.expenses) db.expenses = [];
+
+    const staffId = fields.staffId;
+    const staff = db.staff.find(s => s.id === staffId);
+    if (!staff) throw new Error("Staff member not found");
+
+    const amount = Math.round((Number(fields.amount) || 0) * 100) / 100;
+    if (amount <= 0) throw new Error("Loan disbursement amount must be greater than zero");
+
+    const now = Date.now();
+    const date = fields.date || new Date().toISOString().split("T")[0];
+    const section = fields.section || staff.section || "general";
+    const method = fields.method || "Bank Transfer";
+    const notes = (fields.notes || "").trim();
+    const loanId = `LOAN-DISB-${now}-${Math.floor(Math.random() * 9999)}`;
+    const expenseId = `EXP-LOAN-${now}-${Math.floor(Math.random() * 9999)}`;
+
+    const currentBalance = Number(staff.loanBalance) || 0;
+    const newBalance = Math.round((currentBalance + amount) * 100) / 100;
+    staff.loanBalance = newBalance;
+    staff.totalLoanTaken = Math.round(((Number(staff.totalLoanTaken) || 0) + amount) * 100) / 100;
+    staff.updatedAt = new Date().toISOString();
+
+    const linkedExpense = {
+      id: expenseId,
+      timestamp: now,
+      date,
+      category: "Loan",
+      description: `Staff Loan Advance: ${staff.name} (${staff.role ? staff.role + ' — ' : ''}${section.toUpperCase()})`,
+      amount,
+      period: "one_time",
+      section,
+      account: section,
+      accountName: section === "general" ? "General / Central Account" : `${section.toUpperCase()} Account`,
+      paymentMethod: method,
+      notes: notes || `Staff loan disbursement to ${staff.name}`,
+      isLoanLinked: true,
+      loanId,
+      staffId,
+      recordedBy: sessionStorage.getItem("richvine_admin_username") || "Super Admin",
+      session: db.config?.currentSession || "2026/2027"
+    };
+    db.expenses.unshift(linkedExpense);
+
+    const loanTxn = {
+      id: loanId,
+      staffId,
+      staffName: staff.name,
+      section,
+      role: staff.role || "",
+      type: "disbursement",
+      amount,
+      method,
+      date,
+      notes,
+      expenseId,
+      balanceAfter: newBalance,
+      timestamp: now,
+      createdAt: new Date().toISOString(),
+      recordedBy: sessionStorage.getItem("richvine_admin_username") || "Super Admin"
+    };
+    db.staffLoans.unshift(loanTxn);
+
+    const log = this._buildLog("STAFF_LOAN_DISBURSED", `Disbursed loan: ${staff.name} (₦${amount.toLocaleString(undefined, {minimumFractionDigits:2})}). New Balance: ₦${newBalance.toLocaleString(undefined, {minimumFractionDigits:2})}`);
+    db.auditLogs.unshift(log);
+    this.save(db);
+
+    if (window.RichVineFirebase) {
+      window.RichVineFirebase.saveStaff && window.RichVineFirebase.saveStaff(staff);
+      window.RichVineFirebase.saveStaffLoan && window.RichVineFirebase.saveStaffLoan(loanTxn);
+      window.RichVineFirebase.saveExpense && window.RichVineFirebase.saveExpense(linkedExpense);
+      window.RichVineFirebase.saveLog && window.RichVineFirebase.saveLog(log);
+    }
+    return loanTxn;
+  }
+
+  static logStaffLoanRepayment(fields) {
+    const db = this.get();
+    if (!db.staffLoans) db.staffLoans = [];
+    if (!db.staff) db.staff = [];
+
+    const staffId = fields.staffId;
+    const staff = db.staff.find(s => s.id === staffId);
+    if (!staff) throw new Error("Staff member not found");
+
+    const amount = Math.round((Number(fields.amount) || 0) * 100) / 100;
+    if (amount <= 0) throw new Error("Loan repayment amount must be greater than zero");
+
+    const currentBalance = Math.round((Number(staff.loanBalance) || 0) * 100) / 100;
+    if (currentBalance <= 0) {
+      throw new Error(`Staff member ${staff.name} has no outstanding loan balance to repay.`);
+    }
+
+    const actualRepaid = Math.min(amount, currentBalance);
+    const newBalance = Math.round((currentBalance - actualRepaid) * 100) / 100;
+
+    staff.loanBalance = newBalance;
+    staff.totalLoanRepaid = Math.round(((Number(staff.totalLoanRepaid) || 0) + actualRepaid) * 100) / 100;
+    staff.updatedAt = new Date().toISOString();
+
+    const now = Date.now();
+    const date = fields.date || new Date().toISOString().split("T")[0];
+    const method = fields.method || "Cash";
+    const notes = (fields.notes || "").trim();
+    const salaryPaymentId = fields.salaryPaymentId || null;
+    const loanId = `LOAN-REPAY-${now}-${Math.floor(Math.random() * 9999)}`;
+
+    const loanTxn = {
+      id: loanId,
+      staffId,
+      staffName: staff.name,
+      section: staff.section || "general",
+      role: staff.role || "",
+      type: "repayment",
+      amount: actualRepaid,
+      method,
+      date,
+      notes,
+      salaryPaymentId,
+      balanceAfter: newBalance,
+      timestamp: now,
+      createdAt: new Date().toISOString(),
+      recordedBy: sessionStorage.getItem("richvine_admin_username") || "Super Admin"
+    };
+    db.staffLoans.unshift(loanTxn);
+
+    const log = this._buildLog("STAFF_LOAN_REPAID", `Logged loan repayment: ${staff.name} (₦${actualRepaid.toLocaleString(undefined, {minimumFractionDigits:2})}). Remaining Balance: ₦${newBalance.toLocaleString(undefined, {minimumFractionDigits:2})}`);
+    db.auditLogs.unshift(log);
+    this.save(db);
+
+    if (window.RichVineFirebase) {
+      window.RichVineFirebase.saveStaff && window.RichVineFirebase.saveStaff(staff);
+      window.RichVineFirebase.saveStaffLoan && window.RichVineFirebase.saveStaffLoan(loanTxn);
+      window.RichVineFirebase.saveLog && window.RichVineFirebase.saveLog(log);
+    }
+    return loanTxn;
+  }
+
+  static deleteStaffLoan(loanId) {
+    const db = this.get();
+    if (!db.staffLoans) db.staffLoans = [];
+    const idx = db.staffLoans.findIndex(l => l.id === loanId);
+    if (idx === -1) return false;
+
+    const txn = db.staffLoans[idx];
+    const staff = (db.staff || []).find(s => s.id === txn.staffId);
+
+    if (staff) {
+      if (txn.type === "disbursement") {
+        staff.loanBalance = Math.max(0, Math.round(((Number(staff.loanBalance) || 0) - txn.amount) * 100) / 100);
+        staff.totalLoanTaken = Math.max(0, Math.round(((Number(staff.totalLoanTaken) || 0) - txn.amount) * 100) / 100);
+      } else if (txn.type === "repayment") {
+        staff.loanBalance = Math.round(((Number(staff.loanBalance) || 0) + txn.amount) * 100) / 100;
+        staff.totalLoanRepaid = Math.max(0, Math.round(((Number(staff.totalLoanRepaid) || 0) - txn.amount) * 100) / 100);
+      }
+      staff.updatedAt = new Date().toISOString();
+      if (window.RichVineFirebase && window.RichVineFirebase.saveStaff) {
+        window.RichVineFirebase.saveStaff(staff);
+      }
+    }
+
+    if (txn.expenseId) {
+      db.expenses = (db.expenses || []).filter(e => e.id !== txn.expenseId);
+      if (!db._pendingDeletes) db._pendingDeletes = [];
+      db._pendingDeletes.push({ col: "expenses", id: txn.expenseId });
+      if (window.RichVineFirebase && window.RichVineFirebase.deleteExpense) {
+        window.RichVineFirebase.deleteExpense(txn.expenseId);
+      }
+    }
+
+    db.staffLoans.splice(idx, 1);
+    if (!db._pendingDeletes) db._pendingDeletes = [];
+    db._pendingDeletes.push({ col: "staffLoans", id: loanId });
+
+    const log = this._buildLog("STAFF_LOAN_DELETED", `Reverted/deleted loan transaction (${txn.type}) of ₦${txn.amount} for ${txn.staffName}`);
+    db.auditLogs.unshift(log);
+    this.save(db);
+
+    if (window.RichVineFirebase) {
+      window.RichVineFirebase.deleteStaffLoan && window.RichVineFirebase.deleteStaffLoan(loanId);
+      window.RichVineFirebase.saveLog && window.RichVineFirebase.saveLog(log);
+    }
+    return true;
+  }
+
+  static getFinancialSummary(filter = {}) {
+    const isSectionSpecific = filter.section && filter.section !== "All";
+
+    // Overall base filters (filtered by timeframe/dates/session, ignoring section)
+    const baseFilter = { ...filter };
+    delete baseFilter.section;
+
+    const allPayments = this.getPayments(baseFilter);
+    const allExpenses = this.getExpenses(baseFilter);
+
+    // Total School Revenue: payments + independent stock sales revenue
+    const allStockSales = this.getStockSales(baseFilter);
+    const allStockRestocks = this.getStockRestocks(baseFilter);
+    const independentStockSales = allStockSales.filter(s => !s.isPaymentLinked);
+    const stockSalesRevenue = Math.round(independentStockSales.reduce((s, sl) => s + (Number(sl.totalRevenue) || 0), 0) * 100) / 100;
+    const stockRestockCost = Math.round(allStockRestocks.reduce((s, r) => s + (Number(r.totalCost) || 0), 0) * 100) / 100;
+
+    const overallTotalRevenue  = Math.round((allPayments.reduce((s, p) => s + (Number(p.amount) || 0), 0) + stockSalesRevenue) * 100) / 100;
+    const overallTotalExpenses = Math.round((allExpenses.reduce((s, e) => s + (Number(e.amount) || 0), 0) + stockRestockCost) * 100) / 100;
+
+    // Helper for robust matching across section key, account, or accountName (case-insensitive)
+    const matchSec = (e, sec) => {
+      const s = String(e.section || "").trim().toLowerCase();
+      const a = String(e.account || "").trim().toLowerCase();
+      const n = String(e.accountName || "").trim().toLowerCase();
+      return s === sec || a === sec || n.includes(sec);
+    };
+
+    // General / Central Operations overhead expenses (not assigned to primary/junior/senior)
+    const generalExpensesList = allExpenses.filter(e => !e.section || matchSec(e, "general"));
+    const generalTotal = Math.round(generalExpensesList.reduce((s, e) => s + (Number(e.amount) || 0), 0) * 100) / 100;
+
+    // Direct section expenses
+    const directPrimaryExpenses = Math.round(allExpenses.filter(e => matchSec(e, "primary")).reduce((s, e) => s + (Number(e.amount) || 0), 0) * 100) / 100;
+    const directJuniorExpenses  = Math.round(allExpenses.filter(e => matchSec(e, "junior")).reduce((s, e) => s + (Number(e.amount) || 0), 0) * 100) / 100;
+    const directSeniorExpenses  = Math.round(allExpenses.filter(e => matchSec(e, "senior")).reduce((s, e) => s + (Number(e.amount) || 0), 0) * 100) / 100;
+
+    // Allocate 1/3 of general overhead to each of the 3 sections with exact penny balancing
+    const overheadSharePrimary = Math.round((generalTotal / 3) * 100) / 100;
+    const overheadShareJunior  = Math.round((generalTotal / 3) * 100) / 100;
+    const overheadShareSenior  = Math.round((generalTotal - overheadSharePrimary - overheadShareJunior) * 100) / 100;
+
+    if (isSectionSpecific) {
+      if (filter.section === "general") {
+        // Accounting rule: "And the General / Central Operations is thesame as total revenue."
+        return {
+          section: "general",
+          sectionName: "General / Central Operations",
+          totalRevenue: overallTotalRevenue, // Central operations pools total revenue
+          totalExpenses: generalTotal,       // Central overhead expenses
+          directExpenses: generalTotal,
+          allocatedOverhead: 0,
+          overheadDistributed: generalTotal,  // Apportioned to the 3 sections
+          netProfit: Math.round((overallTotalRevenue - generalTotal) * 100) / 100,
+          paymentCount: allPayments.length,
+          expenseCount: generalExpensesList.length,
+          totalArrearsRecovered: 0,
+          totalTermFeesPaid: 0,
+          totalOtherFeesPaid: 0
+        };
+      }
+
+      // Academic section (primary, junior, senior)
+      const secKey = filter.section;
+      const secPayments = this.getPayments(filter);
+      const secRevenue  = Math.round(secPayments.reduce((s, p) => s + (Number(p.amount) || 0), 0) * 100) / 100;
+
+      let directExpenses = 0;
+      let allocatedOverhead = 0;
+
+      if (secKey === "primary") {
+        directExpenses = directPrimaryExpenses;
+        allocatedOverhead = overheadSharePrimary;
+      } else if (secKey === "junior") {
+        directExpenses = directJuniorExpenses;
+        allocatedOverhead = overheadShareJunior;
+      } else if (secKey === "senior") {
+        directExpenses = directSeniorExpenses;
+        allocatedOverhead = overheadShareSenior;
+      }
+
+      const totalSectionExpenses = Math.round((directExpenses + allocatedOverhead) * 100) / 100;
+      const netProfit = Math.round((secRevenue - totalSectionExpenses) * 100) / 100;
+
+      let totalArrearsRecovered = 0;
+      let totalTermFeesPaid = 0;
+      let totalOtherFeesPaid = 0;
+
+      secPayments.forEach(p => {
+        const b = this.getPaymentBreakdown(p);
+        totalArrearsRecovered += b.arrearsRecovered;
+        totalTermFeesPaid     += b.termFeePaid;
+        totalOtherFeesPaid    += b.otherFeesPaid;
+      });
+
+      return {
+        section: secKey,
+        sectionName: window.SCHOOL_SECTIONS?.[secKey]?.name || secKey,
+        totalRevenue: secRevenue,
+        totalExpenses: totalSectionExpenses,
+        directExpenses,
+        allocatedOverhead,
+        netProfit,
+        totalArrearsRecovered: Math.round(totalArrearsRecovered * 100) / 100,
+        totalTermFeesPaid: Math.round(totalTermFeesPaid * 100) / 100,
+        totalOtherFeesPaid: Math.round(totalOtherFeesPaid * 100) / 100,
+        paymentCount: secPayments.length,
+        expenseCount: allExpenses.filter(e => e.section === secKey || e.account === secKey).length
+      };
+    }
+
+    // Default: Overall School Financial Summary
+    let totalArrearsRecovered = 0;
+    let totalTermFeesPaid = 0;
+    let totalOtherFeesPaid = 0;
+
+    allPayments.forEach(p => {
+      const b = this.getPaymentBreakdown(p);
+      totalArrearsRecovered += b.arrearsRecovered;
+      totalTermFeesPaid     += b.termFeePaid;
+      totalOtherFeesPaid    += b.otherFeesPaid;
+    });
+
+    return {
+      totalRevenue: overallTotalRevenue,
+      stockSalesRevenue,
+      stockRestockCost,
+      totalExpenses: overallTotalExpenses,
+      generalExpenses: generalTotal,
+      directExpenses: Math.round((overallTotalExpenses - generalTotal) * 100) / 100,
+      overheadSharePerSection: Math.round((generalTotal / 3) * 100) / 100,
+      netProfit: Math.round((overallTotalRevenue - overallTotalExpenses) * 100) / 100,
+      totalArrearsRecovered: Math.round(totalArrearsRecovered * 100) / 100,
+      totalTermFeesPaid:     Math.round(totalTermFeesPaid * 100) / 100,
+      totalOtherFeesPaid:    Math.round(totalOtherFeesPaid * 100) / 100,
+      paymentCount: allPayments.length,
+      expenseCount: allExpenses.length
+    };
+  }
+
+  // ── CBT Submissions ──────────────────────────────────────────────────────
+  static getCbtSubmissions(filter = {}) {
+    const db = this.get();
+    let list = Array.isArray(db.cbtSubmissions) ? [...db.cbtSubmissions] : [];
+    if (filter.class && filter.class !== "All") {
+      list = list.filter(s => s.studentClass === filter.class);
+    }
+    if (filter.baseClass && filter.baseClass !== "All") {
+      list = list.filter(s => s.baseClass === filter.baseClass);
+    }
+    if (filter.studentId) {
+      list = list.filter(s => s.studentId === filter.studentId);
+    }
+    return list.sort((a, b) => (Number(b.timestamp) || 0) - (Number(a.timestamp) || 0));
+  }
+
+  static getCbtSubmissionByStudent(identifier) {
+    if (!identifier) return null;
+    const cleanId = String(identifier).trim().toLowerCase();
+    const cleanAlphanum = cleanId.replace(/[^A-Za-z0-9]/g, "");
+    const db = this.get();
+    const list = Array.isArray(db.cbtSubmissions) ? db.cbtSubmissions : [];
+    return list.find(s => {
+      const sId = (s.studentId || "").toLowerCase();
+      const sReg = (s.regNo || "").toLowerCase();
+      const sRegAlpha = sReg.replace(/[^A-Za-z0-9]/g, "");
+      return sId === cleanId || sReg === cleanId || (cleanAlphanum && sRegAlpha === cleanAlphanum);
+    }) || null;
+  }
+
+  static saveCbtSubmission(submission) {
+    if (!submission || !submission.studentId) return { success: false, error: "Invalid submission data" };
+    const db = this.get();
+    if (!db.cbtSubmissions) db.cbtSubmissions = [];
+
+    // Enforce single attempt rule: check if student has already submitted
+    const existing = this.getCbtSubmissionByStudent(submission.studentId) || (submission.regNo ? this.getCbtSubmissionByStudent(submission.regNo) : null);
+    if (existing && existing.id !== submission.id) {
+      return { success: false, error: "Student has already completed this examination", submission: existing };
+    }
+
+    if (!submission.id) {
+      submission.id = `CBT-${submission.studentId.replace(/[^A-Za-z0-9]/g, "")}-${Date.now()}`;
+    }
+    submission.timestamp = submission.timestamp || Date.now();
+    submission.submittedAt = submission.submittedAt || new Date().toISOString();
+    submission.status = submission.status || "Completed";
+
+    const idx = db.cbtSubmissions.findIndex(s => s.id === submission.id);
+    if (idx !== -1) {
+      db.cbtSubmissions[idx] = submission;
+    } else {
+      db.cbtSubmissions.unshift(submission);
+    }
+
+    const log = this._buildLog("CBT_EXAM_SUBMITTED",
+      `CBT Submission: ${submission.studentName} (${submission.studentClass}) scored ${submission.score}/${submission.totalQuestions} (${submission.percentage}%) - Grade: ${submission.grade}`
+    );
+    if (!db.auditLogs) db.auditLogs = [];
+    db.auditLogs.unshift(log);
+
+    this.save(db);
+
+    if (window.RichVineFirebase && window.RichVineFirebase.saveCbtSubmission) {
+      window.RichVineFirebase.saveCbtSubmission(submission);
+      if (window.RichVineFirebase.saveLog) window.RichVineFirebase.saveLog(log);
+    }
+
+    return { success: true, submission };
+  }
+
+  static deleteCbtSubmission(id) {
+    const db = this.get();
+    if (!db.cbtSubmissions) return false;
+    const item = db.cbtSubmissions.find(s => s.id === id);
+    if (!item) return false;
+
+    db.cbtSubmissions = db.cbtSubmissions.filter(s => s.id !== id);
+    if (!db._pendingDeletes) db._pendingDeletes = [];
+    db._pendingDeletes.push({ col: "cbtSubmissions", id });
+
+    const log = this._buildLog("CBT_EXAM_RESET",
+      `Reset CBT attempt for ${item.studentName} (${item.studentClass}) - Previous Score: ${item.score}/${item.totalQuestions}`
+    );
+    if (!db.auditLogs) db.auditLogs = [];
+    db.auditLogs.unshift(log);
+
+    this.save(db);
+
+    if (window.RichVineFirebase) {
+      if (window.RichVineFirebase.deleteCbtSubmission) window.RichVineFirebase.deleteCbtSubmission(id);
+      if (window.RichVineFirebase.saveLog) window.RichVineFirebase.saveLog(log);
+    }
+    return true;
+  }
+
+  // ── Internal Helper ──────────────────────────────────────────────────────
+  static _buildLog(action, details) {
+    return {
+      id: "LOG-" + Date.now() + "-" + Math.floor(Math.random() * 10000),
+      timestamp: Date.now(),
+      date: new Date().toLocaleString("en-GB"),
+      action,
+      user: sessionStorage.getItem("richvine_admin_username") || "Super Admin",
+      details
+    };
+  }
+}
+
+// ─── Day Care / Creche 2026/2027 Monthly Billing Cycles ───────────────────
+// Resumption: 14 September 2026. Cycles run from 14th of month to 13th of next month.
+const DAYCARE_BILLING_CYCLES = [
+  { id: "Month 1", label: "Month 1 (14 Sep – 13 Oct 2026)", shortLabel: "Month 1 (14 Sep – 13 Oct)", term: "1st Term", startDate: "2026-09-14", endDate: "2026-10-13" },
+  { id: "Month 2", label: "Month 2 (14 Oct – 13 Nov 2026)", shortLabel: "Month 2 (14 Oct – 13 Nov)", term: "1st Term", startDate: "2026-10-14", endDate: "2026-11-13" },
+  { id: "Month 3", label: "Month 3 (14 Nov – 13 Dec 2026)", shortLabel: "Month 3 (14 Nov – 13 Dec)", term: "1st Term", startDate: "2026-11-14", endDate: "2026-12-13" },
+  { id: "Month 4", label: "Month 4 (14 Dec – 13 Jan 2027)", shortLabel: "Month 4 (14 Dec – 13 Jan)", term: "1st Term", startDate: "2026-12-14", endDate: "2027-01-13" },
+  { id: "Month 5", label: "Month 5 (14 Jan – 13 Feb 2027)", shortLabel: "Month 5 (14 Jan – 13 Feb)", term: "2nd Term", startDate: "2027-01-14", endDate: "2027-02-13" },
+  { id: "Month 6", label: "Month 6 (14 Feb – 13 Mar 2027)", shortLabel: "Month 6 (14 Feb – 13 Mar)", term: "2nd Term", startDate: "2027-02-14", endDate: "2027-03-13" },
+  { id: "Month 7", label: "Month 7 (14 Mar – 13 Apr 2027)", shortLabel: "Month 7 (14 Mar – 13 Apr)", term: "2nd Term", startDate: "2027-03-14", endDate: "2027-04-13" },
+  { id: "Month 8", label: "Month 8 (14 Apr – 13 May 2027)", shortLabel: "Month 8 (14 Apr – 13 May)", term: "3rd Term", startDate: "2027-04-14", endDate: "2027-05-13" },
+  { id: "Month 9", label: "Month 9 (14 May – 13 Jun 2027)", shortLabel: "Month 9 (14 May – 13 Jun)", term: "3rd Term", startDate: "2027-05-14", endDate: "2027-06-13" },
+  { id: "Month 10", label: "Month 10 (14 Jun – 13 Jul 2027)", shortLabel: "Month 10 (14 Jun – 13 Jul)", term: "3rd Term", startDate: "2027-06-14", endDate: "2027-07-13" },
+  { id: "Month 11", label: "Month 11 (14 Jul – 13 Aug 2027)", shortLabel: "Month 11 (14 Jul – 13 Aug)", term: "Summer / Holiday", startDate: "2027-07-14", endDate: "2027-08-13" },
+  { id: "Month 12", label: "Month 12 (14 Aug – 13 Sep 2027)", shortLabel: "Month 12 (14 Aug – 13 Sep)", term: "Summer / Holiday", startDate: "2027-08-14", endDate: "2027-09-13" }
+];
+
+// Global exposure
+window.RichVineDB = RichVineDB;
+window.SCHOOL_SECTIONS = SCHOOL_SECTIONS;
+window.ALL_CLASSES = ALL_CLASSES;
+window.getSectionByClass = getSectionByClass;
+window.DAYCARE_BILLING_CYCLES = DAYCARE_BILLING_CYCLES;
+
+// Boot
+RichVineDB.init();
