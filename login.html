@@ -3,7 +3,7 @@
 <head>
   <script src="school.config.js"></script>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Admin Security Login - <span class="school-name-text">EXCELLENCE MODEL COLLEGE</span></title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%22 fill=%22%230284c7%22><text y=%2226%22 font-size=%2228%22>🏛️</text></svg>">
   
@@ -33,6 +33,48 @@
   </script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="css/custom.css">
+<style>
+  /* ── BursarIQ Login Page – Mobile/iOS/Android Polish ── */
+  html {
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+  body {
+    overflow-x: hidden;
+    overflow-y: auto !important;
+    min-height: 100vh;
+    min-height: 100dvh;
+    -webkit-overflow-scrolling: touch;
+    /* Allow scroll when virtual keyboard shrinks viewport */
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+  }
+  /* Centre card, allow scroll on short screens */
+  body > .relative, body > div {
+    flex: 0 0 auto;
+    width: 100%;
+  }
+  /* iOS: prevent auto-zoom when tapping inputs */
+  @media (hover: none) and (pointer: coarse) {
+    input, select, textarea { font-size: 16px !important; }
+  }
+  * { -webkit-tap-highlight-color: transparent; }
+  input, select, button, a { touch-action: manipulation; }
+  /* Scroll room on very short viewports (virtual keyboard) */
+  @media (max-height: 640px) {
+    body { padding: 20px 16px 32px !important; justify-content: flex-start !important; }
+  }
+</style>
+  <!-- PWA Manifest & Service Worker -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BursarIQ">
+  <meta name="theme-color" content="#0284c7">
 </head>
 <body class="bg-slate-900 text-slate-800 antialiased min-h-screen flex items-center justify-center p-4 relative overflow-x-hidden">
 
@@ -164,11 +206,19 @@
 
       <!-- Card Footer -->
       <div class="bg-slate-50 px-6 py-4 border-t border-slate-100 text-center text-xs text-slate-500 space-y-2.5">
-        <div class="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 font-semibold text-xs flex flex-wrap items-center justify-between gap-2">
-          <span class="flex items-center"><i class="fas fa-user-graduate text-amber-600 mr-1.5"></i> Are you a senior student writing CBT?</span>
-          <a href="cbt/index.html" class="px-3 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold transition inline-flex items-center text-xs shadow-sm">
-            <i class="fas fa-laptop-code mr-1.5"></i> Student CBT Portal
-          </a>
+        <div class="p-2.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-700 font-semibold text-xs flex flex-wrap items-center justify-between gap-2">
+          <span class="flex items-center"><i class="fas fa-network-wired text-sky-600 mr-1.5"></i> Looking for other school portals?</span>
+          <div class="flex items-center gap-2">
+            <a href="teacher-login.html" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition inline-flex items-center text-xs shadow-sm">
+              <i class="fas fa-chalkboard-teacher mr-1"></i> Teacher Portal
+            </a>
+            <a href="cbt/index.html" class="px-2.5 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold transition inline-flex items-center text-xs shadow-sm">
+              <i class="fas fa-laptop-code mr-1"></i> Student CBT
+            </a>
+            <a href="index.html" class="px-2.5 py-1 rounded-lg bg-sky-600 hover:bg-sky-700 text-white font-bold transition inline-flex items-center text-xs shadow-sm">
+              <i class="fas fa-globe mr-1"></i> Public Site
+            </a>
+          </div>
         </div>
         
         <div id="login-bursariq-footer-card" class="mb-3 p-2.5 rounded-xl bg-white border border-slate-200 flex items-center justify-between shadow-sm">
@@ -235,6 +285,14 @@
     if (currentUser) {
       // Optional auto-redirect if already logged in
       console.log("Already signed in as", currentUser.username);
+    }
+  </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
     }
   </script>
 </body>

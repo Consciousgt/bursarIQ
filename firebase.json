@@ -1,5 +1,40 @@
 {
   "firestore": {
-    "rules": "firestore.rules"
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "firestore.rules",
+      "firestore.indexes.json",
+      "README.md",
+      "build_cbt_*.js",
+      "generate_cbt_bank.js",
+      "**/*.sh"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ],
+    "headers": [
+      {
+        "source": "**/*.@(js|css)",
+        "headers": [{"key": "Cache-Control", "value": "max-age=604800"}]
+      },
+      {
+        "source": "sw.js",
+        "headers": [{"key": "Cache-Control", "value": "no-cache"}]
+      },
+      {
+        "source": "manifest.json",
+        "headers": [{"key": "Cache-Control", "value": "no-cache"}]
+      }
+    ]
   }
 }

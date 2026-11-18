@@ -377,3 +377,189 @@ body {
   background-size: 200% 100%;
   animation: bursarShimmer 3s infinite;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   BURSARIQ GLOBAL MOBILE-FIRST ADDITIONS  (appended to custom.css)
+   Full iOS Safari + Android Chrome robust scroll & touch support
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Document-level scroll foundation ── */
+html {
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  /* iOS safe area support */
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+body {
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  min-height: 100vh;
+  min-height: 100dvh;  /* Dynamic viewport on mobile */
+}
+
+/* ── 2. Remove 300ms tap delay everywhere ── */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a, button, input, select, textarea, label, [role="button"] {
+  touch-action: manipulation;
+}
+
+/* ── 3. iOS Safari: prevent zoom on inputs below 16px ── */
+@media (hover: none) and (pointer: coarse) {
+  input,
+  select,
+  textarea,
+  .form-control {
+    font-size: 16px !important;
+  }
+}
+
+/* ── 4. Table horizontal scroll — global enforcement ── */
+.table-wrap {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+
+/* Ensure tables have a minimum width so they always scroll */
+.table-wrap table {
+  min-width: 600px;
+}
+
+/* Named ultra-wide tables */
+#broadsheet-table { min-width: 1100px !important; }
+#payments-table   { min-width: 820px  !important; }
+#learners-table   { min-width: 760px  !important; }
+#sal-payments-table, #sal-staff-table { min-width: 900px !important; }
+
+/* ── 5. Panels — never clip table scroll ── */
+.panel {
+  overflow: visible;
+  min-width: 0;
+}
+
+/* ── 6. Modal overlay rubber-band containment ── */
+.modal-overlay {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.modal-box {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+/* ── 7. Swipe indicator for mobile tables ── */
+@media (max-width: 768px) {
+  .table-wrap::before {
+    content: '← Swipe to see more →';
+    display: block;
+    text-align: center;
+    font-size: 10px;
+    color: #94a3b8;
+    padding: 4px 0;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+  }
+}
+
+/* ── 8. Sidebar scroll containment for desktop ── */
+@media (min-width: 769px) {
+  #sidebar {
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+  }
+
+  /* Custom scrollbar for dark sidebar */
+  #sidebar::-webkit-scrollbar { width: 4px; }
+  #sidebar::-webkit-scrollbar-track { background: transparent; }
+  #sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+  #sidebar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
+}
+
+/* ── 9. Bottom navigation safe area ── */
+#mobile-bottom-nav,
+.bottom-nav {
+  padding-bottom: max(8px, env(safe-area-inset-bottom, 8px));
+}
+
+/* ── 10. Card hover — disable on touch devices to avoid sticky states ── */
+@media (hover: none) and (pointer: coarse) {
+  .portal-card:hover {
+    transform: none !important;
+    box-shadow: var(--shadow-md) !important;
+  }
+}
+
+/* ── 11. Smooth scrollable horizontal tab bars ── */
+[role="tablist"],
+.tab-nav,
+.flex.gap-1,
+.flex.gap-2 {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+[role="tablist"]::-webkit-scrollbar,
+.tab-nav::-webkit-scrollbar { display: none; }
+
+/* ── 12. Print: clean report cards ── */
+@media print {
+  #sidebar,
+  #header,
+  #mobile-bottom-nav,
+  #sidebar-backdrop,
+  .btn-primary,
+  .btn-secondary,
+  .btn-icon,
+  #scroll-top-fab {
+    display: none !important;
+  }
+
+  #main {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .panel {
+    box-shadow: none !important;
+    border: 1px solid #e2e8f0 !important;
+    break-inside: avoid;
+  }
+
+  .table-wrap {
+    overflow: visible !important;
+  }
+
+  .table-wrap table {
+    min-width: unset !important;
+    width: 100% !important;
+  }
+
+  @page { margin: 15mm; }
+}
+
+/* ── 13. Prevent body scroll lock flash on Android Chrome ── */
+html.scroll-locked body {
+  overflow: hidden;
+}
+
+/* ── 14. Scroll-to-top FAB ── */
+#scroll-top-fab {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+#scroll-top-fab[style*="flex"] {
+  opacity: 1;
+  pointer-events: auto;
+}

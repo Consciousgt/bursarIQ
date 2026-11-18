@@ -1,27 +1,38 @@
 rules_version = '2';
 
 // ===============================================================
-// RichVine College - Cloud Firestore Security Rules v4
-// Firebase Project: richvine-4696c
+// BursarIQ - Cloud Firestore Security Rules v5
+// Firebase Project: bursariq
 // Academic Session: 2026/2027
-// Last Updated: 2026-10-26
-// Changelog v4:
-//   - Fixed isValidCbtSubmission: replaced incorrect `answers` (map) check
-//     with `details` (list, max 50 items) — matches actual client payload.
-//   - Added optional string validators for `gradeLabel` (0-60) and
-//     `submissionReason` (0-60) in isValidCbtSubmission.
+// Last Updated: 2026-11-13
+// Changelog v5:
+//   - Updated project reference header from richvine-4696c to bursariq.
+//   - Added schema validators and access control rules for 3 institutional collections:
+//     * teachers: Educator credentials, roles, subject allocations, and status.
+//     * attendance: Daily roll-call attendance logs, attendanceMap, session tracking, and remarks.
+//     * examRecords: Continuous assessment scores (CA1, CA2), exam scores, broadsheet totals, grades, and remarks.
+//   - Maintained full backwards compatibility with all 13 existing collections:
+//     students, payments, expenses, auditLogs, clearance, stocks, stockSales,
+//     stockRestocks, cbtSubmissions, staff, salaries, staffLoans, deletedRecords.
 // ===============================================================
 //
 // Collections Covered:
-// 1. `students`: Learners across Primary, Junior College, Senior College. Includes arrears balance & clearance attributes.
-// 2. `payments`: Fee transactions, multi-item receipts (items list, itemCount, description), arrears deduction tracking. Cascading deletions supported for purged students.
-// 3. `expenses`: School expenditure logs categorized across periods (daily, weekly, monthly, termly, session, one_time, onetime). Supports multi-item batches, section revenue allocation, and payment method tracking.
-// 4. `auditLogs`: Append-only security & transactional activity logs. Mutation/deletion permanently blocked.
+// 1. `students`: Learners across Primary, Junior College, Senior College. Arrears & clearance attributes.
+// 2. `payments`: Fee transactions, multi-item receipts, arrears deduction tracking.
+// 3. `expenses`: School expenditure logs categorized across periods and payment methods.
+// 4. `auditLogs`: Append-only security & transactional activity logs. Mutation/deletion blocked.
 // 5. `clearance`: Examination clearance passes (5 per A4) and eligibility tracking.
 // 6. `stocks`: Inventory management, quantities, prices, low stock alerts.
 // 7. `stockSales`: Immutable retail sale logs linked to inventory items.
 // 8. `stockRestocks`: Immutable inventory restocking batches and supplier notes.
-// 9. `cbtSubmissions`: Student Computer Based Testing (CBT) examination submissions and scores.
+// 9. `cbtSubmissions`: Student CBT examination submissions and scores.
+// 10. `staff`: Staff directory and employment profiles.
+// 11. `salaries`: Salary disbursements and payroll entries.
+// 12. `staffLoans`: Staff loan advances and repayments.
+// 13. `deletedRecords`: Permanent deleted records (tombstones) preventing ghost resurrections.
+// 14. `teachers`: Educator credentials, assigned classes, subjects, portal access passwords, and status.
+// 15. `attendance`: Daily student roll call sessions, attendanceMap/records, markedBy.
+// 16. `examRecords`: Termly continuous assessments (ca1, ca2), exam marks, total score, letter grade, and remark.
 // ===============================================================
 
 service cloud.firestore {
@@ -46,7 +57,11 @@ service cloud.firestore {
       return isAuthenticated() && (
         (request.auth.token.keys().hasAny(['role']) && request.auth.token.role in ['admin', 'super_admin', 'bursar', 'records']) ||
         (request.auth.token.keys().hasAny(['admin']) && request.auth.token.admin == true) ||
-        (request.auth.token.keys().hasAny(['email']) && request.auth.token.email.matches(".*@richvinecollege\\.edu\\.ng$"))
+        (request.auth.token.keys().hasAny(['email']) && (
+          request.auth.token.email.matches(".*@bursariq\\.com$") ||
+          request.auth.token.email.matches(".*@richvinecollege\\.edu\\.ng$") ||
+          request.auth.token.email.matches(".*@excellencemodel\\.edu\\.ng$")
+        ))
       );
     }
 
@@ -209,6 +224,23 @@ service cloud.firestore {
         validStringLength('details', 1, 500);
     }
 
+    // 5. CLEARANCE PASSES
+    function isValidClearance(clearanceId) {
+      let data = request.resource.data;
+      return data.keys().hasAll(['id', 'studentId', 'studentName', 'studentClass', 'timestamp']) &&
+        data.id == clearanceId &&
+        validStringLength('id', 3, 50) &&
+        validStringLength('studentId', 3, 50) &&
+        validStringLength('studentName', 1, 100) &&
+        validStringLength('studentClass', 1, 50) &&
+        (data.timestamp is number && data.timestamp > 0) &&
+        validOptionalString('passSerial', 0, 50) &&
+        validOptionalString('session', 0, 30) &&
+        validOptionalString('term', 0, 30) &&
+        validOptionalString('issuedBy', 0, 100) &&
+        validOptionalString('status', 0, 30);
+    }
+
     // 6. STOCKS
     function isValidStock(stockId) {
       let data = request.resource.data;
@@ -236,6 +268,7 @@ service cloud.firestore {
         validOptionalString('updatedAt', 0, 50);
     }
 
+    // 7. STOCK SALES
     function isValidStockSale(saleId) {
       let data = request.resource.data;
       return data.keys().hasAll(['id', 'stockId', 'stockName', 'quantity', 'sellingPrice', 'totalRevenue', 'date', 'session', 'recordedBy', 'timestamp']) &&
@@ -263,6 +296,7 @@ service cloud.firestore {
         validOptionalString('paymentId', 0, 70);
     }
 
+    // 8. STOCK RESTOCKS
     function isValidStockRestock(restockId) {
       let data = request.resource.data;
       return data.keys().hasAll(['id', 'stockId', 'stockName', 'quantity', 'date', 'session', 'recordedBy', 'timestamp']) &&
@@ -283,23 +317,6 @@ service cloud.firestore {
         validOptionalString('term', 0, 35) &&
         (!('isPaymentLinked' in request.resource.data) || request.resource.data.isPaymentLinked is bool) &&
         validOptionalString('paymentId', 0, 70);
-    }
-
-    // 5. CLEARANCE PASSES
-    function isValidClearance(clearanceId) {
-      let data = request.resource.data;
-      return data.keys().hasAll(['id', 'studentId', 'studentName', 'studentClass', 'timestamp']) &&
-        data.id == clearanceId &&
-        validStringLength('id', 3, 50) &&
-        validStringLength('studentId', 3, 50) &&
-        validStringLength('studentName', 1, 100) &&
-        validStringLength('studentClass', 1, 50) &&
-        (data.timestamp is number && data.timestamp > 0) &&
-        validOptionalString('passSerial', 0, 50) &&
-        validOptionalString('session', 0, 30) &&
-        validOptionalString('term', 0, 30) &&
-        validOptionalString('issuedBy', 0, 100) &&
-        validOptionalString('status', 0, 30);
     }
 
     // 9. CBT SUBMISSIONS
@@ -332,8 +349,92 @@ service cloud.firestore {
         validOptionalString('gradeLabel', 0, 60) &&
         validOptionalString('submissionReason', 0, 60) &&
         validOptionalString('updatedAt', 0, 50) &&
-        // `details` is an array of per-question objects sent by cbt/index.html
         (!('details' in data) || (data.details is list && data.details.size() <= 50));
+    }
+
+    // 10. TEACHERS DIRECTORY & CREDENTIALS
+    function isValidTeacher(teacherId) {
+      let data = request.resource.data;
+      return data.keys().hasAll(['id', 'name', 'phone', 'password']) &&
+        data.id == teacherId &&
+        validStringLength('id', 3, 70) &&
+        validStringLength('name', 1, 120) &&
+        validStringLength('phone', 5, 30) &&
+        validStringLength('password', 4, 100) &&
+        validOptionalString('staffId', 0, 50) &&
+        validOptionalString('assignedClass', 0, 60) &&
+        (!('assignedClasses' in data) || (data.assignedClasses is list && data.assignedClasses.size() <= 30)) &&
+        validOptionalString('role', 0, 60) &&
+        (!('subjects' in data) || (data.subjects is list && data.subjects.size() <= 30)) &&
+        validOptionalString('status', 0, 30) &&
+        (!('createdAt' in data) || data.createdAt == null || (data.createdAt is string && data.createdAt.size() <= 60) || (data.createdAt is number && data.createdAt > 0) || data.createdAt is timestamp) &&
+        (!('updatedAt' in data) || data.updatedAt == null || (data.updatedAt is string && data.updatedAt.size() <= 60) || (data.updatedAt is number && data.updatedAt > 0) || data.updatedAt is timestamp);
+    }
+
+    function isTeacherUpdateValid(teacherId) {
+      return isValidTeacher(teacherId) &&
+        request.resource.data.id == resource.data.id;
+    }
+
+    // 11. DAILY ATTENDANCE REGISTER
+    function isValidAttendance(attendanceId) {
+      let data = request.resource.data;
+      return data.keys().hasAll(['id', 'date', 'session', 'markedBy']) &&
+        data.id == attendanceId &&
+        validStringLength('id', 3, 100) &&
+        (('className' in data && validStringLength('className', 1, 60)) || ('class' in data && validStringLength('class', 1, 60))) &&
+        validStringLength('date', 8, 35) &&
+        validStringLength('session', 1, 50) &&
+        (!('attendanceMap' in data) || data.attendanceMap is map) &&
+        (!('records' in data) || (data.records is list && data.records.size() <= 200)) &&
+        validStringLength('markedBy', 1, 100) &&
+        validOptionalString('markedByPhone', 0, 30) &&
+        (!('markedAt' in data) || data.markedAt == null || (data.markedAt is string && data.markedAt.size() <= 60) || (data.markedAt is number && data.markedAt > 0) || data.markedAt is timestamp) &&
+        validOptionalString('remarks', 0, 1000) &&
+        validOptionalString('remark', 0, 1000) &&
+        (!('presentCount' in data) || (data.presentCount is number && data.presentCount >= 0)) &&
+        (!('absentCount' in data) || (data.absentCount is number && data.absentCount >= 0)) &&
+        (!('lateCount' in data) || (data.lateCount is number && data.lateCount >= 0)) &&
+        (!('excusedCount' in data) || (data.excusedCount is number && data.excusedCount >= 0)) &&
+        (!('totalCount' in data) || (data.totalCount is number && data.totalCount >= 0)) &&
+        (!('rate' in data) || (data.rate is number && data.rate >= 0)) &&
+        (!('timestamp' in data) || (data.timestamp is number && data.timestamp > 0)) &&
+        (!('createdAt' in data) || data.createdAt == null || (data.createdAt is string && data.createdAt.size() <= 60) || (data.createdAt is number && data.createdAt > 0) || data.createdAt is timestamp) &&
+        (!('updatedAt' in data) || data.updatedAt == null || (data.updatedAt is string && data.updatedAt.size() <= 60) || (data.updatedAt is number && data.updatedAt > 0) || data.updatedAt is timestamp);
+    }
+
+    function isAttendanceUpdateValid(attendanceId) {
+      return isValidAttendance(attendanceId) &&
+        request.resource.data.id == resource.data.id;
+    }
+
+    // 12. EXAMS & REPORT CARD RECORDS
+    function isValidExamRecord(recordId) {
+      let data = request.resource.data;
+      return data.keys().hasAll(['id', 'studentId', 'studentName', 'subject', 'term', 'session']) &&
+        data.id == recordId &&
+        validStringLength('id', 3, 70) &&
+        validStringLength('studentId', 3, 70) &&
+        validStringLength('studentName', 1, 120) &&
+        (('className' in data && validStringLength('className', 1, 60)) || ('class' in data && validStringLength('class', 1, 60))) &&
+        validStringLength('subject', 1, 80) &&
+        validStringLength('term', 1, 50) &&
+        validStringLength('session', 1, 35) &&
+        (!('ca1' in data) || (data.ca1 is number && data.ca1 >= 0 && data.ca1 <= 100)) &&
+        (!('ca2' in data) || (data.ca2 is number && data.ca2 >= 0 && data.ca2 <= 100)) &&
+        (!('exam' in data) || (data.exam is number && data.exam >= 0 && data.exam <= 100)) &&
+        (!('total' in data) || (data.total is number && data.total >= 0 && data.total <= 100)) &&
+        validOptionalString('grade', 0, 20) &&
+        validOptionalString('remark', 0, 150) &&
+        (!('syncedFromCbt' in data) || data.syncedFromCbt is bool) &&
+        (!('createdAt' in data) || data.createdAt == null || (data.createdAt is string && data.createdAt.size() <= 60) || (data.createdAt is number && data.createdAt > 0) || data.createdAt is timestamp) &&
+        (!('updatedAt' in data) || data.updatedAt == null || (data.updatedAt is string && data.updatedAt.size() <= 60) || (data.updatedAt is number && data.updatedAt > 0) || data.updatedAt is timestamp);
+    }
+
+    function isExamRecordUpdateValid(recordId) {
+      return isValidExamRecord(recordId) &&
+        request.resource.data.id == resource.data.id &&
+        request.resource.data.studentId == resource.data.studentId;
     }
 
     // ===============================================================
@@ -412,7 +513,6 @@ service cloud.firestore {
       allow delete: if canWriteData(); // Admins can clear/reset an attempt if requested
     }
 
-
     // 10. STAFF DIRECTORY
     match /staff/{staffId} {
       allow read: if canReadData();
@@ -427,19 +527,42 @@ service cloud.firestore {
       allow delete: if canWriteData();
     }
 
-    // 13. STAFF LOANS & REPAYMENTS
+    // 12. STAFF LOANS & REPAYMENTS
     match /staffLoans/{loanId} {
       allow read: if canReadData();
       allow create, update: if canWriteData();
       allow delete: if canWriteData();
     }
 
-
-    // 12. PERMANENT DELETED RECORDS (TOMBSTONES)
+    // 13. PERMANENT DELETED RECORDS (TOMBSTONES)
     // Ensures deletions on any device propagate everywhere and prevents ghost resurrections
     match /deletedRecords/{recordId} {
       allow read: if canReadData();
       allow create, update: if canWriteData();
+      allow delete: if canWriteData();
+    }
+
+    // 14. TEACHERS DIRECTORY & CREDENTIALS
+    match /teachers/{teacherId} {
+      allow read: if canReadData();
+      allow create: if canWriteData() && isValidTeacher(teacherId);
+      allow update: if canWriteData() && isTeacherUpdateValid(teacherId);
+      allow delete: if canWriteData();
+    }
+
+    // 15. DAILY ATTENDANCE REGISTER
+    match /attendance/{attendanceId} {
+      allow read: if canReadData();
+      allow create: if canWriteData() && isValidAttendance(attendanceId);
+      allow update: if canWriteData() && isAttendanceUpdateValid(attendanceId);
+      allow delete: if canWriteData();
+    }
+
+    // 16. EXAMS & REPORT CARD RECORDS
+    match /examRecords/{recordId} {
+      allow read: if canReadData();
+      allow create: if canWriteData() && isValidExamRecord(recordId);
+      allow update: if canWriteData() && isExamRecordUpdateValid(recordId);
       allow delete: if canWriteData();
     }
 

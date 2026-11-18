@@ -46,6 +46,7 @@
     // ── 5. System Administrator Credentials ───────────────────────────
     adminCredentials: [
       { username: "admin", password: "password123", role: "Super Administrator", name: "Principal Administrator" },
+      { username: "admin", password: "richvine2025", role: "Super Administrator", name: "Principal Administrator" },
       { username: "bursar", password: "bursar123", role: "Chief Bursary Officer", name: "Mrs. A. Adeleke (Chief Bursar)" },
       { username: "records", password: "record123", role: "Records Officer", name: "Mr. D. Okon (Academic Secretary)" }
     ],
@@ -54,13 +55,13 @@
     // Paste the school's Firebase web app credentials here when hosting online.
     // If left empty or dummy, BursarIQ operates 100% offline in LocalStorage.
     firebaseConfig: {
-      apiKey: "AIzaSyBUlH62ZDntFFCX965zw45tqhNmnQ17mQQ",
-      authDomain: "richvine-4696c.firebaseapp.com",
-      projectId: "richvine-4696c",
-      storageBucket: "richvine-4696c.firebasestorage.app",
-      messagingSenderId: "495473769171",
-      appId: "1:495473769171:web:64a0180f71ae33a95db226",
-      measurementId: "G-DWD4TR5GMJ"
+      apiKey: "AIzaSyDPR_ELiTuxM8jObdJeWSIzfqotWJXnf-c",
+      authDomain: "bursariq.firebaseapp.com",
+      projectId: "bursariq",
+      storageBucket: "bursariq.firebasestorage.app",
+      messagingSenderId: "882141938065",
+      appId: "1:882141938065:web:e7725268061ce571f45a30",
+      measurementId: "G-BQ7M82MBK7"
     }
   };
 
@@ -70,9 +71,12 @@
   // Auto-apply branding to DOM once loaded
   if (typeof document !== "undefined") {
     function applyBranding() {
-      // 1. Update Document Title
-      if (document.title && !document.title.includes(config.schoolName)) {
-        document.title = document.title.replace(/RichVine College|RICHVINE COLLEGE/gi, config.schoolName);
+      // 1. Clean and Update Document Title
+      if (document.title) {
+        document.title = document.title.replace(/<[^>]*>?/gm, '').replace(/RichVine College|RICHVINE COLLEGE/gi, config.schoolName);
+        if (!document.title.includes(config.schoolName)) {
+          document.title = config.schoolName + " - " + document.title;
+        }
       }
 
       // 2. Update all elements marked with data-bursar-field
@@ -83,18 +87,19 @@
         }
       });
 
-      // 3. Fallback text replacement on elements with .school-name-text
-      document.querySelectorAll('.school-name-text').forEach(el => {
-        el.textContent = config.schoolName;
-      });
-      document.querySelectorAll('.school-motto-text').forEach(el => {
-        el.textContent = config.motto;
-      });
-      document.querySelectorAll('.school-acronym-text').forEach(el => {
-        el.textContent = config.acronym;
-      });
-      document.querySelectorAll('.school-address-text').forEach(el => {
-        el.textContent = config.address;
+      // 3. Comprehensive Class-Based Fallback Text Replacement
+      document.querySelectorAll('.school-name-text').forEach(el => { el.textContent = config.schoolName; });
+      document.querySelectorAll('.school-motto-text').forEach(el => { el.textContent = config.motto; });
+      document.querySelectorAll('.school-acronym-text').forEach(el => { el.textContent = config.acronym; });
+      document.querySelectorAll('.school-address-text').forEach(el => { el.textContent = config.address; });
+      document.querySelectorAll('.school-phone-text').forEach(el => { el.textContent = config.phone; });
+      document.querySelectorAll('.school-email-text').forEach(el => { el.textContent = config.contactEmail; });
+      document.querySelectorAll('.school-session-text').forEach(el => { el.textContent = config.currentSession; });
+      document.querySelectorAll('.school-term-text').forEach(el => { el.textContent = config.currentTerm; });
+      document.querySelectorAll('.school-bank-text').forEach(el => {
+        if (config.bankDetails) {
+          el.textContent = config.bankDetails.bankName + " | " + config.bankDetails.accountNumber + " (" + config.bankDetails.accountName + ")";
+        }
       });
     }
 

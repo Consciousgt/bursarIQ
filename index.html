@@ -3,9 +3,9 @@
 <head>
   <script src="school.config.js"></script>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><span class="school-name-text">EXCELLENCE MODEL COLLEGE</span> - Premier Private Education | Soaring High</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%22 fill=%22%230284c7%22><text y=%2226%22 font-size=%2228%22>🏛️</text></svg>">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>EXCELLENCE MODEL COLLEGE - School Management & Accounting Information System | BursarIQ</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%200%20100%20100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -15,16 +15,11 @@
         extend: {
           colors: {
             sky: {
-              50: '#f0f9ff',
-              100: '#e0f2fe',
-              200: '#bae6fd',
-              300: '#7dd3fc',
-              400: '#38bdf8',
-              500: '#0ea5e9',
-              600: '#0284c7',
-              700: '#0369a1',
-              800: '#075985',
-              900: '#0c4a6e',
+              50: '#f0f9ff', 100: '#e0f2fe', 200: '#bae6fd', 300: '#7dd3fc', 400: '#38bdf8',
+              500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1', 800: '#075985', 900: '#0c4a6e'
+            },
+            emerald: {
+              50: '#ecfdf5', 100: '#d1fae5', 500: '#10b981', 600: '#059669', 700: '#047857'
             }
           }
         }
@@ -32,14 +27,45 @@
     }
   </script>
   
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   
   <!-- Custom Styles -->
   <link rel="stylesheet" href="css/custom.css">
+  <style>
+    html { scroll-behavior: smooth; }
+    .portal-card {
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .portal-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 30px -10px rgba(2, 132, 199, 0.25);
+    }
+
+    /* Mobile-first index polish */
+    html { overflow-x: hidden; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+    body { overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    * { -webkit-tap-highlight-color: transparent; }
+    input, select, button, a { touch-action: manipulation; }
+    @media (hover: none) and (pointer: coarse) {
+      input, select, textarea { font-size: 16px !important; }
+    }
+    /* Portal cards on mobile: full width */
+    @media (max-width: 480px) {
+      .portal-card { transform: none !important; }
+    }
+  </style>
+  <!-- PWA Manifest & Service Worker -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BursarIQ">
+  <meta name="theme-color" content="#0284c7">
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased selection:bg-sky-500 selection:text-white min-h-screen flex flex-col justify-between">
-  <!-- Top Global BursarIQ Announcement Bar -->
+
+  <!-- ═══════════════ TOP GLOBAL ANNOUNCEMENT BAR ═══════════════ -->
   <div id="bursariq-top-banner" class="bg-gradient-to-r from-slate-950 via-[#0b2b48] to-slate-950 text-white text-xs py-2 px-4 border-b border-sky-950/60 shadow-inner">
     <div class="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-2">
       <div class="flex items-center space-x-2">
@@ -47,572 +73,961 @@
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5 animate-pulse"></span> Certified System
         </span>
         <span class="font-medium text-slate-200 text-[11px] sm:text-xs">
-          Powered by <strong class="text-white font-bold">BursarIQ</strong> &bull; <span class="italic text-emerald-300">Every naira accounted for.</span>
+          Powered by <strong class="text-white font-bold">BursarIQ</strong> &bull; <span class="italic text-emerald-300">"Every naira accounted for."</span>
         </span>
       </div>
-      <div class="hidden sm:flex items-center space-x-4 text-[11px] text-slate-300">
-        <span class="flex items-center"><i class="fas fa-shield-halved text-emerald-400 mr-1.5"></i> 256-Bit Financial Encryption</span>
-        <span class="text-slate-600">&bull;</span>
-        <span class="flex items-center"><i class="fas fa-check-double text-sky-400 mr-1.5"></i> Audited Bursary Operations</span>
+      <div class="flex items-center space-x-3 text-[11px] text-slate-300">
+        <span class="hidden md:inline"><i class="fas fa-shield-halved text-emerald-400 mr-1"></i> 256-Bit Financial Encryption</span>
+        <span class="hidden sm:inline text-slate-600">&bull;</span>
+        <span><i class="far fa-calendar-check text-sky-400 mr-1"></i> Session: <strong class="text-white school-session-text">2026/2027</strong> (<span class="school-term-text">1st Term</span>)</span>
       </div>
     </div>
   </div>
 
-
-  <!-- Top Announcement Bar -->
-  <div class="bg-gradient-to-r from-sky-800 via-sky-700 to-sky-900 text-white text-xs py-2 px-4 shadow-sm">
+  <!-- ═══════════════ SECONDARY CAMPUS CONTACT BAR ═══════════════ -->
+  <div class="bg-gradient-to-r from-sky-900 via-sky-800 to-slate-900 text-white text-xs py-1.5 px-4 shadow-sm border-b border-sky-800/50">
     <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2">
-      <div class="flex items-center space-x-3">
-        <span class="inline-flex items-center px-2.5 py-0.5 rounded text-[11px] font-semibold bg-sky-500 text-white shadow-sm">
-          CAMPUS PORTAL
-        </span>
-        <span class="text-sky-100 hidden sm:inline">5-7 Olukayode Street, Imoro, Ogijo, Shagamu - Ikorodu Road, Shagamu, Ogun State</span>
+      <div class="flex items-center space-x-2">
+        <i class="fas fa-map-marker-alt text-sky-400 text-xs"></i>
+        <span class="text-sky-100 school-address-text text-[11px] truncate max-w-xs sm:max-w-md">Campus Location</span>
       </div>
-      <div class="flex items-center space-x-4 text-sky-200">
-        <a href="cbt/index.html" class="inline-flex items-center text-amber-300 hover:text-white font-bold transition bg-amber-500/20 hover:bg-amber-500/30 px-2.5 py-0.5 rounded border border-amber-400/40 text-[11px]">
-          <i class="fas fa-laptop-code mr-1.5"></i> Student CBT Portal
-        </a>
-        <span><i class="fas fa-phone-alt mr-1"></i> 09053126809</span>
-        <span class="hidden md:inline"><i class="fas fa-envelope mr-1"></i> admissions@richvinecollege.edu.ng</span>
-        <span class="text-white font-medium bg-sky-600/60 px-2.5 py-0.5 rounded text-[11px]">Academic Session: 2026/2027</span>
+      <div class="flex items-center space-x-4 text-sky-200 text-[11px]">
+        <span><i class="fas fa-phone-alt mr-1 text-emerald-400"></i> <span class="school-phone-text">08012345678</span></span>
+        <span class="hidden sm:inline"><i class="fas fa-envelope mr-1 text-sky-400"></i> <span class="school-email-text">admin@excellencemodel.edu.ng</span></span>
       </div>
     </div>
   </div>
 
-  <!-- Header / Navigation (Public Landing Page - NO ADMIN PORTAL BUTTONS) -->
-  <header class="bg-white/95 backdrop-blur border-b border-sky-100 sticky top-0 z-40 shadow-sm">
+  <!-- ═══════════════ MAIN HEADER & NAVIGATION ═══════════════ -->
+  <header class="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-      <!-- Brand Logo -->
+      
+      <!-- Brand Logo & School Identity -->
       <a href="index.html" class="flex items-center space-x-3 group">
-        <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-sky-600 to-sky-400 flex items-center justify-center text-white shadow-md shadow-sky-500/20 group-hover:scale-105 transition-transform duration-300">
-          <i class="fas fa-graduation-cap text-2xl"></i>
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-700 to-indigo-800 flex items-center justify-center text-white shadow-md shadow-sky-500/20 group-hover:scale-105 transition-transform duration-300">
+          <i class="fas fa-graduation-cap text-2xl text-sky-200"></i>
         </div>
         <div>
-          <div class="text-xl sm:text-2xl font-black text-sky-900 tracking-tight flex items-center">
-            RICHVINE <span class="text-sky-500 ml-1">COLLEGE</span>
+          <div class="text-lg sm:text-xl font-black text-slate-900 tracking-tight leading-tight school-name-text">
+            EXCELLENCE MODEL COLLEGE
           </div>
-          <div class="text-[11px] tracking-wider font-semibold text-slate-400 uppercase -mt-1">
-            Soaring High
+          <div class="text-[11px] tracking-wider font-semibold text-slate-500 uppercase -mt-0.5 school-motto-text">
+            Knowledge, Character & Leadership
           </div>
         </div>
       </a>
 
-      <!-- Navigation Links -->
-      <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-600">
-        <a href="#about" class="hover:text-sky-600 transition">About College</a>
-        <a href="#academics" class="hover:text-sky-600 transition">Academics</a>
-        <a href="#campus" class="hover:text-sky-600 transition">Campus Facilities</a>
-        <a href="#curriculum" class="hover:text-sky-600 transition">Curriculum</a>
-        <a href="#contact" class="hover:text-sky-600 transition">Contact & Enquiries</a>
+      <!-- Desktop Navigation Menu -->
+      <nav class="hidden xl:flex items-center space-x-6 text-xs font-semibold text-slate-600">
+        <a href="#about" class="hover:text-sky-600 transition flex items-center gap-1">
+          <i class="fas fa-school text-sky-500"></i> About
+        </a>
+        <a href="#accounting" class="hover:text-sky-600 transition flex items-center gap-1 font-bold text-sky-700">
+          <i class="fas fa-coins text-amber-500"></i> Bursary & Accounting
+        </a>
+        <a href="#cbt" class="hover:text-sky-600 transition flex items-center gap-1">
+          <i class="fas fa-laptop-code text-indigo-500"></i> JAMB CBT
+        </a>
+        <a href="#attendance" class="hover:text-sky-600 transition flex items-center gap-1">
+          <i class="fas fa-clipboard-check text-emerald-500"></i> Attendance
+        </a>
+        <a href="#exams" class="hover:text-sky-600 transition flex items-center gap-1">
+          <i class="fas fa-file-signature text-purple-500"></i> Broadsheets
+        </a>
+        <a href="#clearance-checker" class="hover:text-sky-600 transition flex items-center gap-1 font-bold text-emerald-600">
+          <i class="fas fa-id-card"></i> Fee Clearance
+        </a>
+        <a href="#contact" class="hover:text-sky-600 transition">Contact</a>
       </nav>
 
-      <!-- Public Admission Enquiries Action -->
-      <div class="flex items-center space-x-3">
-        <a href="cbt/index.html" class="inline-flex items-center justify-center px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-sky-800 bg-sky-50 hover:bg-sky-100 border border-sky-200 shadow-sm transition duration-200">
-          <i class="fas fa-laptop-code mr-1.5 text-sky-600"></i> Student CBT
+      <!-- Portals Launch Action Buttons -->
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <!-- Student CBT Button -->
+        <a href="cbt/index.html" class="inline-flex items-center justify-center px-3 py-2 rounded-xl font-bold text-xs text-amber-900 bg-amber-50 hover:bg-amber-100 border border-amber-300 shadow-sm transition" title="Open Student CBT Center">
+          <i class="fas fa-laptop-code mr-1.5 text-amber-600"></i>
+          <span class="hidden sm:inline">Student CBT</span>
         </a>
-        <a href="#contact" class="inline-flex items-center justify-center px-5 py-2.5 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-sky-600 to-sky-500 hover:from-sky-700 hover:to-sky-600 shadow-md shadow-sky-600/30 hover:shadow-lg transition duration-200">
-          <i class="fas fa-paper-plane mr-2 text-xs"></i> 2026/2027 Admissions
+
+        <!-- Teacher Portal Button -->
+        <a href="teacher-login.html" class="inline-flex items-center justify-center px-3 py-2 rounded-xl font-bold text-xs text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 shadow-sm transition" title="Open Teacher Attendance Portal">
+          <i class="fas fa-chalkboard-teacher mr-1.5 text-emerald-600"></i>
+          <span class="hidden sm:inline">Teacher Portal</span>
+        </a>
+
+        <!-- Admin & Bursary Login Button -->
+        <a href="admin/index.html" class="inline-flex items-center justify-center px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-700 hover:to-sky-800 shadow-md shadow-sky-600/30 hover:shadow-lg transition">
+          <i class="fas fa-shield-alt mr-1.5 text-sky-200"></i>
+          <span>Admin Portal</span>
         </a>
       </div>
     </div>
   </header>
 
-  <!-- Hero Section with Massive Nigerian Secondary School Campus Building -->
-  <section class="relative min-h-[640px] flex items-center bg-slate-900 overflow-hidden">
+  <!-- ═══════════════ HERO SECTION & PORTALS LAUNCHPAD ═══════════════ -->
+  <section id="hero" class="relative min-h-[640px] flex items-center bg-slate-950 overflow-hidden">
     <!-- Background Image with Overlay -->
     <div class="absolute inset-0 z-0">
       <img 
         src="https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?auto=format&fit=crop&w=1920&q=80" 
-        alt="<span class="school-name-text">EXCELLENCE MODEL COLLEGE</span> Massive Academic Campus" 
-        class="w-full h-full object-cover object-center filter brightness-50 scale-105 transform hover:scale-100 transition-transform duration-1000"
+        alt="School Academic Campus" 
+        class="w-full h-full object-cover object-center filter brightness-[0.25] scale-105"
       >
-      <div class="absolute inset-0 bg-gradient-to-r from-sky-950/95 via-sky-900/80 to-slate-900/85"></div>
-      <div class="absolute inset-0 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:24px_24px] opacity-20"></div>
+      <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/90 to-sky-950/80"></div>
+      <div class="absolute inset-0 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:24px_24px] opacity-15"></div>
     </div>
 
-    <!-- Content Hero Container -->
-    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-white">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-        <!-- Hero Text -->
-        <div class="lg:col-span-8 space-y-6">
-          
-            <div id="hero-bursariq-trust-tag" class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-slate-950/80 border border-emerald-400/30 text-white text-xs font-semibold backdrop-blur-md shadow-lg mb-3">
-              <img src="assets/images/bursariq-logo.png" alt="BursarIQ" class="h-4 w-auto bg-white px-1.5 py-0.5 rounded">
-              <span class="text-emerald-300 font-bold">BursarIQ Certified</span>
-              <span class="text-slate-400">&bull;</span>
-              <span class="text-slate-300 italic">"Every naira accounted for."</span>
-            </div>
-            <div class="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full bg-sky-500/20 border border-sky-400/30 text-sky-200 text-xs font-semibold backdrop-blur-sm">
-            <span class="w-2 h-2 rounded-full bg-sky-400 animate-ping"></span>
-            <span>Welcome to <span class="school-name-text">EXCELLENCE MODEL COLLEGE</span> • 2026/2027 Academic Year</span>
+    <!-- Hero Content Container -->
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-white w-full">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+        
+        <!-- Left Column: Vision & Identity -->
+        <div class="lg:col-span-7 space-y-6">
+          <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-emerald-400/40 text-white text-xs font-semibold backdrop-blur-md shadow-lg">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span>Welcome to <span class="school-name-text font-bold text-emerald-300">EXCELLENCE MODEL COLLEGE</span></span>
           </div>
 
-          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
-            Nurturing Tomorrow's Leaders Through <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-300 to-sky-100">Global Standards</span> & Character.
+          <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight">
+            Institutional Brilliance Powered by <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-sky-300 to-emerald-300">BursarIQ OS</span>.
           </h1>
 
-          <p class="text-slate-200 text-base sm:text-lg max-w-2xl font-light leading-relaxed">
-            Situated on a sprawling, purpose-built campus in Ogijo, Ogun State (along Shagamu - Ikorodu Road), <strong><span class="school-name-text">EXCELLENCE MODEL COLLEGE</span></strong> delivers holistic education, blending the Nigerian National Curriculum with international standards to develop academic giants and grounded leaders.
+          <p class="text-slate-300 text-sm sm:text-base max-w-2xl font-normal leading-relaxed">
+            A comprehensive, zero-loss institutional management system that unifies 
+            <strong>precision bursary accounting</strong>, <strong>teacher attendance roll calls</strong>, 
+            <strong>JAMB-standard multi-subject CBT</strong>, and <strong>automated terminal broadsheets</strong> with official report card generation.
           </p>
 
-          <!-- Quick Metrics Bar -->
-          <div class="grid grid-cols-3 gap-6 pt-4 border-t border-sky-700/40 max-w-lg">
+          <!-- Core Institutional Metrics -->
+          <div class="grid grid-cols-3 gap-4 pt-3 border-t border-slate-800 max-w-lg">
             <div>
-              <div class="text-2xl sm:text-3xl font-extrabold text-sky-300">100%</div>
-              <div class="text-xs text-sky-100 font-medium">WAEC/NECO Distinction</div>
+              <div class="text-xl sm:text-2xl font-black text-emerald-400">100%</div>
+              <div class="text-[11px] text-slate-400 font-medium">Bursary Reconciliation</div>
             </div>
             <div>
-              <div class="text-2xl sm:text-3xl font-extrabold text-white">15:1</div>
-              <div class="text-xs text-sky-100 font-medium">Learner-Teacher Ratio</div>
+              <div class="text-xl sm:text-2xl font-black text-sky-400">8 Subjects</div>
+              <div class="text-[11px] text-slate-400 font-medium">Standard JAMB CBT</div>
             </div>
             <div>
-              <div class="text-2xl sm:text-3xl font-extrabold text-sky-300">2026/2027</div>
-              <div class="text-xs text-sky-100 font-medium">Current Session</div>
+              <div class="text-xl sm:text-2xl font-black text-amber-400">AM & PM</div>
+              <div class="text-[11px] text-slate-400 font-medium">Dual Daily Attendance</div>
             </div>
           </div>
 
-          <!-- Buttons -->
-          <div class="flex flex-wrap gap-4 pt-2">
-            <a href="#about" class="px-7 py-3.5 rounded-xl font-bold text-slate-900 bg-sky-300 hover:bg-sky-200 shadow-lg shadow-sky-500/20 transform hover:-translate-y-0.5 transition duration-200 flex items-center">
-              <i class="fas fa-compass mr-2 text-sky-900"></i> Explore College Profile
+          <!-- Action CTA Buttons -->
+          <div class="flex flex-wrap gap-3 pt-2">
+            <a href="#portals" class="px-6 py-3 rounded-xl font-bold text-xs sm:text-sm text-slate-900 bg-sky-300 hover:bg-sky-200 shadow-lg shadow-sky-400/20 transition flex items-center gap-2">
+              <i class="fas fa-th-large text-sky-900"></i> Access System Portals
             </a>
-            <a href="#campus" class="px-7 py-3.5 rounded-xl font-semibold text-white bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-sm transition duration-200 flex items-center">
-              <i class="fas fa-images mr-2"></i> View Campus Life
+            <a href="#clearance-checker" class="px-6 py-3 rounded-xl font-semibold text-xs sm:text-sm text-white bg-slate-800/80 hover:bg-slate-700 border border-slate-700 transition flex items-center gap-2">
+              <i class="fas fa-search text-emerald-400"></i> Check Student Clearance
             </a>
           </div>
         </div>
 
-        <!-- Campus Highlights Card -->
-        <div class="lg:col-span-4">
-          <div class="bg-white/10 backdrop-blur-md border border-white/20 p-6 sm:p-8 rounded-3xl shadow-2xl space-y-6 text-white">
-            <div class="flex items-center justify-between border-b border-white/15 pb-4">
+        <!-- Right Column: Portal Launchpad Grid -->
+        <div class="lg:col-span-5" id="portals">
+          <div class="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-6 rounded-3xl shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
               <div>
-                <span class="text-xs font-semibold text-sky-300 uppercase tracking-wider">Admissions Desk</span>
-                <h3 class="text-xl font-bold">2026/2027 Enrollment</h3>
+                <span class="text-[10px] font-extrabold text-sky-400 uppercase tracking-widest">Institutional Gateway</span>
+                <h3 class="text-base sm:text-lg font-bold text-white">Central Portal Launchpad</h3>
               </div>
-              <div class="w-10 h-10 rounded-full bg-sky-500/30 flex items-center justify-center text-sky-300">
-                <i class="fas fa-award text-lg"></i>
-              </div>
-            </div>
-
-            <p class="text-xs text-slate-300 leading-relaxed">
-              Applications are now open for prospective learners entering Junior Secondary (JSS 1 - 3) and Senior Secondary (SSS 1 - 3 Science, Art, and Commercial tracks).
-            </p>
-
-            <div class="space-y-3">
-              <div class="flex items-center space-x-3 text-xs text-sky-100 bg-sky-900/40 p-3 rounded-xl border border-sky-400/20">
-                <i class="fas fa-check-circle text-sky-400 text-sm"></i>
-                <span>World-class STEM, Robotics & Coding Labs</span>
-              </div>
-              <div class="flex items-center space-x-3 text-xs text-sky-100 bg-sky-900/40 p-3 rounded-xl border border-sky-400/20">
-                <i class="fas fa-check-circle text-sky-400 text-sm"></i>
-                <span>Olympic-size athletic grounds & house sports</span>
-              </div>
-              <div class="flex items-center space-x-3 text-xs text-sky-100 bg-sky-900/40 p-3 rounded-xl border border-sky-400/20">
-                <i class="fas fa-check-circle text-sky-400 text-sm"></i>
-                <span>Conducive boarding & air-conditioned day facilities</span>
+              <div class="w-8 h-8 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center text-sm font-bold">
+                <i class="fas fa-network-wired"></i>
               </div>
             </div>
 
-            <a href="#contact" class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-sky-500 to-sky-400 hover:from-sky-400 hover:to-sky-300 text-slate-900 font-bold text-sm flex items-center justify-center transition shadow-lg shadow-sky-500/30">
-              Enquire for Admission <i class="fas fa-arrow-right ml-2 text-xs"></i>
+            <!-- Portal 1: Admin & Bursary ERP -->
+            <a href="admin/index.html" class="portal-card block p-3.5 rounded-2xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700 hover:border-sky-500 transition group">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                  <div class="w-10 h-10 rounded-xl bg-sky-600/30 text-sky-400 border border-sky-500/30 flex items-center justify-center text-base group-hover:scale-110 transition">
+                    <i class="fas fa-calculator"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-xs sm:text-sm font-bold text-white group-hover:text-sky-300 transition">Bursary &amp; Admin ERP</h4>
+                    <p class="text-[11px] text-slate-400">Student fees, debt recovery, payroll, expenses &amp; P&amp;L</p>
+                  </div>
+                </div>
+                <i class="fas fa-arrow-right text-xs text-sky-400 group-hover:translate-x-1 transition"></i>
+              </div>
             </a>
+
+            <!-- Portal 2: Teacher Portal -->
+            <a href="teacher-login.html" class="portal-card block p-3.5 rounded-2xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700 hover:border-emerald-500 transition group">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                  <div class="w-10 h-10 rounded-xl bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-base group-hover:scale-110 transition">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-xs sm:text-sm font-bold text-white group-hover:text-emerald-300 transition">Teacher &amp; Attendance Portal</h4>
+                    <p class="text-[11px] text-slate-400">Class teachers mark morning &amp; afternoon roll calls</p>
+                  </div>
+                </div>
+                <i class="fas fa-arrow-right text-xs text-emerald-400 group-hover:translate-x-1 transition"></i>
+              </div>
+            </a>
+
+            <!-- Portal 3: Student CBT Center -->
+            <a href="cbt/index.html" class="portal-card block p-3.5 rounded-2xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700 hover:border-amber-500 transition group">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                  <div class="w-10 h-10 rounded-xl bg-amber-600/30 text-amber-400 border border-amber-500/30 flex items-center justify-center text-base group-hover:scale-110 transition">
+                    <i class="fas fa-laptop-code"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-xs sm:text-sm font-bold text-white group-hover:text-amber-300 transition">JAMB Multi-Subject CBT</h4>
+                    <p class="text-[11px] text-slate-400">8 subjects, strictly timed 30-min exams with instant scores</p>
+                  </div>
+                </div>
+                <i class="fas fa-arrow-right text-xs text-amber-400 group-hover:translate-x-1 transition"></i>
+              </div>
+            </a>
+
+            <!-- Portal 4: Exams & Broadsheets -->
+            <a href="admin/index.html" class="portal-card block p-3.5 rounded-2xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700 hover:border-purple-500 transition group">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                  <div class="w-10 h-10 rounded-xl bg-purple-600/30 text-purple-400 border border-purple-500/30 flex items-center justify-center text-base group-hover:scale-110 transition">
+                    <i class="fas fa-file-signature"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-xs sm:text-sm font-bold text-white group-hover:text-purple-300 transition">Exams &amp; Records Broadsheet</h4>
+                    <p class="text-[11px] text-slate-400">Class positions, averages &amp; downloadable report cards</p>
+                  </div>
+                </div>
+                <i class="fas fa-arrow-right text-xs text-purple-400 group-hover:translate-x-1 transition"></i>
+              </div>
+            </a>
+
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- School Core Pillars -->
-  <section id="about" class="py-16 bg-white border-b border-sky-100">
+  <!-- ═══════════════ INTERACTIVE FEE CLEARANCE & BALANCE CHECKER ═══════════════ -->
+  <section id="clearance-checker" class="py-12 bg-gradient-to-b from-slate-900 to-sky-950 text-white border-y border-slate-800">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="bg-slate-900/80 border border-sky-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-md">
+        
+        <div class="text-center max-w-2xl mx-auto mb-6">
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 uppercase tracking-widest">
+            <i class="fas fa-id-card mr-1.5"></i> Parent &amp; Student Self-Service
+          </span>
+          <h2 class="text-2xl sm:text-3xl font-black text-white mt-2">
+            Verify Student Fee &amp; Exam Clearance Status
+          </h2>
+          <p class="text-slate-400 text-xs sm:text-sm mt-1">
+            Instantly check current term fee balance, past arrears, payment history, and examination clearance card status.
+          </p>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="max-w-xl mx-auto mb-4">
+          <form id="clearanceLookupForm" onsubmit="event.preventDefault(); lookupStudentClearance();" class="flex gap-2">
+            <div class="relative flex-1">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                <i class="fas fa-search"></i>
+              </div>
+              <input 
+                type="text" 
+                id="clearanceSearchInput" 
+                required
+                placeholder="Enter Student ID or Reg No (e.g. EMC/2026/001)"
+                class="w-full pl-10 pr-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs sm:text-sm font-semibold focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 uppercase placeholder:normal-case placeholder:text-slate-500"
+              >
+            </div>
+            <button 
+              type="submit" 
+              class="px-5 py-3 rounded-xl bg-gradient-to-r from-sky-600 to-sky-500 hover:from-sky-500 hover:to-sky-400 text-white font-bold text-xs sm:text-sm transition flex items-center gap-1.5 shadow-md shadow-sky-600/30"
+            >
+              <span>Verify</span>
+              <i class="fas fa-arrow-right text-xs"></i>
+            </button>
+          </form>
+
+          <!-- Quick Test IDs -->
+          <div class="mt-2.5 flex flex-wrap items-center justify-center gap-2 text-xs text-slate-400">
+            <span>Quick Sample IDs:</span>
+            <button type="button" onclick="setQuickClearance('EMC/2026/001')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-sky-400 font-mono text-[11px] border border-slate-700">EMC/2026/001</button>
+            <button type="button" onclick="setQuickClearance('EMC/2026/002')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-sky-400 font-mono text-[11px] border border-slate-700">EMC/2026/002</button>
+            <button type="button" onclick="setQuickClearance('EMC/2026/003')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-sky-400 font-mono text-[11px] border border-slate-700">EMC/2026/003</button>
+          </div>
+        </div>
+
+        <!-- Result Box (Hidden until searched) -->
+        <div id="clearanceResultBox" class="hidden mt-6 p-5 rounded-2xl bg-slate-950 border border-slate-800">
+          <div id="clearanceCardContent"></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ CORE ACCOUNTING & BURSARY ENGINE ═══════════════ -->
+  <section id="accounting" class="py-16 bg-white border-b border-slate-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center max-w-3xl mx-auto mb-12">
-        <span class="text-xs font-bold uppercase tracking-widest text-sky-600 bg-sky-50 px-3 py-1 rounded-full border border-sky-200">
-          Our Educational Philosophy
+      
+      <div class="text-center max-w-3xl mx-auto mb-14">
+        <span class="text-xs font-bold uppercase tracking-widest text-sky-700 bg-sky-100 px-3 py-1 rounded-full border border-sky-200">
+          Double-Entry Accounting Architecture
         </span>
-        <h2 class="text-3xl font-bold text-slate-900 mt-3">
-          Why Discerning Parents Choose <span class="school-name-text">EXCELLENCE MODEL COLLEGE</span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-3">
+          Majorly Engineered for Institutional Financial Precision
         </h2>
-        <p class="text-slate-500 text-sm mt-2">
-          Ranked among Nigeria's leading private secondary schools with an ultra-modern campus, digital laboratories, and an accountable academic environment.
+        <p class="text-slate-600 text-sm sm:text-base mt-2">
+          Eliminate school fee defaults, manual receipt tampering, and untracked expenses with BursarIQ's enterprise accounting modules.
         </p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <!-- Pillar 1 -->
-        <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200 hover:border-sky-300 hover:shadow-xl hover:shadow-sky-500/10 transition group">
-          <div class="w-14 h-14 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center text-2xl mb-5 group-hover:scale-110 group-hover:bg-sky-600 group-hover:text-white transition duration-300">
-            <i class="fas fa-graduation-cap"></i>
+      <!-- Feature Grid: 6 Pillars of Bursary -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        
+        <!-- Pillar 1: Arrears-First Recovery -->
+        <div class="p-6 rounded-3xl bg-slate-50 border border-slate-200 hover:border-emerald-400 hover:shadow-xl hover:shadow-emerald-500/10 transition group">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl mb-4 group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition duration-300">
+            <i class="fas fa-hand-holding-usd"></i>
           </div>
-          <h3 class="text-lg font-bold text-slate-900 mb-2">Academic Excellence</h3>
-          <p class="text-slate-600 text-xs leading-relaxed">
-            Our curriculum bridges Nigerian NECO/WAEC syllabus with Cambridge checkpoint standards, equipping students for top national and Ivy League international universities.
+          <h3 class="text-base sm:text-lg font-bold text-slate-900 mb-2">Arrears-First Payment Recovery</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Incoming tuition and fee payments are algorithmically prioritized to extinguish past unpaid arrears before crediting current term tuition, halting bad debts automatically.
           </p>
+          <div class="mt-4 flex items-center text-xs font-bold text-emerald-700">
+            <span>Zero Debt Accumulation</span> <i class="fas fa-check-circle ml-1.5"></i>
+          </div>
         </div>
 
-        <!-- Pillar 2 -->
-        <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200 hover:border-sky-300 hover:shadow-xl hover:shadow-sky-500/10 transition group">
-          <div class="w-14 h-14 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center text-2xl mb-5 group-hover:scale-110 group-hover:bg-sky-600 group-hover:text-white transition duration-300">
-            <i class="fas fa-shield-alt"></i>
+        <!-- Pillar 2: Digital Receipts -->
+        <div class="p-6 rounded-3xl bg-slate-50 border border-slate-200 hover:border-sky-400 hover:shadow-xl hover:shadow-sky-500/10 transition group">
+          <div class="w-12 h-12 rounded-2xl bg-sky-100 text-sky-700 flex items-center justify-center text-xl mb-4 group-hover:scale-110 group-hover:bg-sky-600 group-hover:text-white transition duration-300">
+            <i class="fas fa-receipt"></i>
           </div>
-          <h3 class="text-lg font-bold text-slate-900 mb-2">Character & Moral Discipline</h3>
-          <p class="text-slate-600 text-xs leading-relaxed">
-            We cultivate sound integrity, empathy, and leadership ethics through mentorship, community service projects, and structured leadership societies.
+          <h3 class="text-base sm:text-lg font-bold text-slate-900 mb-2">Cryptographic Digital Receipts</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Every transaction issues an official PDF receipt featuring bank reconciliation references, tuition itemizations, and verification hashes for parent peace of mind.
           </p>
+          <div class="mt-4 flex items-center text-xs font-bold text-sky-700">
+            <span>Instant PDF Print &amp; Download</span> <i class="fas fa-print ml-1.5"></i>
+          </div>
         </div>
 
-        <!-- Pillar 3 -->
-        <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200 hover:border-sky-300 hover:shadow-xl hover:shadow-sky-500/10 transition group">
-          <div class="w-14 h-14 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center text-2xl mb-5 group-hover:scale-110 group-hover:bg-sky-600 group-hover:text-white transition duration-300">
-            <i class="fas fa-microchip"></i>
+        <!-- Pillar 3: Income & Expenditure P&L -->
+        <div class="p-6 rounded-3xl bg-slate-50 border border-slate-200 hover:border-indigo-400 hover:shadow-xl hover:shadow-indigo-500/10 transition group">
+          <div class="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-700 flex items-center justify-center text-xl mb-4 group-hover:scale-110 group-hover:bg-indigo-600 group-hover:text-white transition duration-300">
+            <i class="fas fa-chart-pie"></i>
           </div>
-          <h3 class="text-lg font-bold text-slate-900 mb-2">Innovation & Technological Edge</h3>
-          <p class="text-slate-600 text-xs leading-relaxed">
-            Every learner engages with hands-on coding, robotics, and interactive science experiments supported by ultra-modern cloud digital infrastructure.
+          <h3 class="text-base sm:text-lg font-bold text-slate-900 mb-2">Income &amp; Expenditure Ledger</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Real-time operating cashbook comparing daily collections against categorized operational expenses (fuel, diesel, maintenance, teaching aids) with surplus/deficit reporting.
           </p>
+          <div class="mt-4 flex items-center text-xs font-bold text-indigo-700">
+            <span>Real-Time Audit Trail</span> <i class="fas fa-balance-scale ml-1.5"></i>
+          </div>
         </div>
+
+        <!-- Pillar 4: Payroll & Loans -->
+        <div class="p-6 rounded-3xl bg-slate-50 border border-slate-200 hover:border-amber-400 hover:shadow-xl hover:shadow-amber-500/10 transition group">
+          <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center text-xl mb-4 group-hover:scale-110 group-hover:bg-amber-600 group-hover:text-white transition duration-300">
+            <i class="fas fa-money-check-alt"></i>
+          </div>
+          <h3 class="text-base sm:text-lg font-bold text-slate-900 mb-2">Staff Payroll &amp; Loan Ledger</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Automated monthly salary computations factoring in allowances, statutory deductions, staff loan disbursements, and scheduled monthly loan repayments.
+          </p>
+          <div class="mt-4 flex items-center text-xs font-bold text-amber-700">
+            <span>Integrated Salary Slips</span> <i class="fas fa-file-invoice-dollar ml-1.5"></i>
+          </div>
+        </div>
+
+        <!-- Pillar 5: Stock & Inventory Control -->
+        <div class="p-6 rounded-3xl bg-slate-50 border border-slate-200 hover:border-purple-400 hover:shadow-xl hover:shadow-purple-500/10 transition group">
+          <div class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center text-xl mb-4 group-hover:scale-110 group-hover:bg-purple-600 group-hover:text-white transition duration-300">
+            <i class="fas fa-boxes"></i>
+          </div>
+          <h3 class="text-base sm:text-lg font-bold text-slate-900 mb-2">Stock &amp; Store Inventory</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Tracks school uniforms, textbooks, science laboratory reagents, and stationery supplies. Auto-calculates total inventory valuation with low-stock warnings.
+          </p>
+          <div class="mt-4 flex items-center text-xs font-bold text-purple-700">
+            <span>Asset Valuation Ledger</span> <i class="fas fa-warehouse ml-1.5"></i>
+          </div>
+        </div>
+
+        <!-- Pillar 6: Clearance System -->
+        <div class="p-6 rounded-3xl bg-slate-50 border border-slate-200 hover:border-teal-400 hover:shadow-xl hover:shadow-teal-500/10 transition group">
+          <div class="w-12 h-12 rounded-2xl bg-teal-100 text-teal-700 flex items-center justify-center text-xl mb-4 group-hover:scale-110 group-hover:bg-teal-600 group-hover:text-white transition duration-300">
+            <i class="fas fa-id-badge"></i>
+          </div>
+          <h3 class="text-base sm:text-lg font-bold text-slate-900 mb-2">Examination Clearance Cards</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Enforces exam hall admission rules. The system generates tamper-evident examination clearance photo-cards solely for candidates with fully verified bursary clearance.
+          </p>
+          <div class="mt-4 flex items-center text-xs font-bold text-teal-700">
+            <span>Exam Fraud Protection</span> <i class="fas fa-shield-alt ml-1.5"></i>
+          </div>
+        </div>
+
       </div>
+
+      <!-- Action Banner to Open Bursary -->
+      <div class="mt-12 p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-sky-900 via-sky-800 to-slate-900 text-white flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl">
+        <div>
+          <h3 class="text-lg sm:text-xl font-bold">Authorized Bursars &amp; Administrators</h3>
+          <p class="text-xs text-sky-200 mt-1">Access the central accounting ledger, record payments, disburse salaries, and print audit reports.</p>
+        </div>
+        <a href="admin/index.html" class="px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs sm:text-sm transition flex items-center gap-2 whitespace-nowrap shadow-lg">
+          <i class="fas fa-lock"></i> Login to Bursary Dashboard
+        </a>
+      </div>
+
     </div>
   </section>
 
-  <!-- Dynamic Campus Visual Gallery - Dope Nigerian Private School Facilities -->
-  <section id="campus" class="py-16 bg-slate-50">
+  <!-- ═══════════════ MULTI-SUBJECT JAMB CBT SHOWCASE ═══════════════ -->
+  <section id="cbt" class="py-16 bg-slate-100 border-b border-slate-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center max-w-3xl mx-auto mb-10">
-        <span class="text-xs font-bold uppercase tracking-widest text-sky-600 bg-sky-100 px-3 py-1 rounded-full">
-          Campus Life & Infrastructure
+      
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+        <!-- Left Side: CBT Engine Details -->
+        <div class="lg:col-span-6 space-y-5">
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-800 border border-amber-300 uppercase tracking-widest">
+            <i class="fas fa-laptop-code mr-1.5"></i> Computer-Based Test Center
+          </span>
+
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight">
+            Standard JAMB &amp; WAEC Multi-Subject CBT Platform
+          </h2>
+
+          <p class="text-slate-600 text-sm leading-relaxed">
+            Prepare senior college students for national qualifying exams with our timed, responsive examination simulator. Supports mathematical formulas with KaTeX LaTeX rendering and real-time score grading.
+          </p>
+
+          <!-- 8 Subjects Grid -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2">
+            <div class="p-3 bg-white rounded-xl border border-slate-200 text-center shadow-sm">
+              <i class="fas fa-book-open text-sky-600 text-base mb-1"></i>
+              <div class="text-xs font-bold text-slate-800">English</div>
+            </div>
+            <div class="p-3 bg-white rounded-xl border border-slate-200 text-center shadow-sm">
+              <i class="fas fa-square-root-variable text-emerald-600 text-base mb-1"></i>
+              <div class="text-xs font-bold text-slate-800">Mathematics</div>
+            </div>
+            <div class="p-3 bg-white rounded-xl border border-slate-200 text-center shadow-sm">
+              <i class="fas fa-dna text-teal-600 text-base mb-1"></i>
+              <div class="text-xs font-bold text-slate-800">Biology</div>
+            </div>
+            <div class="p-3 bg-white rounded-xl border border-slate-200 text-center shadow-sm">
+              <i class="fas fa-atom text-purple-600 text-base mb-1"></i>
+              <div class="text-xs font-bold text-slate-800">Physics</div>
+            </div>
+            <div class="p-3 bg-white rounded-xl border border-slate-200 text-center shadow-sm">
+              <i class="fas fa-flask text-pink-600 text-base mb-1"></i>
+              <div class="text-xs font-bold text-slate-800">Chemistry</div>
+            </div>
+            <div class="p-3 bg-white rounded-xl border border-slate-200 text-center shadow-sm">
+              <i class="fas fa-chart-line text-indigo-600 text-base mb-1"></i>
+              <div class="text-xs font-bold text-slate-800">Economics</div>
+            </div>
+            <div class="p-3 bg-white rounded-xl border border-slate-200 text-center shadow-sm">
+              <i class="fas fa-landmark text-amber-600 text-base mb-1"></i>
+              <div class="text-xs font-bold text-slate-800">Government</div>
+            </div>
+            <div class="p-3 bg-white rounded-xl border border-slate-200 text-center shadow-sm">
+              <i class="fas fa-store text-blue-600 text-base mb-1"></i>
+              <div class="text-xs font-bold text-slate-800">Commerce</div>
+            </div>
+          </div>
+
+          <div class="pt-3">
+            <a href="cbt/index.html" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white font-bold text-xs sm:text-sm shadow-lg shadow-amber-600/30 transition">
+              <i class="fas fa-play text-xs"></i> Open Student CBT Platform
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Side: CBT Mock Preview Card -->
+        <div class="lg:col-span-6">
+          <div class="bg-slate-900 rounded-3xl p-6 shadow-2xl border border-slate-800 text-white space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+                <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                <span class="text-xs font-mono text-slate-400 ml-2">CBT Examination Screen</span>
+              </div>
+              <span class="px-2 py-0.5 rounded bg-slate-800 text-emerald-400 font-mono text-xs font-bold">29:45 Remaining</span>
+            </div>
+
+            <div class="p-4 rounded-xl bg-slate-800/80 border border-slate-700/80">
+              <div class="flex justify-between text-xs text-slate-400 mb-2">
+                <span>Subject: <strong class="text-sky-400">Mathematics</strong></span>
+                <span>Question <strong>14 of 40</strong></span>
+              </div>
+              <p class="text-sm font-semibold text-slate-100">
+                If the quadratic equation \(2x^2 - 7x + k = 0\) has equal roots, find the exact value of \(k\).
+              </p>
+              <div class="grid grid-cols-2 gap-2 mt-3 text-xs">
+                <div class="p-2 rounded-lg bg-slate-900 border border-slate-700 text-slate-300">A. 49/8</div>
+                <div class="p-2 rounded-lg bg-emerald-950 border border-emerald-500 text-emerald-300 font-bold">B. 49/8 (Selected)</div>
+                <div class="p-2 rounded-lg bg-slate-900 border border-slate-700 text-slate-300">C. 7/4</div>
+                <div class="p-2 rounded-lg bg-slate-900 border border-slate-700 text-slate-300">D. 14</div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between text-xs text-slate-400 pt-2">
+              <span>Single Attempt Enforcement</span>
+              <span class="text-emerald-400 font-bold">Instant WAEC Grade Generation</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════ TEACHER PORTAL & ATTENDANCE ═══════════════ -->
+  <section id="attendance" class="py-16 bg-white border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+        <!-- Left Side: Teacher Portal Card -->
+        <div class="lg:col-span-5 order-2 lg:order-1">
+          <div class="bg-gradient-to-br from-slate-900 to-emerald-950 p-6 sm:p-8 rounded-3xl shadow-2xl border border-emerald-500/30 text-white space-y-5">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500 text-slate-900 flex items-center justify-center font-bold text-lg">
+                  <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+                <div>
+                  <h4 class="font-bold text-sm">Class Teacher Portal</h4>
+                  <p class="text-xs text-emerald-400">Secure Staff Phone &amp; Password Auth</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-3 text-xs">
+              <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700 flex items-center justify-between">
+                <div>
+                  <span class="text-slate-400 block text-[10px] uppercase font-bold">Session Roll Call</span>
+                  <strong class="text-white">Morning Roll Call (AM)</strong>
+                </div>
+                <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold">Arrivals</span>
+              </div>
+              <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700 flex items-center justify-between">
+                <div>
+                  <span class="text-slate-400 block text-[10px] uppercase font-bold">Session Roll Call</span>
+                  <strong class="text-white">Afternoon Roll Call (PM)</strong>
+                </div>
+                <span class="px-2 py-0.5 rounded bg-sky-500/20 text-sky-400 font-bold">Dismissals</span>
+              </div>
+              <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700 flex items-center justify-between">
+                <div>
+                  <span class="text-slate-400 block text-[10px] uppercase font-bold">Accountability</span>
+                  <strong class="text-white">Assigned Class Teacher Lockdown</strong>
+                </div>
+                <span class="px-2 py-0.5 rounded bg-purple-500/20 text-purple-400 font-bold">Zero Fraud</span>
+              </div>
+            </div>
+
+            <a href="teacher-login.html" class="block w-full py-3 text-center rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs sm:text-sm transition shadow-lg">
+              Sign In to Teacher Portal &rarr;
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Side: Details -->
+        <div class="lg:col-span-7 order-1 lg:order-2 space-y-5">
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-700 border border-emerald-300 uppercase tracking-widest">
+            <i class="fas fa-clipboard-check mr-1.5"></i> Daily Learners Attendance
+          </span>
+
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight">
+            Class Teacher Morning &amp; Afternoon Attendance Roll Call
+          </h2>
+
+          <p class="text-slate-600 text-sm leading-relaxed">
+            School administrators generate unique login credentials (registered phone number + secure unique password) for teaching staff. Class teachers mark daily morning arrivals and afternoon departures for their assigned learners, with records immediately synchronized into termly broadsheets.
+          </p>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
+            <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200">
+              <div class="text-emerald-600 text-lg mb-1"><i class="fas fa-check-double"></i></div>
+              <div class="font-bold text-slate-900 text-xs">One-Click Present</div>
+              <p class="text-[11px] text-slate-500 mt-0.5">Quick mark all present in seconds</p>
+            </div>
+            <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200">
+              <div class="text-amber-600 text-lg mb-1"><i class="fas fa-clock"></i></div>
+              <div class="font-bold text-slate-900 text-xs">Late &amp; Excused</div>
+              <p class="text-[11px] text-slate-500 mt-0.5">Custom remarks and reasons</p>
+            </div>
+            <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 col-span-2 sm:col-span-1">
+              <div class="text-sky-600 text-lg mb-1"><i class="fas fa-chart-bar"></i></div>
+              <div class="font-bold text-slate-900 text-xs">Report Card Sync</div>
+              <p class="text-[11px] text-slate-500 mt-0.5">Attendance rates appear on PDF result</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════ EXAMS & RECORDS / BROADSHEET SHOWCASE ═══════════════ -->
+  <section id="exams" class="py-16 bg-slate-50 border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-12">
+        <span class="text-xs font-bold uppercase tracking-widest text-purple-700 bg-purple-100 px-3 py-1 rounded-full border border-purple-200">
+          Exams &amp; Records Architecture
         </span>
-        <h2 class="text-3xl font-bold text-slate-900 mt-2">
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-3">
+          Automated Broadsheets &amp; Official Terminal Report Cards
+        </h2>
+        <p class="text-slate-600 text-sm mt-2">
+          Class ranking (1st, 2nd, 3rd), terminal average calculations, psychomotor skill ratings, and one-click PDF printouts.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="p-6 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-3">
+          <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold">
+            <i class="fas fa-table text-lg"></i>
+          </div>
+          <h3 class="text-base font-bold text-slate-900">Class-Wide Broadsheet Matrix</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Consolidated terminal matrix aggregating student continuous assessment scores (CA 1, CA 2) and examination marks with automatic position rankings.
+          </p>
+          <span class="inline-block text-[11px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-200">Exportable to CSV</span>
+        </div>
+
+        <div class="p-6 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-3">
+          <div class="w-10 h-10 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center font-bold">
+            <i class="fas fa-file-pdf text-lg"></i>
+          </div>
+          <h3 class="text-base font-bold text-slate-900">Instant PDF Terminal Report Cards</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Complete official Nigerian school report card featuring school crest, terminal average, attendance breakdown, Form Teacher comments, and Principal signature block.
+          </p>
+          <span class="inline-block text-[11px] font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-200">100% Print Ready</span>
+        </div>
+
+        <div class="p-6 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+            <i class="fas fa-sync text-lg"></i>
+          </div>
+          <h3 class="text-base font-bold text-slate-900">CBT Score Synchronization</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            One-click automated synchronization scaling CBT test performance (40 marks) to terminal examination ledgers (60 marks) without duplicate data entry.
+          </p>
+          <span class="inline-block text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Zero Manual Transfer</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════ CAMPUS FACILITIES & ABOUT ═══════════════ -->
+  <section id="about" class="py-16 bg-white border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-12">
+        <span class="text-xs font-bold uppercase tracking-widest text-sky-600 bg-sky-50 px-3 py-1 rounded-full border border-sky-200">
+          World-Class Infrastructure
+        </span>
+        <h2 class="text-3xl font-bold text-slate-900 mt-3">
           Inside <span class="school-name-text">EXCELLENCE MODEL COLLEGE</span> Campus
         </h2>
         <p class="text-slate-500 text-sm mt-1">
-          State-of-the-art facilities designed to foster academic excellence, sportsmanship, and creativity.
+          Ultra-modern facilities designed to nurture academic giants, sports champions, and grounded leaders.
         </p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Photo 1: Massive College Administrative Complex -->
-        <div class="group relative rounded-2xl overflow-hidden shadow-md bg-white border border-sky-100 h-72">
-          <img 
-            src="https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?auto=format&fit=crop&w=800&q=80" 
-            alt="<span class="school-name-text">EXCELLENCE MODEL COLLEGE</span> Main Building" 
-            class="w-full h-full object-cover group-hover:scale-110 transition duration-500"
-          >
+        <!-- Photo 1 -->
+        <div class="group relative rounded-2xl overflow-hidden shadow-md bg-white border border-slate-200 h-72">
+          <img src="https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?auto=format&fit=crop&w=800&q=80" alt="Main College Complex" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
           <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/30 to-transparent flex flex-col justify-end p-5 text-white">
             <span class="text-xs font-semibold text-sky-300">Central Block</span>
-            <h4 class="text-base font-bold">Administrative & Bursary Complex</h4>
-            <p class="text-xs text-slate-200 mt-1 line-clamp-2">Houses the principal's office, bursary unit, council chambers, and centralized digital records center.</p>
+            <h4 class="text-base font-bold">Administrative &amp; Bursary Complex</h4>
+            <p class="text-xs text-slate-200 mt-1 line-clamp-2">Houses the principal's office, bursary unit, council chambers, and digital records center.</p>
           </div>
         </div>
 
-        <!-- Photo 2: Ultra-Modern Science Laboratory -->
-        <div class="group relative rounded-2xl overflow-hidden shadow-md bg-white border border-sky-100 h-72">
-          <img 
-            src="https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=800&q=80" 
-            alt="Advanced Science Laboratory" 
-            class="w-full h-full object-cover group-hover:scale-110 transition duration-500"
-          >
+        <!-- Photo 2 -->
+        <div class="group relative rounded-2xl overflow-hidden shadow-md bg-white border border-slate-200 h-72">
+          <img src="https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=800&q=80" alt="Science Laboratory" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
           <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/30 to-transparent flex flex-col justify-end p-5 text-white">
             <span class="text-xs font-semibold text-sky-300">STEM Innovation</span>
-            <h4 class="text-base font-bold">Ultra-Modern Science & Robotics Lab</h4>
-            <p class="text-xs text-slate-200 mt-1 line-clamp-2">Equipped for Physics, Chemistry, Biology, and Robotics practicals adhering to WAEC & Cambridge criteria.</p>
+            <h4 class="text-base font-bold">Ultra-Modern Science &amp; Robotics Lab</h4>
+            <p class="text-xs text-slate-200 mt-1 line-clamp-2">Equipped for Physics, Chemistry, Biology practicals adhering to WAEC &amp; Cambridge standards.</p>
           </div>
         </div>
 
-        <!-- Photo 3: Digital E-Library -->
-        <div class="group relative rounded-2xl overflow-hidden shadow-md bg-white border border-sky-100 h-72">
-          <img 
-            src="https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=800&q=80" 
-            alt="E-Library & Study Resource Center" 
-            class="w-full h-full object-cover group-hover:scale-110 transition duration-500"
-          >
+        <!-- Photo 3 -->
+        <div class="group relative rounded-2xl overflow-hidden shadow-md bg-white border border-slate-200 h-72">
+          <img src="https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=800&q=80" alt="Digital E-Library" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
           <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/30 to-transparent flex flex-col justify-end p-5 text-white">
             <span class="text-xs font-semibold text-sky-300">Resource Center</span>
-            <h4 class="text-base font-bold">Herbert Macaulay Memorial E-Library</h4>
-            <p class="text-xs text-slate-200 mt-1 line-clamp-2">Over 25,000 digital journals, approved textbook catalogues, and quiet multimedia cubicles for senior students.</p>
-          </div>
-        </div>
-
-        <!-- Photo 4: Smart Classroom & Interactive Learning -->
-        <div class="group relative rounded-2xl overflow-hidden shadow-md bg-white border border-sky-100 h-72">
-          <img 
-            src="https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=800&q=80" 
-            alt="Smart Classrooms" 
-            class="w-full h-full object-cover group-hover:scale-110 transition duration-500"
-          >
-          <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/30 to-transparent flex flex-col justify-end p-5 text-white">
-            <span class="text-xs font-semibold text-sky-300">Academic Classrooms</span>
-            <h4 class="text-base font-bold">Climate-Controlled Smart Classrooms</h4>
-            <p class="text-xs text-slate-200 mt-1 line-clamp-2">Air-conditioned classrooms equipped with interactive smart screens for JSS 1 through SSS 3 cohorts.</p>
-          </div>
-        </div>
-
-        <!-- Photo 5: Sports Complex & Athletic Fields -->
-        <div class="group relative rounded-2xl overflow-hidden shadow-md bg-white border border-sky-100 h-72">
-          <img 
-            src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=800&q=80" 
-            alt="Olympic Standard Sports Complex" 
-            class="w-full h-full object-cover group-hover:scale-110 transition duration-500"
-          >
-          <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/30 to-transparent flex flex-col justify-end p-5 text-white">
-            <span class="text-xs font-semibold text-sky-300">Sports & Recreation</span>
-            <h4 class="text-base font-bold">Inter-House Athletic Complex & Pitch</h4>
-            <p class="text-xs text-slate-200 mt-1 line-clamp-2">Standard synthetic football turf, basketball courts, and athletics running tracks for House sports competitions.</p>
-          </div>
-        </div>
-
-        <!-- Photo 6: Assembly & Auditorium -->
-        <div class="group relative rounded-2xl overflow-hidden shadow-md bg-white border border-sky-100 h-72">
-          <img 
-            src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=800&q=80" 
-            alt="Multipurpose Hall & Auditorium" 
-            class="w-full h-full object-cover group-hover:scale-110 transition duration-500"
-          >
-          <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/30 to-transparent flex flex-col justify-end p-5 text-white">
-            <span class="text-xs font-semibold text-sky-300">Assembly & Arts</span>
-            <h4 class="text-base font-bold">1,500-Seater Grand Multi-Purpose Hall</h4>
-            <p class="text-xs text-slate-200 mt-1 line-clamp-2">Venue for valedictory services, PTA summits, science exhibitions, and speech & prize-giving ceremonies.</p>
+            <h4 class="text-base font-bold">Digital Multimedia E-Library</h4>
+            <p class="text-xs text-slate-200 mt-1 line-clamp-2">Over 25,000 digital journals, approved textbook catalogues, and high-speed internet cubicles.</p>
           </div>
         </div>
       </div>
+
     </div>
   </section>
 
-  <!-- Academic Classes Section -->
-  <section id="academics" class="py-16 bg-white border-t border-sky-100">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center max-w-3xl mx-auto mb-12">
-        <span class="text-xs font-bold uppercase tracking-widest text-sky-600 bg-sky-50 px-3 py-1 rounded-full border border-sky-200">
-          Academic Structure
-        </span>
-        <h2 class="text-3xl font-bold text-slate-900 mt-3">
-          Secondary School Cohorts (2026/2027)
-        </h2>
-        <p class="text-slate-500 text-sm mt-2">
-          Structured pathways preparing each student from foundational junior secondary learning to specialized senior departmental majors.
-        </p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <!-- Primary School Section -->
-        <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
-          <div class="flex items-center space-x-3 mb-4">
-            <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold">
-              PRI
-            </div>
-            <div>
-              <h3 class="text-base font-bold text-slate-900">Primary & Early Years</h3>
-              <p class="text-xs text-slate-500">Day Care, Creche, Nursery & Primary 1-6</p>
-            </div>
-          </div>
-          <p class="text-xs text-slate-600 leading-relaxed mb-4">
-            Montessori early childhood foundation nurturing cognitive motor skills, phonics, numeracy, creative discovery, and moral discipline.
-          </p>
-          <div class="flex flex-wrap gap-1.5 text-xs">
-            <span class="badge badge-sky" style="background:#d1fae5;color:#065f46">DayCare &amp; Creche</span>
-            <span class="badge badge-sky" style="background:#d1fae5;color:#065f46">Nursery 1 &amp; 2</span>
-            <span class="badge badge-sky" style="background:#d1fae5;color:#065f46">Primary 1 to 6</span>
-          </div>
-        </div>
-
-        <!-- Junior Secondary School -->
-        <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
-          <div class="flex items-center space-x-3 mb-4">
-            <div class="w-10 h-10 rounded-xl bg-sky-600 text-white flex items-center justify-center font-bold">
-              JSS
-            </div>
-            <div>
-              <h3 class="text-base font-bold text-slate-900">Junior College (JSS 1 - 3)</h3>
-              <p class="text-xs text-slate-500">Basic Education & BECE Examination</p>
-            </div>
-          </div>
-          <p class="text-xs text-slate-600 leading-relaxed mb-4">
-            Balanced immersion across Mathematics, English, Basic Science & Technology, French, Cultural & Creative Arts, Civic Education, and ICT.
-          </p>
-          <div class="flex flex-wrap gap-1.5 text-xs">
-            <span class="badge badge-sky">JSS 1A &amp; 1B</span>
-            <span class="badge badge-sky">JSS 2A &amp; 2B</span>
-            <span class="badge badge-sky">JSS 3A &amp; 3B</span>
-          </div>
-        </div>
-
-        <!-- Senior Secondary School -->
-        <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
-          <div class="flex items-center space-x-3 mb-4">
-            <div class="w-10 h-10 rounded-xl bg-purple-700 text-white flex items-center justify-center font-bold">
-              SSS
-            </div>
-            <div>
-              <h3 class="text-base font-bold text-slate-900">Senior College (SSS 1 - 3)</h3>
-              <p class="text-xs text-slate-500">WAEC, NECO & Intensive SS3 Preparation</p>
-            </div>
-          </div>
-          <p class="text-xs text-slate-600 leading-relaxed mb-4">
-            Departmental majors (Science, Arts, Commercial) with specialized SS3 WAEC/NECO coaching, camping, and morning & afternoon lessons.
-          </p>
-          <div class="flex flex-wrap gap-1.5 text-xs">
-            <span class="badge badge-sky" style="background:#ede9fe;color:#5b21b6">SSS Science</span>
-            <span class="badge badge-sky" style="background:#ede9fe;color:#5b21b6">SSS Arts</span>
-            <span class="badge badge-sky" style="background:#ede9fe;color:#5b21b6">SSS Commercial</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Contact & Admission Form -->
+  <!-- ═══════════════ ADMISSION & CONTACT FORM ═══════════════ -->
   <section id="contact" class="py-16 bg-slate-100 border-t border-slate-200">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="bg-white rounded-3xl p-8 border border-sky-100 shadow-xl">
+      <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-xl">
+        
         <div class="text-center max-w-xl mx-auto mb-8">
-          <span class="text-xs font-bold uppercase tracking-widest text-sky-600 bg-sky-50 px-3 py-1 rounded-full border border-sky-200">
-            Admissions & Inquiries
+          <span class="text-xs font-bold uppercase tracking-widest text-sky-700 bg-sky-50 px-3 py-1 rounded-full border border-sky-200">
+            Admissions &amp; Enquiries
           </span>
           <h2 class="text-2xl font-bold text-slate-900 mt-2">Connect with <span class="school-name-text">EXCELLENCE MODEL COLLEGE</span></h2>
-          <p class="text-xs text-slate-500 mt-1">Schedule a physical campus tour or request admission guidelines for the 2026/2027 academic session.</p>
+          <p class="text-xs text-slate-500 mt-1">Schedule a campus tour or request admission guidelines for the 2026/2027 academic year.</p>
         </div>
 
-        <form onsubmit="event.preventDefault(); alert('Thank you! Your enquiry for <span class="school-name-text">EXCELLENCE MODEL COLLEGE</span> 2026/2027 admissions has been received. Our Admissions Officer will contact you within 24 hours.'); this.reset();" class="space-y-4">
+        <form id="publicEnquiryForm" onsubmit="event.preventDefault(); submitPublicEnquiry();" class="space-y-4">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Parent / Guardian Full Name *</label>
-              <input type="text" required placeholder="e.g. Chief & Mrs. Adeleke" class="w-full p-3 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-sky-200 focus:outline-none">
+              <input type="text" id="enqName" required placeholder="e.g. Chief &amp; Mrs. Adeleke" class="w-full p-3 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-sky-200 focus:outline-none">
             </div>
             <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Phone Number (WhatsApp active) *</label>
-              <input type="tel" required placeholder="e.g. 09053126809" class="w-full p-3 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-sky-200 focus:outline-none">
+              <label class="block text-xs font-semibold text-slate-700 mb-1">WhatsApp Phone Number *</label>
+              <input type="tel" id="enqPhone" required placeholder="e.g. 08012345678" class="w-full p-3 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-sky-200 focus:outline-none">
             </div>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Email Address *</label>
-              <input type="email" required placeholder="parent@example.com" class="w-full p-3 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-sky-200 focus:outline-none">
+              <input type="email" id="enqEmail" required placeholder="parent@example.com" class="w-full p-3 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-sky-200 focus:outline-none">
             </div>
             <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Prospective Class of Entry (2026/2027)</label>
-              <select class="w-full p-3 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-sky-200 focus:outline-none">
-                <optgroup label="Primary &amp; Early Years">
-                  <option value="Creche/DayCare">Creche / Day Care</option>
-                  <option value="Nursery">Nursery (1 or 2)</option>
-                  <option value="Primary">Primary (1 - 6)</option>
-                </optgroup>
-                <optgroup label="Junior College">
-                  <option value="JSS 1">JSS 1 (Junior Secondary Year 1)</option>
-                  <option value="JSS 2">JSS 2 (Transfer)</option>
-                  <option value="JSS 3">JSS 3 (Transfer)</option>
-                </optgroup>
-                <optgroup label="Senior College">
-                  <option value="SSS 1 Science">SSS 1 Science</option>
-                  <option value="SSS 1 Art">SSS 1 Arts &amp; Humanities</option>
-                  <option value="SSS 1 Commercial">SSS 1 Commercial</option>
-                  <option value="SSS 2">SSS 2 (Transfer)</option>
-                  <option value="SSS 3">SSS 3 (WAEC/NECO Final Year)</option>
-                </optgroup>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Prospective Class of Entry</label>
+              <select id="enqClass" class="w-full p-3 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-sky-200 focus:outline-none">
+                <option value="JSS 1">JSS 1 (Junior College Year 1)</option>
+                <option value="JSS 2">JSS 2 (Transfer)</option>
+                <option value="JSS 3">JSS 3 (Transfer)</option>
+                <option value="SSS 1 Science">SSS 1 Science</option>
+                <option value="SSS 1 Art">SSS 1 Arts &amp; Humanities</option>
+                <option value="SSS 1 Commercial">SSS 1 Commercial</option>
+                <option value="SSS 2">SSS 2 (Transfer)</option>
+                <option value="SSS 3">SSS 3 (WAEC/NECO Final Year)</option>
+                <option value="Primary/Creche">Primary &amp; Early Years</option>
               </select>
             </div>
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Enquiry Note or Schedule Tour Request</label>
-            <textarea rows="3" placeholder="Tell us about your ward or preferred campus tour date..." class="w-full p-3 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-sky-200 focus:outline-none"></textarea>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Tour Request or Enquiry Note</label>
+            <textarea id="enqNote" rows="3" placeholder="Tell us about your ward or your preferred campus tour date..." class="w-full p-3 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-sky-200 focus:outline-none"></textarea>
           </div>
 
           <button type="submit" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-sky-600 to-sky-500 hover:from-sky-700 hover:to-sky-600 text-white font-bold text-sm shadow-md shadow-sky-600/30 transition">
             Submit Admission Enquiry
           </button>
         </form>
+
       </div>
     </div>
   </section>
 
-  <!-- Footer -->
+  <!-- ═══════════════ FOOTER & UNIVERSAL NAVIGATION ═══════════════ -->
   <footer class="bg-slate-900 text-slate-400 text-xs py-12 border-t border-slate-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Top Footer Grid -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-        <!-- Brand -->
-        <div class="space-y-3">
-          <div class="flex items-center space-x-2 text-white font-bold text-lg">
-            <i class="fas fa-graduation-cap text-sky-400"></i>
-            <span><span class="school-name-text">EXCELLENCE MODEL COLLEGE</span></span>
-          </div>
-          <p class="text-slate-400 leading-relaxed">
-            Leading Nigerian private secondary school dedicated to intellectual brilliance, sound moral ethics, and 21st-century educational innovation.
-          </p>
-        </div>
-
-        <!-- Quick Links -->
-        <div>
-          <h4 class="text-white font-semibold text-sm mb-3">Quick Navigation</h4>
-          <ul class="space-y-2">
-            <li><a href="#about" class="hover:text-sky-400 transition">About RichVine</a></li>
-            <li><a href="#academics" class="hover:text-sky-400 transition">Academic Programs</a></li>
-            <li><a href="#campus" class="hover:text-sky-400 transition">Campus Facilities</a></li>
-            <li><a href="#contact" class="hover:text-sky-400 transition">Admission Enquiries</a></li>
-          </ul>
-        </div>
-
-        <!-- Academics -->
-        <div>
-          <h4 class="text-white font-semibold text-sm mb-3">Academic Classes (2026/2027)</h4>
-          <ul class="space-y-1.5 text-[11px]">
-            <li>JSS 1A, JSS 1B (Junior Secondary)</li>
-            <li>JSS 2A, JSS 2B</li>
-            <li>JSS 3A, JSS 3B</li>
-            <li>SSS 1, 2, 3 (Science Division)</li>
-            <li>SSS 1, 2, 3 (Arts & Humanities)</li>
-            <li>SSS 1, 2, 3 (Commercial Department)</li>
-          </ul>
-        </div>
-
-        <!-- Contact info -->
-        <div>
-          <h4 class="text-white font-semibold text-sm mb-3">Campus Contact</h4>
-          <p class="mb-1"><i class="fas fa-map-marker-alt text-sky-400 mr-1.5"></i> 5-7 Olukayode Street, Imoro, Ogijo, Shagamu - Ikorodu Road, Shagamu, Ogun State</p>
-          <p class="mb-1"><i class="fas fa-phone text-sky-400 mr-1.5"></i> 09053126809</p>
-          <p><i class="fas fa-envelope text-sky-400 mr-1.5"></i> admissions@richvinecollege.edu.ng</p>
-        </div>
-      </div>
-
-      <div class="pt-6 border-t border-slate-800 flex flex-col sm:flex-row justify-between items-center text-slate-500">
         
-        <!-- BursarIQ Certified Institutional Partner Banner -->
-        <div id="footer-bursariq-brand-box" class="w-full mb-8 p-6 rounded-2xl bg-gradient-to-r from-slate-950 via-[#0b2b48] to-slate-950 border border-slate-800 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
-          <div class="flex items-center space-x-4">
-            <div class="bg-white p-2.5 rounded-xl shadow-md border border-slate-200 flex-shrink-0">
-              <img src="assets/images/bursariq-logo.png" alt="Powered by BursarIQ - Every naira accounted for." class="h-8 w-auto object-contain">
-            </div>
-            <div>
-              <div class="text-white text-sm font-bold flex items-center gap-2">
-                <span>Official School Management &amp; Accounting Information Operating System</span>
-                <span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">CERTIFIED</span>
-              </div>
-              <p class="text-xs text-slate-400 mt-1">
-                Zero-loss financial accounting, arrears-first bursary recovery, and automated parent reconciliation.
-              </p>
-            </div>
+        <!-- School Identity -->
+        <div class="space-y-3">
+          <div class="flex items-center space-x-2 text-white font-bold text-base">
+            <i class="fas fa-graduation-cap text-sky-400"></i>
+            <span class="school-name-text">EXCELLENCE MODEL COLLEGE</span>
           </div>
-          <div class="flex items-center space-x-4 text-xs text-slate-300 flex-shrink-0">
-            <div class="text-right">
-              <div class="font-bold text-white">Institutional Enterprise v2.9</div>
-              <div class="text-emerald-400 font-semibold italic">&ldquo;Every naira accounted for.&rdquo;</div>
-            </div>
-            <a href="admin/index.html" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition">
-              Staff Portal <i class="fas fa-arrow-right ml-1"></i>
-            </a>
+          <p class="text-slate-400 text-[11px] leading-relaxed school-motto-text">
+            Knowledge, Character & Leadership
+          </p>
+          <div class="text-[11px] text-slate-400">
+            Official School Banking Details:
+            <div class="font-mono text-emerald-400 font-bold school-bank-text mt-1">Zenith Bank Plc &bull; 1012345678</div>
           </div>
         </div>
 
-        <div>&copy; 2026/2027 <span class="school-name-text">EXCELLENCE MODEL COLLEGE</span>. All Rights Reserved. Soaring High.</div>
-  
-        <div class="mt-2 sm:mt-0 space-x-4">
-          <a href="#about" class="hover:text-sky-400">Privacy Policy</a>
-          <a href="#about" class="hover:text-sky-400">Terms of Enrollment</a>
+        <!-- Portals Links -->
+        <div>
+          <h4 class="text-white font-semibold text-xs uppercase tracking-wider mb-3">Institutional Portals</h4>
+          <ul class="space-y-2">
+            <li><a href="admin/index.html" class="hover:text-sky-400 transition flex items-center gap-1.5"><i class="fas fa-calculator text-sky-400"></i> Bursary &amp; Admin ERP</a></li>
+            <li><a href="teacher-login.html" class="hover:text-emerald-400 transition flex items-center gap-1.5"><i class="fas fa-chalkboard-teacher text-emerald-400"></i> Teacher Attendance Portal</a></li>
+            <li><a href="cbt/index.html" class="hover:text-amber-400 transition flex items-center gap-1.5"><i class="fas fa-laptop-code text-amber-400"></i> Student Multi-Subject CBT</a></li>
+            <li><a href="#clearance-checker" class="hover:text-sky-400 transition flex items-center gap-1.5"><i class="fas fa-id-card text-purple-400"></i> Student Clearance Checker</a></li>
+          </ul>
         </div>
+
+        <!-- Academics Links -->
+        <div>
+          <h4 class="text-white font-semibold text-xs uppercase tracking-wider mb-3">Academics &amp; Cohorts</h4>
+          <ul class="space-y-1.5 text-[11px]">
+            <li>Junior Secondary: JSS 1, JSS 2, JSS 3</li>
+            <li>Senior Science: SSS 1, SSS 2, SSS 3</li>
+            <li>Senior Arts &amp; Humanities</li>
+            <li>Senior Commercial Department</li>
+            <li>Primary &amp; Early Years Foundation</li>
+          </ul>
+        </div>
+
+        <!-- Contact & Location -->
+        <div>
+          <h4 class="text-white font-semibold text-xs uppercase tracking-wider mb-3">Campus Office</h4>
+          <p class="mb-1 text-[11px]"><i class="fas fa-map-marker-alt text-sky-400 mr-1.5"></i> <span class="school-address-text">Campus Location</span></p>
+          <p class="mb-1 text-[11px]"><i class="fas fa-phone text-emerald-400 mr-1.5"></i> <span class="school-phone-text">08012345678</span></p>
+          <p class="text-[11px]"><i class="fas fa-envelope text-sky-400 mr-1.5"></i> <span class="school-email-text">admin@excellencemodel.edu.ng</span></p>
+        </div>
+
       </div>
+
+      <!-- Bottom Dock: Certified BursarIQ Banner -->
+      <div class="pt-6 border-t border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4 text-slate-500">
+        
+        <div class="flex items-center space-x-3">
+          <div class="bg-white p-1.5 rounded-lg shadow">
+            <img src="assets/images/bursariq-logo.png" alt="BursarIQ" class="h-5 w-auto">
+          </div>
+          <span class="text-[11px] text-slate-400">
+            Powered by <strong>BursarIQ OS v2.9</strong> &bull; <span class="text-emerald-400 font-semibold italic">"Every naira accounted for."</span>
+          </span>
+        </div>
+
+        <div class="text-[11px] text-slate-400">
+          &copy; <span class="school-session-text">2026/2027</span> <span class="school-name-text">EXCELLENCE MODEL COLLEGE</span>. All Rights Reserved.
+        </div>
+
+      </div>
+
     </div>
   </footer>
 
+  <!-- ═══════════════ CLIENT SCRIPTS & CLEARANCE VERIFICATION ═══════════════ -->
+  <script src="js/data.js"></script>
+  <script>
+    // Quick Clearance Test Helper
+    function setQuickClearance(id) {
+      document.getElementById('clearanceSearchInput').value = id;
+      lookupStudentClearance();
+    }
+
+    // Live Student Fee Clearance Lookup
+    function lookupStudentClearance() {
+      const input = document.getElementById('clearanceSearchInput').value.trim();
+      const resultBox = document.getElementById('clearanceResultBox');
+      const content = document.getElementById('clearanceCardContent');
+
+      if (!input) return;
+
+      if (!window.RichVineDB || !window.RichVineDB.getStudents) {
+        resultBox.classList.remove('hidden');
+        content.innerHTML = '<div class="text-amber-400 text-xs">System database initializing. Please try again.</div>';
+        return;
+      }
+
+      // Search student by regNo or ID or Name
+      const students = window.RichVineDB.getStudents();
+      const cleanQuery = input.toLowerCase().trim();
+      const student = students.find(s => {
+        const sId = (s.id || '').toLowerCase();
+        const sReg = (s.regNo || '').toLowerCase();
+        const sName = (s.name || '').toLowerCase();
+        return sId === cleanQuery || sReg === cleanQuery || sName.includes(cleanQuery);
+      });
+
+      resultBox.classList.remove('hidden');
+
+      if (!student) {
+        content.innerHTML = `
+          <div class="text-center py-4 text-red-400 text-xs font-semibold">
+            <i class="fas fa-exclamation-triangle text-base mb-1 block"></i>
+            No learner found matching Registration Number: "<strong>${input}</strong>". Please verify with the Bursary office.
+          </div>
+        `;
+        return;
+      }
+
+      const bal = window.RichVineDB.getStudentBalance(student.id);
+      const isCleared = bal && bal.totalOutstanding <= 0;
+
+      content.innerHTML = `
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-4 mb-4">
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Official Candidate Clearance Record</span>
+            <h3 class="text-lg font-black text-white">${student.name}</h3>
+            <div class="text-xs text-sky-400 font-mono mt-0.5">Reg No: ${student.regNo || student.id} &bull; Class: ${student.class || student.currentClass}</div>
+          </div>
+          <div>
+            ${isCleared ? `
+              <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-xs font-black shadow-lg">
+                <i class="fas fa-check-circle"></i> OFFICIALLY CLEARED FOR EXAMS
+              </span>
+            ` : `
+              <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-500/20 text-red-400 border border-red-500/40 text-xs font-black shadow-lg">
+                <i class="fas fa-ban"></i> FEE CLEARANCE PENDING
+              </span>
+            `}
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs mb-4">
+          <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+            <div class="text-slate-400 text-[10px] uppercase font-bold">Term Fee</div>
+            <div class="text-base font-black text-white mt-0.5">₦${(bal.termFeeExpected || 0).toLocaleString()}</div>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+            <div class="text-slate-400 text-[10px] uppercase font-bold">Past Arrears</div>
+            <div class="text-base font-black ${bal.arrearsBalance > 0 ? 'text-red-400' : 'text-slate-400'} mt-0.5">₦${(bal.arrearsBalance || 0).toLocaleString()}</div>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+            <div class="text-slate-400 text-[10px] uppercase font-bold">Total Paid</div>
+            <div class="text-base font-black text-emerald-400 mt-0.5">₦${(bal.totalPaidAll || 0).toLocaleString()}</div>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+            <div class="text-slate-400 text-[10px] uppercase font-bold">Outstanding Balance</div>
+            <div class="text-base font-black ${bal.totalOutstanding > 0 ? 'text-amber-400 font-black' : 'text-emerald-400'} mt-0.5">₦${(bal.totalOutstanding || 0).toLocaleString()}</div>
+          </div>
+        </div>
+
+        <div class="text-[11px] text-slate-400 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-t border-slate-800 pt-3">
+          <span>Parent: <strong>${student.parentName || 'Parent / Guardian'}</strong> (${student.parentPhone || '--'})</span>
+          <span class="text-slate-500 italic">Bursary Hash: RVC-${student.id.substring(0,8).toUpperCase()}</span>
+        </div>
+      `;
+    }
+
+    // Public Admission Enquiry Handler
+    function submitPublicEnquiry() {
+      const name = document.getElementById('enqName').value.trim();
+      const phone = document.getElementById('enqPhone').value.trim();
+      const email = document.getElementById('enqEmail').value.trim();
+      const cls = document.getElementById('enqClass').value;
+      const note = document.getElementById('enqNote').value.trim();
+
+      alert(`Thank you ${name}!\nYour admission enquiry for ${cls} has been submitted to the Admissions & Bursary unit.\nOur Admissions Officer will contact you on WhatsApp (${phone}) within 24 hours.`);
+      document.getElementById('publicEnquiryForm').reset();
+    }
+  </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+  </script>
 </body>
 </html>

@@ -82,13 +82,93 @@
         display: none !important;
       }
     }
+
+    /* ── CBT Portal Mobile Polish ── */
+    html, body {
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
+    }
+    #screen-login, #screen-exam, #screen-result {
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      max-height: 100dvh;
+      padding-bottom: env(safe-area-inset-bottom, 20px);
+    }
+    /* KaTeX wide formula scroll */
+    .katex-display, .katex {
+      overflow-x: auto;
+      overflow-y: hidden;
+      max-width: 100%;
+    }
+    /* Option buttons on small screens */
+    .option-btn {
+      min-height: 48px;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      white-space: normal;
+      word-break: break-word;
+    }
+    /* Question navigator grid scroll */
+    #q-nav-grid {
+      max-height: 220px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-y: contain;
+    }
+    @media (hover: none) and (pointer: coarse) {
+      input, select { font-size: 16px !important; }
+    }
+    @media (max-width: 480px) {
+      .timer-box { font-size: 22px; }
+      .subject-badge { font-size: 10px; padding: 2px 8px; }
+    }
+
+
+    /* CBT touch scroll fix */
+    #screen-login, #screen-exam, #screen-result, #screen-review {
+      touch-action: pan-y !important;
+      -webkit-overflow-scrolling: touch !important;
+      overscroll-behavior-y: contain;
+    }
+    /* Question panel */
+    #question-box {
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      max-height: calc(100dvh - 180px);
+    }
   </style>
   <!-- KaTeX for Standard Mathematical Formula Rendering -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+  <!-- PWA Manifest & Service Worker -->
+  <link rel="manifest" href="../manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BursarIQ">
+  <meta name="theme-color" content="#0284c7">
 </head>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col justify-between">
+  <!-- CBT Universal Portal Navigation Bar -->
+  <div class="w-full bg-slate-950 border-b border-slate-800 text-xs py-2.5 px-4 text-slate-300 shadow-md">
+    <div class="max-w-5xl mx-auto flex items-center justify-between flex-wrap gap-2">
+      <a href="../index.html" class="text-sky-400 hover:text-white font-bold flex items-center gap-1.5 transition">
+        <i class="fas fa-arrow-left"></i> Back to Public Website
+      </a>
+      <div class="flex items-center gap-3 sm:gap-5">
+        <a href="../teacher-login.html" class="text-emerald-400 hover:text-white font-semibold flex items-center gap-1.5 transition">
+          <i class="fas fa-chalkboard-teacher"></i> Teacher Portal
+        </a>
+        <span class="text-slate-700">&bull;</span>
+        <a href="../admin/index.html" class="text-sky-300 hover:text-white font-semibold flex items-center gap-1.5 transition">
+          <i class="fas fa-shield-alt"></i> Staff &amp; Admin Login
+        </a>
+      </div>
+    </div>
+  </div>
 
   <!-- ═════════════════════════════════════════════════════════════════════════ -->
   <!-- GLOBAL IN-APP NOTIFICATION TOAST -->
@@ -130,8 +210,11 @@
             <i class="fas fa-stopwatch mr-1"></i> Strictly 30 Mins
           </span>
         </div>
-        <h2 class="text-lg sm:text-xl font-bold mt-1">General Mathematics Assessment</h2>
-        <p class="text-xs text-sky-100 mt-0.5">Target Classes: SSS 1, SSS 2, SSS 3 (All Departments)</p>
+        <h2 class="text-lg sm:text-xl font-bold mt-1 flex items-center gap-2">
+          <span id="cbt-exam-subject-heading">General Mathematics</span>
+          <span class="text-xs bg-emerald-400 text-slate-900 font-bold px-2 py-0.5 rounded-full uppercase">JAMB Standard</span>
+        </h2>
+        <p class="text-xs text-sky-100 mt-0.5" id="cbt-exam-class-subtext">Senior College &bull; All Departments</p>
       </div>
 
       <div class="p-4 sm:p-6 space-y-4">
@@ -153,6 +236,50 @@
 
         <!-- Verification Form -->
         <form id="login-form" class="space-y-4">
+          <!-- Subject & Class Selection (JAMB-Style) -->
+          <div class="p-3.5 bg-slate-50 border-2 border-sky-100 rounded-xl space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fas fa-layer-group text-sky-600"></i> Exam Subject & Level
+              </span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-sky-200 text-sky-800">Multi-Subject CBT</span>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div>
+                <label for="cbt-subject-select" class="block text-[11px] font-bold text-slate-600 uppercase mb-1">
+                  Subject Selection
+                </label>
+                <select id="cbt-subject-select" class="w-full px-3 py-2 rounded-lg border-2 border-slate-200 bg-white font-bold text-slate-800 text-xs focus:border-sky-500 focus:outline-none">
+                  <option value="Mathematics" selected>Mathematics (General)</option>
+                  <option value="English Language">English Language</option>
+                  <option value="Biology">Biology</option>
+                  <option value="Physics">Physics</option>
+                  <option value="Chemistry">Chemistry</option>
+                  <option value="Economics">Economics</option>
+                  <option value="Government">Government</option>
+                  <option value="Commerce">Commerce</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="cbt-class-override" class="block text-[11px] font-bold text-slate-600 uppercase mb-1">
+                  Target Class
+                </label>
+                <select id="cbt-class-override" class="w-full px-3 py-2 rounded-lg border-2 border-slate-200 bg-white font-bold text-slate-800 text-xs focus:border-sky-500 focus:outline-none">
+                  <option value="Auto" selected>Auto-Detect from ID</option>
+                  <option value="SSS 1">SSS 1</option>
+                  <option value="SSS 2">SSS 2</option>
+                  <option value="SSS 3">SSS 3</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="text-[11px] text-slate-500 flex items-center justify-between border-t border-slate-200 pt-2">
+              <span><i class="fas fa-check-circle text-emerald-500 mr-1"></i> 40 Questions &bull; 30 Mins</span>
+              <span class="font-semibold text-sky-700" id="selected-subject-badge">Current: Mathematics</span>
+            </div>
+          </div>
           <div>
             <label for="student-id-input" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
               Enter Student ID or Reg Number
@@ -276,6 +403,8 @@
             <div id="exam-student-name" class="font-bold text-xs sm:text-sm text-slate-900 truncate">Candidate Name</div>
             <div class="flex items-center space-x-1.5 text-[11px] text-slate-500 font-medium">
               <span id="exam-student-class" class="font-semibold text-sky-700">SSS 2 Science</span>
+              <span>•</span>
+              <span id="exam-header-subject" class="font-bold text-emerald-600">Mathematics</span>
               <span>•</span>
               <span id="exam-student-id" class="truncate">RVC-2026-001</span>
             </div>
@@ -559,7 +688,7 @@
           </div>
           <div class="flex justify-between border-b border-slate-200 pb-1.5">
             <span class="text-slate-500">Subject:</span>
-            <span class="font-bold text-slate-900">General Mathematics</span>
+            <span id="res-student-subject" class="font-bold text-sky-700">General Mathematics</span>
           </div>
           <div class="flex justify-between">
             <span class="text-slate-500">Date & Time Submitted:</span>
@@ -647,7 +776,7 @@
           <td class="py-1.5 font-bold text-slate-600">Class & Department:</td>
           <td id="slip-class" class="py-1.5 font-semibold text-slate-800"></td>
           <td class="py-1.5 font-bold text-slate-600">Subject:</td>
-          <td class="py-1.5 font-semibold text-slate-800">General Mathematics</td>
+          <td id="slip-subject" class="py-1.5 font-bold text-sky-800">General Mathematics</td>
         </tr>
         <tr class="border-b border-slate-200">
           <td class="py-1.5 font-bold text-slate-600">Examination Session:</td>
@@ -668,7 +797,7 @@
     <div class="border-2 border-slate-900 p-4 rounded-lg my-4 bg-slate-50 flex items-center justify-between">
       <div>
         <div class="text-xs uppercase font-bold text-slate-600">Final Candidate Assessment</div>
-        <div class="text-xl font-bold text-slate-900">General Mathematics Examination</div>
+        <div id="slip-exam-title" class="text-xl font-bold text-slate-900">General Mathematics Examination</div>
         <div class="text-xs text-slate-500 mt-1">Total Questions Evaluated: 40 Multiple Choice Questions</div>
       </div>
       <div class="text-right">
@@ -1048,8 +1177,15 @@
           }
         }
 
-        // Single Attempt Rule: Check if submission already exists
-        var existingSubmission = window.RichVineDB.getCbtSubmissionByStudent(student.id) || window.RichVineDB.getCbtSubmissionByStudent(student.regNo);
+        // Multi-Subject Selection
+        var selectedSubject = document.getElementById('cbt-subject-select') ? document.getElementById('cbt-subject-select').value : 'Mathematics';
+        var classOverride = document.getElementById('cbt-class-override') ? document.getElementById('cbt-class-override').value : 'Auto';
+        if (classOverride && classOverride !== 'Auto') {
+          student.currentClass = classOverride;
+        }
+
+        // Single Attempt Rule per subject: Check if submission already exists for this subject
+        var existingSubmission = (window.RichVineDB.getCbtSubmissionByStudent && (window.RichVineDB.getCbtSubmissionByStudent(student.id, selectedSubject) || window.RichVineDB.getCbtSubmissionByStudent(student.regNo, selectedSubject))) || null;
         if (existingSubmission) {
           showPreviousAttempt(student, existingSubmission);
           return;
@@ -1086,7 +1222,9 @@
           return;
         }
 
-        var sampled = window.CBT_HELPERS.getRandomExamQuestions(student.currentClass, 40);
+        var selectedSubject = document.getElementById('cbt-subject-select') ? document.getElementById('cbt-subject-select').value : 'Mathematics';
+        state.subject = selectedSubject;
+        var sampled = window.CBT_HELPERS.getRandomExamQuestions(student.currentClass, 40, selectedSubject);
         if (!sampled || sampled.length === 0) {
           showLoginAlert('Could not load examination questions for class: ' + student.currentClass, 'error');
           return;
@@ -1500,7 +1638,7 @@
             studentName: sFullName,
             studentClass: sClass,
             baseClass: normBase,
-            subject: 'General Mathematics',
+            subject: state.subject || (document.getElementById('cbt-subject-select') ? document.getElementById('cbt-subject-select').value : 'General Mathematics'),
             score: correctCount,
             totalQuestions: totalQ,
             percentage: percentage,
@@ -1548,6 +1686,9 @@
         screenExam.classList.add('hidden');
         screenResult.classList.remove('hidden');
 
+        if (document.getElementById('res-student-subject')) {
+          document.getElementById('res-student-subject').textContent = sub.subject || 'General Mathematics';
+        }
         document.getElementById('res-score-number').textContent = sub.score + ' / ' + sub.totalQuestions;
         document.getElementById('res-percentage').textContent = sub.percentage + '%';
 
@@ -1592,6 +1733,12 @@
         document.getElementById('slip-name').textContent = sub.studentName;
         document.getElementById('slip-reg').textContent = sub.regNo || sub.studentId;
         document.getElementById('slip-class').textContent = sub.studentClass;
+        if (document.getElementById('slip-subject')) {
+          document.getElementById('slip-subject').textContent = sub.subject || 'General Mathematics';
+        }
+        if (document.getElementById('slip-exam-title')) {
+          document.getElementById('slip-exam-title').textContent = (sub.subject || 'General Mathematics') + ' Examination';
+        }
         document.getElementById('slip-date').textContent = new Date(sub.submittedAt || sub.timestamp).toLocaleString('en-GB');
 
         var mins = Math.floor(sub.timeSpentSeconds / 60);
@@ -1706,5 +1853,13 @@
     })();
   </script>
 
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('../sw.js').catch(() => {});
+      });
+    }
+  </script>
 </body>
 </html>
