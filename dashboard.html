@@ -38,16 +38,28 @@
 
     /* ── Sidebar ── */
     #sidebar {
-      width: var(--sidebar-w); min-height: 100vh; background: var(--gray-900);
+      width: var(--sidebar-w);
+      height: 100vh; height: 100dvh;
+      max-height: 100vh; max-height: 100dvh;
+      background: var(--gray-900);
       display: flex; flex-direction: column; position: fixed; top: 0; left: 0; z-index: 100;
+      overflow: hidden;
       transition: transform .28s ease;
     }
-    .sidebar-brand { padding: 20px 18px; border-bottom: 1px solid rgba(255,255,255,.08); }
+    .sidebar-brand { padding: 20px 18px; border-bottom: 1px solid rgba(255,255,255,.08); flex-shrink: 0; }
     .sidebar-brand .brand-logo { width: 42px; height: 42px; border-radius: 50%; background: var(--sky); display: inline-flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 16px; margin-bottom: 8px; }
     .sidebar-brand h2 { color: #fff; font-size: 13px; font-weight: 700; letter-spacing: .5px; line-height: 1.3; }
     .sidebar-brand p  { color: var(--gray-400); font-size: 10px; margin-top: 2px; }
 
-    nav { flex: 1; padding: 14px 10px; overflow-y: auto; }
+    nav {
+      flex: 1 1 auto;
+      min-height: 0;
+      padding: 14px 10px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-y: contain;
+    }
     .nav-section-label { color: var(--gray-400); font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 12px 8px 6px; }
     nav a, nav button {
       display: flex; align-items: center; gap: 10px; padding: 10px 12px;
@@ -61,7 +73,7 @@
     nav button.active { background: var(--sky); color: #fff; }
     nav button i { width: 18px; text-align: center; font-size: 14px; }
 
-    .sidebar-footer { padding: 14px; border-top: 1px solid rgba(255,255,255,.08); }
+    .sidebar-footer { padding: 14px; border-top: 1px solid rgba(255,255,255,.08); flex-shrink: 0; }
     .sidebar-user { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
     .sidebar-user .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--sky); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; font-weight: 700; flex-shrink: 0; }
     .sidebar-user .user-info { color: #fff; }
@@ -82,7 +94,7 @@
     .btn-logout:hover { background: #fee2e2; color: var(--red); border-color: var(--red); }
 
     /* ── Main content ── */
-    #main { margin-left: var(--sidebar-w); margin-top: var(--header-h); padding: 24px; }
+    #main { margin-left: var(--sidebar-w); margin-top: var(--header-h); padding: 24px; min-height: calc(100vh - var(--header-h)); overflow-x: hidden; }
     .tab-section { display: block; }
     .tab-section.hidden { display: none !important; }
 
@@ -121,7 +133,7 @@
 
     /* ── Tables ── */
     .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%; max-width: 100%; }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 600px; }
     th { background: var(--gray-50); color: var(--gray-600); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--gray-200); }
     td { padding: 11px 12px; border-bottom: 1px solid var(--gray-100); color: var(--gray-800); }
     tr:hover td { background: var(--sky-light); }
@@ -432,7 +444,8 @@
         width: 100% !important;
       }
       .panel {
-        overflow: hidden;
+        overflow: visible;
+        min-width: 0;
       }
 
       /* Mobile App Drawer / Sidebar */
@@ -442,13 +455,15 @@
         bottom: 0;
         left: 0;
         width: min(82vw, 300px);
-        min-height: 100dvh;
+        height: 100vh; height: 100dvh;
+        max-height: 100vh; max-height: 100dvh;
         z-index: 250;
         transform: translateX(-100%);
         transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
         box-shadow: 10px 0 35px rgba(0, 0, 0, 0.35);
         padding-top: env(safe-area-inset-top, 0px);
         padding-bottom: env(safe-area-inset-bottom, 0px);
+        overflow: hidden;
       }
       #sidebar.open {
         transform: translateX(0);
@@ -714,7 +729,7 @@
       }
       .table-wrap table {
         width: 100%;
-        min-width: 720px !important;
+        min-width: 680px !important;
         font-size: 12px;
         border-collapse: separate;
         border-spacing: 0;
@@ -911,10 +926,9 @@
     }
     body.modal-open {
       overflow: hidden !important;
-      position: fixed;
       width: 100%;
       touch-action: none;
-      overscroll-behavior: contain;
+      overscroll-behavior: none;
     }
 
     /* Modern Table Wrap with Sticky Header on Laptops & Desktops */
@@ -973,9 +987,12 @@
       }
       #main {
         margin-left: 0 !important;
-        padding: 20px 16px !important;
+        padding: 20px 16px calc(80px + env(safe-area-inset-bottom, 0px)) 16px !important;
         max-width: 100vw !important;
         width: 100% !important;
+        overflow-x: hidden;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
       }
       #sidebar {
         position: fixed;
@@ -983,10 +1000,14 @@
         bottom: 0;
         left: 0;
         width: 280px;
+        height: 100vh; height: 100dvh;
+        max-height: 100vh; max-height: 100dvh;
         z-index: 250;
         transform: translateX(-100%);
         transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
         box-shadow: 10px 0 35px rgba(0, 0, 0, 0.35);
+        overflow: hidden;
+      }
       }
       #sidebar.open {
         transform: translateX(0);
@@ -1023,8 +1044,132 @@
       }
       .modal-footer { flex-shrink: 0; }
     }
+
+    /* ════════════════════════════════════════════════════════════════════
+       BURSARIQ MOBILE-FIRST GLOBAL POLISH  (iOS / Android masterclass)
+       ════════════════════════════════════════════════════════════════════ */
+
+    /* Dynamic viewport height for all key containers */
+    #sidebar, #header { will-change: transform; }
+
+    /* Smooth momentum scrolling everywhere */
+    * { -webkit-overflow-scrolling: touch; }
+
+    /* Broadsheet / ultra-wide tables get extra min-width */
+    #broadsheet-table { min-width: 1100px !important; }
+    #payments-table   { min-width: 820px  !important; }
+    #learners-table   { min-width: 760px  !important; }
+    #sal-payments-table, #sal-staff-table { min-width: 900px !important; }
+
+    /* table-wrap: always block display, never overflow:visible at root level */
+    .table-wrap {
+      display: block !important;
+      position: relative;
+    }
+
+    /* Mobile bottom-nav clearance — prevents content hiding under iOS home bar */
+    @supports (padding-bottom: env(safe-area-inset-bottom)) {
+      .bottom-nav {
+        padding-bottom: env(safe-area-inset-bottom);
+        height: calc(60px + env(safe-area-inset-bottom));
+      }
+    }
+
+    /* Cards / panels should never overflow their own row */
+    .stat-card, .panel, .tab-section { min-width: 0; }
+
+    /* Input fields — prevent iOS Safari 300ms tap delay */
+    input, select, textarea, button, a {
+      touch-action: manipulation;
+    }
+
+    /* Prevent text selection during swipe gestures on sidebar */
+    #sidebar { user-select: none; -webkit-user-select: none; }
+
+    /* iOS rubber-band overscroll containment for modals */
+    .modal-overlay {
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+    }
+    .modal-box {
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-y: contain;
+    }
+
+    /* Tab nav pill on mobile – horizontal scroll, no wrapping */
+    .tab-bar-scroll {
+      display: flex;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      gap: 6px;
+      padding: 2px 0 8px;
+      white-space: nowrap;
+    }
+    .tab-bar-scroll::-webkit-scrollbar { display: none; }
+
+    /* Expense category dropdown list – scroll inside */
+    #exp-cat-panel, .dropdown-panel {
+      max-height: 220px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-y: contain;
+    }
+
+    /* Print media: hide nav/sidebar for clean report cards */
+    @media print {
+      #sidebar, #header, .bottom-nav, #sidebar-backdrop,
+      .btn-primary, .btn-secondary, .btn-icon, .mobile-quick-actions,
+      .tab-bar-scroll, .filters-bar { display: none !important; }
+      #main { margin: 0 !important; padding: 0 !important; }
+      .panel { box-shadow: none !important; }
+      .table-wrap { overflow: visible !important; }
+      .table-wrap table { min-width: unset !important; }
+      @page { margin: 15mm; }
+    }
+
+    /* ── Swipe hint for tables on mobile ── */
+    @media (hover: none) and (pointer: coarse) {
+      .table-wrap::after {
+        content: '← swipe →';
+        display: block;
+        text-align: center;
+        font-size: 10px;
+        color: var(--gray-400);
+        padding: 4px 0 2px;
+        letter-spacing: .5px;
+      }
+      .table-wrap:not(:has(+ *)):after { display: none; }
+    }
+
+
+    /* Header Responsive Layout & Portal Buttons */
+    #header {
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    #header::-webkit-scrollbar { display: none; }
+    #header > * { flex-shrink: 0; }
+    .portal-link-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+    @media (max-width: 768px) {
+      .portal-link-btn span { display: inline-block !important; }
+      #page-title { display: none; }
+    }
+
   </style>
 
+  <!-- PWA Manifest & Service Worker -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BursarIQ">
+  <meta name="theme-color" content="#0284c7">
 </head>
 <body>
 
@@ -1046,7 +1191,13 @@
     <button data-tab="class-hub"><i class="fas fa-school"></i> Class Hub</button>
     <button data-tab="clearance" onclick="RichVineApp.switchTab('clearance')"><i class="fas fa-id-card"></i> Clearance</button>
     <button data-tab="cbt-assessment" onclick="RichVineApp.switchTab('cbt-assessment')"><i class="fas fa-laptop-code" style="color:#38bdf8"></i> CBT Assessment</button>
-    <a href="cbt/index.html" target="_blank" style="display:flex;align-items:center;gap:10px;padding:8px 12px;color:#f59e0b;font-size:12px;font-weight:600;border-radius:8px;text-decoration:none;"><i class="fas fa-external-link-alt text-xs"></i> Open Student CBT</a>
+
+    <div class="nav-section-label">Academics & Staff</div>
+    <button data-tab="teachers" onclick="RichVineApp.switchTab('teachers')"><i class="fas fa-chalkboard-teacher" style="color:#f59e0b"></i> Teachers & Portal</button>
+    <button data-tab="attendance" onclick="RichVineApp.switchTab('attendance')"><i class="fas fa-clipboard-check" style="color:#10b981"></i> Daily Attendance</button>
+    <button data-tab="exams-records" onclick="RichVineApp.switchTab('exams-records')"><i class="fas fa-file-signature" style="color:#a855f7"></i> Exams & Records</button>
+    <a href="teacher-login.html" class="sidebar-portal-link" style="display:flex;align-items:center;gap:10px;padding:9px 12px;color:#34d399;font-size:12px;font-weight:700;border-radius:8px;text-decoration:none;background:rgba(16,185,129,0.1);margin:2px 0;"><i class="fas fa-chalkboard-teacher text-xs"></i> Open Teacher Portal</a>
+    <a href="cbt/index.html" class="sidebar-portal-link" style="display:flex;align-items:center;gap:10px;padding:9px 12px;color:#fbbf24;font-size:12px;font-weight:700;border-radius:8px;text-decoration:none;background:rgba(245,158,11,0.1);margin:2px 0;"><i class="fas fa-laptop-code text-xs"></i> Open Student CBT</a>
 
     <div class="nav-section-label">Finance &amp; Store</div>
     <button data-tab="payments"><i class="fas fa-receipt"></i> Payments</button>
@@ -1060,7 +1211,12 @@
 
   
     <!-- Powered by BursarIQ Certified Brand Dock -->
-    <div id="sidebar-bursariq-dock" onclick="RichVineApp.openModal('modal-about-bursariq')" style="margin:8px 12px 14px;padding:12px;background:linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);border:1px solid rgba(255,255,255,0.12);border-radius:14px;box-shadow:0 6px 18px rgba(0,0,0,0.35);cursor:pointer;transition:transform .15s">
+    <div style="padding:0 12px 10px">
+    <a href="index.html" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:#38bdf8;font-size:11px;font-weight:700;text-decoration:none;transition:all .15s">
+      <i class="fas fa-arrow-left text-xs"></i> Back to Public Website
+    </a>
+  </div>
+  <div id="sidebar-bursariq-dock" onclick="RichVineApp.openModal('modal-about-bursariq')" style="margin:8px 12px 14px;padding:12px;background:linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);border:1px solid rgba(255,255,255,0.12);border-radius:14px;box-shadow:0 6px 18px rgba(0,0,0,0.35);cursor:pointer;transition:transform .15s">
       <div style="background:#ffffff;padding:8px 12px;border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.2)">
         <img src="assets/images/bursariq-logo.png" alt="Powered by BursarIQ - Every naira accounted for." style="max-height:26px;width:auto;object-fit:contain;display:block">
       </div>
@@ -1129,6 +1285,19 @@
   <h1 id="page-title">Bursary Management Portal</h1>
     
     <!-- Powered by BursarIQ Header Trust Badge -->
+    <!-- Quick Global Portal Switcher -->
+    <div id="header-portal-switcher" style="display:flex;align-items:center;gap:6px;margin-right:auto;flex-shrink:0">
+      <a href="index.html" class="portal-link-btn" style="font-size:11px;padding:5px 12px;text-decoration:none;border-radius:20px;display:inline-flex;align-items:center;gap:6px;font-weight:700;background:#f0f9ff;border:1px solid #bae6fd;color:#0369a1;transition:all .15s" title="Return to Public School Website">
+        <i class="fas fa-globe" style="color:#0284c7"></i> <span>Public Site</span>
+      </a>
+      <a href="teacher-login.html" class="portal-link-btn" style="font-size:11px;padding:5px 12px;text-decoration:none;border-radius:20px;display:inline-flex;align-items:center;gap:6px;font-weight:700;background:#ecfdf5;border:1px solid #a7f3d0;color:#047857;transition:all .15s" title="Open Teacher Portal">
+        <i class="fas fa-chalkboard-teacher" style="color:#10b981"></i> <span>Teacher Portal</span>
+      </a>
+      <a href="cbt/index.html" class="portal-link-btn" style="font-size:11px;padding:5px 12px;text-decoration:none;border-radius:20px;display:inline-flex;align-items:center;gap:6px;font-weight:700;background:#fffbeb;border:1px solid #fde68a;color:#b45309;transition:all .15s" title="Open CBT Exam Center">
+        <i class="fas fa-laptop-code" style="color:#f59e0b"></i> <span>CBT Portal</span>
+      </a>
+    </div>
+
     <div id="header-bursariq-pill" onclick="RichVineApp.openModal('modal-about-bursariq')" style="display:inline-flex;align-items:center;gap:8px;padding:4px 12px;background:linear-gradient(135deg, #0b2b48 0%, #0f172a 100%);border:1px solid rgba(0,168,132,0.35);border-radius:24px;box-shadow:0 2px 8px rgba(11,43,72,0.25);cursor:pointer;transition:transform .15s" title="Audited and Verified by BursarIQ Accounting Engine">
       <div style="background:#ffffff;padding:2px 6px;border-radius:6px;display:inline-flex;align-items:center">
         <img src="assets/images/bursariq-logo.png" alt="BursarIQ" style="height:15px;width:auto;display:block">
@@ -1160,6 +1329,79 @@
     <div class="dash-welcome-row">
       <h2 style="font-size:20px;font-weight:800;margin-bottom:4px">System Dashboard &amp; Outstanding Tracker 👋</h2>
       <p class="dash-welcome-sub">Live school bursary &amp; operations portal · 2026/2027</p>
+    </div>
+
+    <!-- ═══════════════ INSTITUTIONAL PORTAL GATEWAY CARDS ═══════════════ -->
+    <div class="panel" style="background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%);color:#fff;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:16px 18px;margin-bottom:18px;box-shadow:0 10px 25px -5px rgba(0,0,0,0.25)">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(56,189,248,0.2);color:#38bdf8;display:flex;align-items:center;justify-content:center;font-size:16px">
+            <i class="fas fa-th-large"></i>
+          </div>
+          <div>
+            <div style="font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#38bdf8">Quick Navigation Gateway</div>
+            <h3 style="font-size:15px;font-weight:800;color:#fff;margin:0">Active School Portals &amp; Operations</h3>
+          </div>
+        </div>
+        <div style="font-size:11px;color:#94a3b8;display:flex;align-items:center;gap:6px">
+          <span style="width:8px;height:8px;border-radius:50%;background:#10b981;box-shadow:0 0 8px #10b981"></span>
+          All portals connected &bull; Real-time synchronization
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(210px, 1fr));gap:10px">
+        <!-- Card 1: Public Website -->
+        <a href="index.html" style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:12px;text-decoration:none;color:#fff;transition:all .18s" onmouseover="this.style.background='rgba(56,189,248,0.15)';this.style.borderColor='#38bdf8'" onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.borderColor='rgba(255,255,255,0.12)'">
+          <div style="width:40px;height:40px;border-radius:10px;background:#0284c7;color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">
+            <i class="fas fa-globe"></i>
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px">
+              Public Website <i class="fas fa-arrow-right" style="font-size:10px;color:#38bdf8"></i>
+            </div>
+            <div style="font-size:11px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">School Home &amp; Clearance</div>
+          </div>
+        </a>
+
+        <!-- Card 2: Teacher Portal -->
+        <a href="teacher-login.html" style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:12px;text-decoration:none;color:#fff;transition:all .18s" onmouseover="this.style.background='rgba(16,185,129,0.15)';this.style.borderColor='#10b981'" onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.borderColor='rgba(255,255,255,0.12)'">
+          <div style="width:40px;height:40px;border-radius:10px;background:#059669;color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">
+            <i class="fas fa-chalkboard-teacher"></i>
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px">
+              Teacher Portal <i class="fas fa-arrow-right" style="font-size:10px;color:#34d399"></i>
+            </div>
+            <div style="font-size:11px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Daily Roll Call &amp; Attendance</div>
+          </div>
+        </a>
+
+        <!-- Card 3: Student CBT Center -->
+        <a href="cbt/index.html" style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:12px;text-decoration:none;color:#fff;transition:all .18s" onmouseover="this.style.background='rgba(245,158,11,0.15)';this.style.borderColor='#f59e0b'" onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.borderColor='rgba(255,255,255,0.12)'">
+          <div style="width:40px;height:40px;border-radius:10px;background:#d97706;color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">
+            <i class="fas fa-laptop-code"></i>
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px">
+              Student CBT <i class="fas fa-arrow-right" style="font-size:10px;color:#fbbf24"></i>
+            </div>
+            <div style="font-size:11px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">8-Subject JAMB Exam Center</div>
+          </div>
+        </a>
+
+        <!-- Card 4: Exams & Broadsheets -->
+        <button type="button" onclick="RichVineApp.switchTab('exams-records')" style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:12px;text-decoration:none;color:#fff;cursor:pointer;width:100%;text-align:left;transition:all .18s" onmouseover="this.style.background='rgba(168,85,247,0.15)';this.style.borderColor='#a855f7'" onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.borderColor='rgba(255,255,255,0.12)'">
+          <div style="width:40px;height:40px;border-radius:10px;background:#7c3aed;color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">
+            <i class="fas fa-file-signature"></i>
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px">
+              Exams &amp; Reports <i class="fas fa-arrow-right" style="font-size:10px;color:#c084fc"></i>
+            </div>
+            <div style="font-size:11px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Broadsheets &amp; Terminal Cards</div>
+          </div>
+        </button>
+      </div>
     </div>
 
     <!-- Mobile App Quick Actions (Visible on Mobile) -->
@@ -1887,6 +2129,63 @@
         </div>
       </div>
 
+      <!-- ═══ NEXT TERM FEE NOTICES ═══════════════════════════════════════ -->
+      <div class="panel" style="border-top:3px solid #2dd4bf;grid-column:1/-1">
+        <div class="panel-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+          <h3 style="display:flex;align-items:center;gap:8px">
+            <i class="fas fa-file-invoice" style="color:#2dd4bf"></i>
+            &nbsp;Next Term / Session School Fees Notices
+          </h3>
+          <span style="font-size:11px;font-weight:700;background:#ccfbf1;color:#0d9488;padding:3px 10px;border-radius:12px">
+            📋 Portrait A4 · 4 Notices per Page
+          </span>
+        </div>
+        <div class="panel-body">
+          <p style="font-size:12.5px;color:#475569;margin-bottom:14px">
+            Generate and print official <strong>next term school fees notices</strong> for learners — 4 cutout slips per A4 sheet (portrait). Each notice shows term fee, arrears, total due, and payment instructions.
+          </p>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:14px">
+            <div class="form-group">
+              <label class="form-label">Section Filter</label>
+              <select class="form-control" id="fn-section-filter" onchange="RichVineApp.onFeeNoticeSectionChange()">
+                <option value="All">All Sections</option>
+                <option value="primary">Primary School</option>
+                <option value="junior">Junior College</option>
+                <option value="senior">Senior College</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Class Filter</label>
+              <select class="form-control" id="fn-class-filter">
+                <option value="All">All Classes</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Next Term Label</label>
+              <input type="text" class="form-control" id="fn-next-term" placeholder="e.g. 2nd Term" value="2nd Term">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Session</label>
+              <input type="text" class="form-control" id="fn-next-session" placeholder="e.g. 2025/2026" value="">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Override Term Fee <span style="color:#94a3b8;font-weight:400">(0 = use each student's fee)</span></label>
+              <input type="number" class="form-control" id="fn-fee-override" placeholder="0" value="0" min="0" step="500">
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+            <button class="btn-primary" style="background:linear-gradient(135deg,#0b2b48,#1e4976);border-color:#0b2b48;font-weight:800;padding:10px 22px;font-size:14px" onclick="RichVineApp.generateFeeNotices()">
+              <i class="fas fa-print"></i> &nbsp;Generate &amp; Print Fee Notices
+            </button>
+            <span style="font-size:12px;color:#64748b;font-style:italic">
+              <i class="fas fa-info-circle" style="color:#2dd4bf"></i>
+              Only <strong>Active</strong> students will be included
+            </span>
+          </div>
+        </div>
+      </div>
+
+
     </div>
   </section>
 
@@ -2330,7 +2629,320 @@
 
 
     <!-- Executive Software Footer -->
-    <footer id="dash-software-footer" style="margin-top:40px;padding:24px 20px;border-top:1px solid var(--gray-200);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow)">
+    
+  <!-- ═══════════════ VIEW: TEACHERS & CREDENTIALS ═══════════════ -->
+  <section id="view-teachers" class="tab-section hidden">
+    <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:18px">
+      <h2 style="font-size:18px;font-weight:800;color:#0f172a;display:flex;align-items:center;gap:8px">
+        <i class="fas fa-chalkboard-teacher" style="color:#f59e0b"></i> Teacher Accounts & Access Credentials
+      </h2>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <a href="teacher-login.html" target="_blank" class="btn-secondary" style="color:#059669;border-color:#10b981">
+          <i class="fas fa-external-link-alt"></i> Teacher Login Page
+        </a>
+        <button class="btn-primary" onclick="RichVineApp.openAddTeacherModal()">
+          <i class="fas fa-user-plus"></i> Generate Teacher Login
+        </button>
+      </div>
+    </div>
+
+    <!-- Teacher KPI Stats -->
+    <div class="stat-grid" style="margin-bottom:20px">
+      <div class="stat-card">
+        <div class="stat-icon purple"><i class="fas fa-users-cog"></i></div>
+        <div>
+          <div class="stat-value" id="tch-kpi-total">0</div>
+          <div class="stat-label">Total Registered Staff</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green"><i class="fas fa-user-check"></i></div>
+        <div>
+          <div class="stat-value" id="tch-kpi-active">0</div>
+          <div class="stat-label">Active Credentials</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon blue"><i class="fas fa-school"></i></div>
+        <div>
+          <div class="stat-value" id="tch-kpi-assigned">0</div>
+          <div class="stat-label">Assigned Class Teachers</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon amber"><i class="fas fa-user-lock"></i></div>
+        <div>
+          <div class="stat-value" id="tch-kpi-suspended">0</div>
+          <div class="stat-label">Suspended Accounts</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Teachers Table Panel -->
+    <div class="panel">
+      <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+        <h3><i class="fas fa-id-badge" style="color:#f59e0b"></i> &nbsp;Authorized Teaching Staff (<span id="tch-table-count">0</span>)</h3>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <input type="text" id="tch-search-filter" class="form-control" placeholder="Search teacher or phone..." style="width:220px" oninput="RichVineApp.loadTeachersTab()">
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Teacher Name</th>
+                <th>Phone (Username)</th>
+                <th>Assigned Class</th>
+                <th>Subjects</th>
+                <th style="text-align:center">Portal Password</th>
+                <th style="text-align:center">Account Status</th>
+                <th style="text-align:center">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tch-table-body">
+              <tr><td colspan="7" class="empty-cell">No teacher credentials generated yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ VIEW: DAILY ATTENDANCE ═══════════════ -->
+  <section id="view-attendance" class="tab-section hidden">
+    <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:18px">
+      <h2 style="font-size:18px;font-weight:800;color:#0f172a;display:flex;align-items:center;gap:8px">
+        <i class="fas fa-clipboard-check" style="color:#10b981"></i> Daily Attendance Register (Morning & Afternoon)
+      </h2>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <button class="btn-secondary" onclick="window.print()">
+          <i class="fas fa-print"></i> Print Register
+        </button>
+      </div>
+    </div>
+
+    <!-- Attendance Filters -->
+    <div class="panel" style="margin-bottom:18px;padding:14px 18px">
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+        <div>
+          <label style="font-size:11px;font-weight:700;color:var(--gray-600);display:block;margin-bottom:4px">FILTER CLASS:</label>
+          <select id="att-filter-class" class="form-control" onchange="RichVineApp.loadAttendanceTab()" style="width:160px">
+            <option value="All">All Classes</option>
+            <option value="SSS 1">SSS 1</option>
+            <option value="SSS 2">SSS 2</option>
+            <option value="SSS 3">SSS 3</option>
+            <option value="JSS 1">JSS 1</option>
+            <option value="JSS 2">JSS 2</option>
+            <option value="JSS 3">JSS 3</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:700;color:var(--gray-600);display:block;margin-bottom:4px">SESSION:</label>
+          <select id="att-filter-session" class="form-control" onchange="RichVineApp.loadAttendanceTab()" style="width:140px">
+            <option value="All">All Sessions</option>
+            <option value="Morning">Morning Only</option>
+            <option value="Afternoon">Afternoon Only</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:700;color:var(--gray-600);display:block;margin-bottom:4px">TIMEFRAME:</label>
+          <select id="att-filter-days" class="form-control" onchange="RichVineApp.loadAttendanceTab()" style="width:140px">
+            <option value="7">Last 7 Days</option>
+            <option value="30" selected>Last 30 Days</option>
+            <option value="90">Last 90 Days</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Attendance Log Table -->
+    <div class="panel">
+      <div class="panel-header">
+        <h3><i class="fas fa-history" style="color:#10b981"></i> &nbsp;Daily Attendance Submissions (<span id="att-table-count">0</span>)</h3>
+      </div>
+      <div class="panel-body">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Class</th>
+                <th>Session</th>
+                <th style="text-align:center">Present</th>
+                <th style="text-align:center">Absent</th>
+                <th style="text-align:center">Late</th>
+                <th style="text-align:center">Attendance Rate</th>
+                <th>Class Teacher</th>
+                <th style="text-align:center">Action</th>
+              </tr>
+            </thead>
+            <tbody id="att-table-body">
+              <tr><td colspan="9" class="empty-cell">No attendance submissions logged yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ VIEW: EXAMS & RECORDS ═══════════════ -->
+  <section id="view-exams-records" class="tab-section hidden">
+    <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:18px">
+      <h2 style="font-size:18px;font-weight:800;color:#0f172a;display:flex;align-items:center;gap:8px">
+        <i class="fas fa-file-signature" style="color:#a855f7"></i> Exams & Records: Automated Broadsheets & Report Cards
+      </h2>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <button class="btn-primary" style="background:#0284c7;border-color:#0284c7" onclick="RichVineApp.syncCbtScoresToExams()">
+          <i class="fas fa-sync-alt"></i> Sync CBT Scores &rarr; Exams
+        </button>
+        <button class="btn-secondary" onclick="RichVineApp.openAddScoreModal()">
+          <i class="fas fa-plus"></i> Enter Scores
+        </button>
+      </div>
+    </div>
+
+    <!-- Sub-navigation tabs -->
+    <div style="display:flex;gap:8px;margin-bottom:18px;border-bottom:2px solid var(--gray-200);padding-bottom:10px">
+      <button id="er-subtab-broadsheet-btn" class="btn-primary" onclick="RichVineApp.switchErSubTab('broadsheet')">
+        <i class="fas fa-table"></i> Class Broadsheet
+      </button>
+      <button id="er-subtab-report-btn" class="btn-secondary" onclick="RichVineApp.switchErSubTab('report')">
+        <i class="fas fa-user-graduate"></i> Student Report Card
+      </button>
+      <button id="er-subtab-ledger-btn" class="btn-secondary" onclick="RichVineApp.switchErSubTab('ledger')">
+        <i class="fas fa-list-alt"></i> Raw Scores Ledger
+      </button>
+    </div>
+
+    <!-- SUBTAB 1: Class Broadsheet -->
+    <div id="er-view-broadsheet" class="space-y-4">
+      <div class="panel" style="padding:14px 18px">
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between">
+          <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+            <div>
+              <label style="font-size:11px;font-weight:700;color:var(--gray-600);display:block;margin-bottom:4px">CLASS:</label>
+              <select id="er-bs-class" class="form-control" onchange="RichVineApp.renderBroadsheet()" style="width:160px">
+                <option value="SSS 1">SSS 1</option>
+                <option value="SSS 2">SSS 2</option>
+                <option value="SSS 3" selected>SSS 3</option>
+                <option value="JSS 1">JSS 1</option>
+                <option value="JSS 2">JSS 2</option>
+                <option value="JSS 3">JSS 3</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:700;color:var(--gray-600);display:block;margin-bottom:4px">TERM:</label>
+              <select id="er-bs-term" class="form-control" onchange="RichVineApp.renderBroadsheet()" style="width:130px">
+                <option value="1st Term" selected>1st Term</option>
+                <option value="2nd Term">2nd Term</option>
+                <option value="3rd Term">3rd Term</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:700;color:var(--gray-600);display:block;margin-bottom:4px">ACADEMIC SESSION:</label>
+              <select id="er-bs-session" class="form-control" onchange="RichVineApp.renderBroadsheet()" style="width:140px">
+                <option value="2026/2027" selected>2026/2027</option>
+                <option value="2025/2026">2025/2026</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="btn-secondary" onclick="RichVineApp.exportBroadsheetCsv()">
+              <i class="fas fa-file-csv"></i> Download CSV
+            </button>
+            <button class="btn-primary" onclick="RichVineApp.printBroadsheet()">
+              <i class="fas fa-print"></i> Print Broadsheet
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <h3 id="broadsheet-header-title"><i class="fas fa-scroll" style="color:#a855f7"></i> Broadsheet</h3>
+        </div>
+        <div class="panel-body">
+          <div class="table-wrap" id="broadsheet-table-wrap">
+            <table id="broadsheet-table">
+              <thead>
+                <tr><th>Loading...</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUBTAB 2: Student Report Card -->
+    <div id="er-view-report" class="space-y-4 hidden">
+      <div class="panel" style="padding:14px 18px">
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between">
+          <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+            <div>
+              <label style="font-size:11px;font-weight:700;color:var(--gray-600);display:block;margin-bottom:4px">SELECT STUDENT:</label>
+              <select id="er-rc-student" class="form-control" onchange="RichVineApp.renderReportCard()" style="width:240px"></select>
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:700;color:var(--gray-600);display:block;margin-bottom:4px">TERM:</label>
+              <select id="er-rc-term" class="form-control" onchange="RichVineApp.renderReportCard()" style="width:130px">
+                <option value="1st Term" selected>1st Term</option>
+                <option value="2nd Term">2nd Term</option>
+                <option value="3rd Term">3rd Term</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn-primary" style="background:#059669;border-color:#059669" onclick="RichVineApp.printReportCard()">
+            <i class="fas fa-print"></i> Download / Print Report Card (PDF)
+          </button>
+        </div>
+      </div>
+
+      <!-- Printable Report Card Container -->
+      <div id="report-card-container" style="background:#fff;border-radius:12px;padding:30px;box-shadow:0 4px 16px rgba(0,0,0,0.06);max-width:850px;margin:0 auto;color:#1e293b;border:1px solid #e2e8f0">
+        <div style="text-align:center;padding:40px 20px;color:#94a3b8">
+          <i class="fas fa-user-graduate" style="font-size:42px;margin-bottom:12px;color:#cbd5e1"></i>
+          <p>Please select a student above to generate their automated terminal report card.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUBTAB 3: Raw Score Ledger -->
+    <div id="er-view-ledger" class="space-y-4 hidden">
+      <div class="panel">
+        <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center">
+          <h3><i class="fas fa-list-ol" style="color:#a855f7"></i> Subject Score Entries (<span id="ledger-count">0</span>)</h3>
+          <button class="btn-secondary" onclick="RichVineApp.openAddScoreModal()"><i class="fas fa-plus"></i> Add Score Record</button>
+        </div>
+        <div class="panel-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Student Name</th>
+                  <th>Class</th>
+                  <th>Subject</th>
+                  <th>Term</th>
+                  <th style="text-align:center">CA 1 (20)</th>
+                  <th style="text-align:center">CA 2 (20)</th>
+                  <th style="text-align:center">Exam (60)</th>
+                  <th style="text-align:center">Total (100)</th>
+                  <th style="text-align:center">Grade</th>
+                  <th style="text-align:center">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="er-ledger-tbody">
+                <tr><td colspan="10" class="empty-cell">No score records found.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<footer id="dash-software-footer" style="margin-top:40px;padding:24px 20px;border-top:1px solid var(--gray-200);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow)">
       <div style="display:flex;align-items:center;gap:12px">
         <div style="background:#ffffff;padding:4px 8px;border-radius:8px;border:1px solid var(--gray-200)">
           <img src="assets/images/bursariq-logo.png" alt="BursarIQ" style="height:22px;width:auto;display:block">
@@ -2357,6 +2969,138 @@
 <!-- ═══════════════ MODALS ═══════════════ -->
 
 <!-- Add Stock Item Modal -->
+<!-- Modal: Add / Edit Teacher -->
+<div class="modal-overlay hidden" id="modal-add-teacher">
+  <div class="modal-box" style="max-width:520px">
+    <div class="modal-header">
+      <h3 id="modal-teacher-title"><i class="fas fa-user-plus" style="color:#f59e0b"></i> Generate Teacher Login</h3>
+      <button class="modal-close" onclick="RichVineApp.closeModal('modal-add-teacher')">&times;</button>
+    </div>
+    <form id="form-teacher-modal" onsubmit="event.preventDefault(); RichVineApp.saveTeacherModal();">
+      <div class="modal-body" style="display:flex;flex-direction:column;gap:14px">
+        <input type="hidden" id="tch-form-id">
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--gray-700);display:block;margin-bottom:4px">Full Name *</label>
+          <input type="text" id="tch-form-name" class="form-control" required placeholder="e.g. Mr. Olawale Adeyemi">
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--gray-700);display:block;margin-bottom:4px">Phone Number (Login Username) *</label>
+          <input type="tel" id="tch-form-phone" class="form-control" required placeholder="e.g. 08012345671">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div>
+            <label style="font-size:12px;font-weight:700;color:var(--gray-700);display:block;margin-bottom:4px">Assigned Class Teacher *</label>
+            <select id="tch-form-class" class="form-control" required>
+              <option value="SSS 1">SSS 1</option>
+              <option value="SSS 2">SSS 2</option>
+              <option value="SSS 3">SSS 3</option>
+              <option value="JSS 1">JSS 1</option>
+              <option value="JSS 2">JSS 2</option>
+              <option value="JSS 3">JSS 3</option>
+              <option value="Primary 1">Primary 1</option>
+              <option value="Primary 2">Primary 2</option>
+              <option value="Primary 3">Primary 3</option>
+              <option value="Primary 4">Primary 4</option>
+              <option value="Primary 5">Primary 5</option>
+              <option value="Primary 6">Primary 6</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:var(--gray-700);display:block;margin-bottom:4px">Status</label>
+            <select id="tch-form-status" class="form-control">
+              <option value="active">Active</option>
+              <option value="suspended">Suspended</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--gray-700);display:block;margin-bottom:4px">Teaching Subject(s)</label>
+          <input type="text" id="tch-form-subjects" class="form-control" placeholder="e.g. Mathematics, Further Maths">
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <label style="font-size:12px;font-weight:700;color:var(--gray-700)">Unique Portal Password *</label>
+            <button type="button" class="btn-secondary" style="font-size:10px;padding:2px 8px" onclick="RichVineApp.generateTeacherPassword()">
+              <i class="fas fa-random"></i> Generate New
+            </button>
+          </div>
+          <div style="position:relative">
+            <input type="text" id="tch-form-password" class="form-control" required style="font-family:monospace;font-weight:700;letter-spacing:1px;color:#0284c7">
+          </div>
+          <p style="font-size:11px;color:var(--gray-500);margin-top:4px">Provide this phone number and password to the teacher to access their portal.</p>
+        </div>
+      </div>
+      <div class="modal-footer" style="display:flex;justify-content:flex-end;gap:8px">
+        <button type="button" class="btn-secondary" onclick="RichVineApp.closeModal('modal-add-teacher')">Cancel</button>
+        <button type="submit" class="btn-primary" style="background:#f59e0b;border-color:#f59e0b">Save Credentials</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Enter / Edit Score -->
+<div class="modal-overlay hidden" id="modal-add-score">
+  <div class="modal-box" style="max-width:480px">
+    <div class="modal-header">
+      <h3><i class="fas fa-pen-alt" style="color:#a855f7"></i> Enter Academic Score</h3>
+      <button class="modal-close" onclick="RichVineApp.closeModal('modal-add-score')">&times;</button>
+    </div>
+    <form id="form-score-modal" onsubmit="event.preventDefault(); RichVineApp.saveScoreModal();">
+      <div class="modal-body" style="display:flex;flex-direction:column;gap:12px">
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--gray-700);display:block;margin-bottom:4px">Student *</label>
+          <select id="score-form-student" class="form-control" required></select>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div>
+            <label style="font-size:12px;font-weight:700;color:var(--gray-700);display:block;margin-bottom:4px">Subject *</label>
+            <select id="score-form-subject" class="form-control" required>
+              <option value="Mathematics">Mathematics</option>
+              <option value="English Language">English Language</option>
+              <option value="Biology">Biology</option>
+              <option value="Physics">Physics</option>
+              <option value="Chemistry">Chemistry</option>
+              <option value="Economics">Economics</option>
+              <option value="Government">Government</option>
+              <option value="Commerce">Commerce</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:var(--gray-700);display:block;margin-bottom:4px">Term *</label>
+            <select id="score-form-term" class="form-control" required>
+              <option value="1st Term">1st Term</option>
+              <option value="2nd Term">2nd Term</option>
+              <option value="3rd Term">3rd Term</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:10px">
+          <div>
+            <label style="font-size:11px;font-weight:700;color:var(--gray-700);display:block;margin-bottom:4px">CA 1 (Max 20)</label>
+            <input type="number" id="score-form-ca1" min="0" max="20" class="form-control" value="0" required oninput="RichVineApp.calcScoreModalTotal()">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;color:var(--gray-700);display:block;margin-bottom:4px">CA 2 (Max 20)</label>
+            <input type="number" id="score-form-ca2" min="0" max="20" class="form-control" value="0" required oninput="RichVineApp.calcScoreModalTotal()">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;color:var(--gray-700);display:block;margin-bottom:4px">Exam (Max 60)</label>
+            <input type="number" id="score-form-exam" min="0" max="60" class="form-control" value="0" required oninput="RichVineApp.calcScoreModalTotal()">
+          </div>
+        </div>
+        <div style="background:#f8fafc;padding:10px 14px;border-radius:8px;border:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:12px;font-weight:700;color:var(--gray-600)">Computed Total & Grade:</span>
+          <span id="score-modal-computed" style="font-size:14px;font-weight:800;color:#0284c7">0 / 100 — F9</span>
+        </div>
+      </div>
+      <div class="modal-footer" style="display:flex;justify-content:flex-end;gap:8px">
+        <button type="button" class="btn-secondary" onclick="RichVineApp.closeModal('modal-add-score')">Cancel</button>
+        <button type="submit" class="btn-primary" style="background:#a855f7;border-color:#a855f7">Save Score</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <div class="modal-overlay hidden" id="modal-add-stock">
   <div class="modal-box">
     <div class="modal-header">
@@ -3814,6 +4558,34 @@
   });
 </script>
 
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+  </script>
+
+  <!-- Scroll to Top FAB (mobile) -->
+  <button id="scroll-top-fab" onclick="window.scrollTo({top:0,behavior:'smooth'})"
+    style="display:none;position:fixed;bottom:max(80px,calc(72px + env(safe-area-inset-bottom,0px)));right:16px;z-index:190;width:44px;height:44px;border-radius:50%;background:#0284c7;color:#fff;border:none;box-shadow:0 4px 16px rgba(2,132,199,.4);font-size:18px;cursor:pointer;align-items:center;justify-content:center;transition:opacity .2s;">
+    <i class="fas fa-chevron-up"></i>
+  </button>
+  <script>
+    (function() {
+      var fab = document.getElementById('scroll-top-fab');
+      if (!fab) return;
+      var main = document.getElementById('main') || window;
+      var scrollEl = document.getElementById('main') || document.documentElement;
+      function onScroll() {
+        var top = main.scrollTop !== undefined ? main.scrollTop : window.scrollY;
+        fab.style.display = top > 300 ? 'flex' : 'none';
+      }
+      if (main !== window) main.addEventListener('scroll', onScroll, {passive:true});
+      window.addEventListener('scroll', onScroll, {passive:true});
+    })();
+  </script>
 </body>
 </html>
 
