@@ -70,24 +70,51 @@ const EXPENSE_ACCOUNTS = [
 if (typeof window !== "undefined") window.EXPENSE_ACCOUNTS = EXPENSE_ACCOUNTS;
 
 // ─── Clean Initial State (Zero Dummy Data) ────────────────────────────────
-const _bursarCfg = (typeof window !== "undefined" && window.BURSARIQ_CONFIG) ? window.BURSARIQ_CONFIG : {};
+
+// ─── Tutorial & Stakeholders Configuration (JSS 3 BECE & SS 3 WAEC) ────────
+const TUTORIAL_CLASSES = [
+  { id: "JSS 3", name: "JSS 3 (BECE Exam)", exam: "BECE", defaultMonthlyFee: 10000, description: "Junior Secondary BECE Intensive Preparation" },
+  { id: "SS 3", name: "SS 3 (WAEC Exam)", exam: "WAEC", defaultMonthlyFee: 15000, description: "Senior Secondary WAEC & NECO Intensive Preparation" }
+];
+
+const TUTORIAL_MONTHS = [
+  { id: "october", label: "October 2026", shortLabel: "Oct 2026", order: 1, year: 2026, monthIndex: 9 },
+  { id: "november", label: "November 2026", shortLabel: "Nov 2026", order: 2, year: 2026, monthIndex: 10 },
+  { id: "december", label: "December 2026", shortLabel: "Dec 2026", order: 3, year: 2026, monthIndex: 11 },
+  { id: "january", label: "January 2027", shortLabel: "Jan 2027", order: 4, year: 2027, monthIndex: 0 },
+  { id: "february", label: "February 2027", shortLabel: "Feb 2027", order: 5, year: 2027, monthIndex: 1 },
+  { id: "march", label: "March 2027", shortLabel: "Mar 2027", order: 6, year: 2027, monthIndex: 2 },
+  { id: "april", label: "April 2027", shortLabel: "Apr 2027", order: 7, year: 2027, monthIndex: 3 },
+  { id: "may", label: "May 2027", shortLabel: "May 2027", order: 8, year: 2027, monthIndex: 4 },
+  { id: "june", label: "June 2027", shortLabel: "Jun 2027", order: 9, year: 2027, monthIndex: 5 },
+  { id: "july", label: "July 2027", shortLabel: "Jul 2027", order: 10, year: 2027, monthIndex: 6 }
+];
+
+const TUTORIAL_FEE_CATEGORIES = [
+  { id: "monthly_tuition", name: "Monthly Tutorial Fee", isMonthly: true, description: "Monthly tuition starting from October" },
+  { id: "bece_exam_fee", name: "BECE Examination Fee", forClass: "JSS 3", defaultAmount: 25000 },
+  { id: "bece_lesson_fee", name: "BECE Special Extension Lesson", forClass: "JSS 3", defaultAmount: 10000 },
+  { id: "waec_exam_fee", name: "WAEC Examination Fee", forClass: "SS 3", defaultAmount: 65000 },
+  { id: "neco_exam_fee", name: "NECO Examination Fee", forClass: "SS 3", defaultAmount: 60000 },
+  { id: "mock_exams_fee", name: "Mock Examination Fee", defaultAmount: 10000 },
+  { id: "waec_logistics", name: "WAEC/NECO Practical & Logistics Fee", forClass: "SS 3", defaultAmount: 20000 },
+  { id: "waec_id_card", name: "WAEC / Exam ID Card Fee", defaultAmount: 4000 },
+  { id: "camping_fee", name: "Intensive Weekend / Camping Fee", defaultAmount: 15000 },
+  { id: "tutorial_materials", name: "Tutorial Books & Study Materials", defaultAmount: 5000 },
+  { id: "optional_special", name: "Other Special / Optional Fee", isCustom: true }
+];
 
 const DEFAULT_DATA = {
   config: {
     schoolName: _bursarCfg.schoolName || "EXCELLENCE MODEL COLLEGE",
-    motto: _bursarCfg.motto || "Knowledge, Character & Leadership",
-    address: _bursarCfg.address || "12 Education Boulevard, Victoria Island / Ikeja, Lagos State, Nigeria",
-    contactEmail: _bursarCfg.contactEmail || "admin@excellencemodel.edu.ng",
-    phone: _bursarCfg.phone || "08012345678",
-    adminContact: _bursarCfg.adminContact || "08012345678",
-    currentSession: _bursarCfg.currentSession || "2026/2027",
-    currentTerm: _bursarCfg.currentTerm || "1st Term",
-    currency: _bursarCfg.currencySymbol || "₦",
-    bankDetails: _bursarCfg.bankDetails || {
-      bankName: "Zenith Bank Plc",
-      accountName: "BURSARY COLLECTION ACCOUNT",
-      accountNumber: "1012345678"
-    }
+    motto: "Soaring High",
+    address: "5-7 Olukayode Street, Imoro, Ogijo, Shagamu - Ikorodu Road, Shagamu, Ogun State",
+    contactEmail: "admin@richvinecollege.edu.ng",
+    phone: "09053126809",
+    adminContact: "09053126809",
+    currentSession: "2026/2027",
+    currentTerm: "1st Term",
+    currency: "₦"
   },
 
   classes: ALL_CLASSES,
@@ -121,912 +148,18 @@ const DEFAULT_DATA = {
   ],
 
   // Fresh, empty collections
-    students: [
-    {
-      id: "EMC-2026-001",
-      regNo: "EMC/2026/001",
-      name: "Adeleke Chukwuemeka",
-      class: "Primary 1",
-      section: "primary",
-      gender: "Male",
-      parentName: "Engr. & Mrs. Adeleke",
-      parentPhone: "08023456781",
-      address: "14 Palm Avenue, Lagos",
-      termFee: 55000,
-      pastArrears: 0,
-      status: "Active",
-      createdAt: 1718000000000
-    },
-    {
-      id: "EMC-2026-002",
-      regNo: "EMC/2026/002",
-      name: "Ibrahim Zainab Folashade",
-      class: "Primary 4",
-      section: "primary",
-      gender: "Female",
-      parentName: "Alhaji Ibrahim",
-      parentPhone: "08034567892",
-      address: "8 Unity Close, Lagos",
-      termFee: 65000,
-      pastArrears: 12500,
-      status: "Active",
-      createdAt: 1718000001000
-    },
-    {
-      id: "EMC-2026-003",
-      regNo: "EMC/2026/003",
-      name: "Okon Blessing Mary",
-      class: "Nursery 2",
-      section: "primary",
-      gender: "Female",
-      parentName: "Mr. D. Okon",
-      parentPhone: "08045678903",
-      address: "21 Heritage Estate, Lagos",
-      termFee: 45000,
-      pastArrears: 0,
-      status: "Active",
-      createdAt: 1718000002000
-    },
-    {
-      id: "EMC-2026-004",
-      regNo: "EMC/2026/004",
-      name: "Danjuma Emmanuel",
-      class: "JSS 1A",
-      section: "junior",
-      gender: "Male",
-      parentName: "Pastor Danjuma",
-      parentPhone: "08056789014",
-      address: "5 Victory Way, Lagos",
-      termFee: 85000,
-      pastArrears: 25000,
-      status: "Active",
-      createdAt: 1718000003000
-    },
-    {
-      id: "EMC-2026-005",
-      regNo: "EMC/2026/005",
-      name: "Babatunde Olamide",
-      class: "JSS 2B",
-      section: "junior",
-      gender: "Male",
-      parentName: "Chief Babatunde",
-      parentPhone: "08067890125",
-      address: "17 Commercial Road, Lagos",
-      termFee: 85000,
-      pastArrears: 0,
-      status: "Active",
-      createdAt: 1718000004000
-    },
-    {
-      id: "EMC-2026-006",
-      regNo: "EMC/2026/006",
-      name: "Eze Chisom David",
-      class: "JSS 3A",
-      section: "junior",
-      gender: "Male",
-      parentName: "Dr. Eze",
-      parentPhone: "08078901236",
-      address: "9 Lekki Expressway, Lagos",
-      termFee: 95000,
-      pastArrears: 0,
-      status: "Active",
-      createdAt: 1718000005000
-    },
-    {
-      id: "EMC-2026-007",
-      regNo: "EMC/2026/007",
-      name: "Yusuf Aminat Sadiya",
-      class: "SSS 1 Science",
-      section: "senior",
-      gender: "Female",
-      parentName: "Barrister Yusuf",
-      parentPhone: "08089012347",
-      address: "3 Coral View, Lagos",
-      termFee: 110000,
-      pastArrears: 30000,
-      status: "Active",
-      createdAt: 1718000006000
-    },
-    {
-      id: "EMC-2026-008",
-      regNo: "EMC/2026/008",
-      name: "Williams Victor Ayomide",
-      class: "SSS 2 Commercial",
-      section: "senior",
-      gender: "Male",
-      parentName: "Mrs. Williams",
-      parentPhone: "08090123458",
-      address: "11 Admiralty Way, Lagos",
-      termFee: 110000,
-      pastArrears: 0,
-      status: "Active",
-      createdAt: 1718000007000
-    },
-    {
-      id: "EMC-2026-009",
-      regNo: "EMC/2026/009",
-      name: "Nwachukwu Somtochukwu",
-      class: "SSS 3 Science",
-      section: "senior",
-      gender: "Male",
-      parentName: "Sir & Lady Nwachukwu",
-      parentPhone: "08011223344",
-      address: "24 Marina Boulevard, Lagos",
-      termFee: 135000,
-      pastArrears: 0,
-      status: "Active",
-      createdAt: 1718000008000
-    },
-    {
-      id: "EMC-2026-010",
-      regNo: "EMC/2026/010",
-      name: "Aliyu Farouk Mohammed",
-      class: "SSS 3 Art",
-      section: "senior",
-      gender: "Male",
-      parentName: "Senator Aliyu",
-      parentPhone: "08022334455",
-      address: "7 Bourdillon Road, Ikoyi, Lagos",
-      termFee: 135000,
-      pastArrears: 45000,
-      status: "Active",
-      createdAt: 1718000009000
-    }
-  ],
-
-  payments: [
-    {
-      id: "PAY-DEMO-001",
-      receiptNo: "REC-2026-001",
-      studentId: "EMC-2026-001",
-      studentName: "Adeleke Chukwuemeka",
-      class: "Primary 1",
-      section: "primary",
-      amount: 55000,
-      termFeePaid: 55000,
-      arrearsDeducted: 0,
-      otherFeesPaid: 0,
-      category: "school_fees",
-      method: "Bank Transfer",
-      date: new Date(Date.now() - 14 * 86400000).toISOString().split('T')[0],
-      session: "2026/2027",
-      term: "1st Term",
-      notes: "Full 1st term tuition settlement",
-      createdAt: Date.now() - 14 * 86400000
-    },
-    {
-      id: "PAY-DEMO-002",
-      receiptNo: "REC-2026-002",
-      studentId: "EMC-2026-002",
-      studentName: "Ibrahim Zainab Folashade",
-      class: "Primary 4",
-      section: "primary",
-      amount: 30000,
-      termFeePaid: 17500,
-      arrearsDeducted: 12500,
-      otherFeesPaid: 0,
-      category: "school_fees",
-      method: "POS Card",
-      date: new Date(Date.now() - 10 * 86400000).toISOString().split('T')[0],
-      session: "2026/2027",
-      term: "1st Term",
-      notes: "₦12,500 arrears cleared first; ₦17,500 credited to 1st Term",
-      createdAt: Date.now() - 10 * 86400000
-    },
-    {
-      id: "PAY-DEMO-003",
-      receiptNo: "REC-2026-003",
-      studentId: "EMC-2026-003",
-      studentName: "Okon Blessing Mary",
-      class: "Nursery 2",
-      section: "primary",
-      amount: 45000,
-      termFeePaid: 45000,
-      arrearsDeducted: 0,
-      otherFeesPaid: 0,
-      category: "school_fees",
-      method: "Cash Deposit",
-      date: new Date(Date.now() - 8 * 86400000).toISOString().split('T')[0],
-      session: "2026/2027",
-      term: "1st Term",
-      notes: "Early bird term payment",
-      createdAt: Date.now() - 8 * 86400000
-    },
-    {
-      id: "PAY-DEMO-004",
-      receiptNo: "REC-2026-004",
-      studentId: "EMC-2026-005",
-      studentName: "Babatunde Olamide",
-      class: "JSS 2B",
-      section: "junior",
-      amount: 85000,
-      termFeePaid: 85000,
-      arrearsDeducted: 0,
-      otherFeesPaid: 0,
-      category: "school_fees",
-      method: "Bank Transfer",
-      date: new Date(Date.now() - 6 * 86400000).toISOString().split('T')[0],
-      session: "2026/2027",
-      term: "1st Term",
-      notes: "Full junior secondary fee payment",
-      createdAt: Date.now() - 6 * 86400000
-    },
-    {
-      id: "PAY-DEMO-005",
-      receiptNo: "REC-2026-005",
-      studentId: "EMC-2026-006",
-      studentName: "Eze Chisom David",
-      class: "JSS 3A",
-      section: "junior",
-      amount: 130000,
-      termFeePaid: 95000,
-      arrearsDeducted: 0,
-      otherFeesPaid: 35000,
-      category: "school_fees",
-      items: [
-        { name: "School Fees / Tuition", amount: 95000, category: "school_fees" },
-        { name: "BECE Examination Fee", amount: 35000, category: "bece_fee" }
-      ],
-      method: "Bank Transfer",
-      date: new Date(Date.now() - 5 * 86400000).toISOString().split('T')[0],
-      session: "2026/2027",
-      term: "1st Term",
-      notes: "Tuition + BECE National Exam Fee",
-      createdAt: Date.now() - 5 * 86400000
-    },
-    {
-      id: "PAY-DEMO-006",
-      receiptNo: "REC-2026-006",
-      studentId: "EMC-2026-008",
-      studentName: "Williams Victor Ayomide",
-      class: "SSS 2 Commercial",
-      section: "senior",
-      amount: 110000,
-      termFeePaid: 110000,
-      arrearsDeducted: 0,
-      otherFeesPaid: 0,
-      category: "school_fees",
-      method: "Bank Transfer",
-      date: new Date(Date.now() - 4 * 86400000).toISOString().split('T')[0],
-      session: "2026/2027",
-      term: "1st Term",
-      notes: "Senior secondary cleared",
-      createdAt: Date.now() - 4 * 86400000
-    },
-    {
-      id: "PAY-DEMO-007",
-      receiptNo: "REC-2026-007",
-      studentId: "EMC-2026-009",
-      studentName: "Nwachukwu Somtochukwu",
-      class: "SSS 3 Science",
-      section: "senior",
-      amount: 200000,
-      termFeePaid: 135000,
-      arrearsDeducted: 0,
-      otherFeesPaid: 65000,
-      category: "school_fees",
-      items: [
-        { name: "School Fees / Tuition", amount: 135000, category: "school_fees" },
-        { name: "WAEC Examination Registration", amount: 65000, category: "waec_fee" }
-      ],
-      method: "Bank Transfer",
-      date: new Date(Date.now() - 3 * 86400000).toISOString().split('T')[0],
-      session: "2026/2027",
-      term: "1st Term",
-      notes: "Final year tuition + WAEC registration fee",
-      createdAt: Date.now() - 3 * 86400000
-    },
-    {
-      id: "PAY-DEMO-008",
-      receiptNo: "REC-2026-008",
-      studentId: "EMC-2026-010",
-      studentName: "Aliyu Farouk Mohammed",
-      class: "SSS 3 Art",
-      section: "senior",
-      amount: 50000,
-      termFeePaid: 5000,
-      arrearsDeducted: 45000,
-      otherFeesPaid: 0,
-      category: "school_fees",
-      method: "Bank Transfer",
-      date: new Date(Date.now() - 1 * 86400000).toISOString().split('T')[0],
-      session: "2026/2027",
-      term: "1st Term",
-      notes: "₦45,000 arrears recovered first; ₦5,000 credited to term balance",
-      createdAt: Date.now() - 1 * 86400000
-    }
-  ],
-
-  expenses: [
-    {
-      id: "EXP-DEMO-001",
-      title: "Diesel Generator Fuel Purchase (500L)",
-      amount: 650000,
-      category: "Diesel & Fuel",
-      account: "general",
-      period: "monthly",
-      date: new Date(Date.now() - 12 * 86400000).toISOString().split('T')[0],
-      method: "Bank Transfer",
-      notes: "500 litres diesel @ ₦1,300/L for school backup plant",
-      createdAt: Date.now() - 12 * 86400000
-    },
-    {
-      id: "EXP-DEMO-002",
-      title: "Science Lab Consumables & Reagents",
-      amount: 185000,
-      category: "Academic Materials",
-      account: "senior",
-      period: "termly",
-      date: new Date(Date.now() - 9 * 86400000).toISOString().split('T')[0],
-      method: "Bank Transfer",
-      notes: "Titration reagents, specimen slides, pipette kits for Chemistry/Biology",
-      createdAt: Date.now() - 9 * 86400000
-    },
-    {
-      id: "EXP-DEMO-003",
-      title: "Customized Continuous Assessment & Report Booklets",
-      amount: 95000,
-      category: "Stationery",
-      account: "general",
-      period: "termly",
-      date: new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0],
-      method: "Cash",
-      notes: "Bulk printing of termly learner dossier sheets",
-      createdAt: Date.now() - 7 * 86400000
-    },
-    {
-      id: "EXP-DEMO-004",
-      title: "Dedicated Fiber Internet Broadband",
-      amount: 65000,
-      category: "Utilities",
-      account: "general",
-      period: "monthly",
-      date: new Date(Date.now() - 4 * 86400000).toISOString().split('T')[0],
-      method: "Bank Transfer",
-      notes: "Monthly unlimited fiber broadband for computer laboratory & admin",
-      createdAt: Date.now() - 4 * 86400000
-    },
-    {
-      id: "EXP-DEMO-005",
-      title: "Kindergarten & Primary Playground Upkeep",
-      amount: 45000,
-      category: "Repairs & Maintenance",
-      account: "primary",
-      period: "one_time",
-      date: new Date(Date.now() - 2 * 86400000).toISOString().split('T')[0],
-      method: "POS",
-      notes: "Swings and turf maintenance",
-      createdAt: Date.now() - 2 * 86400000
-    }
-  ],
-
-  stocks: [
-    {
-      id: "STK-DEMO-001",
-      name: "College Blazer (Senior Navy Blue)",
-      category: "Uniform",
-      unit: "piece",
-      costPrice: 9500,
-      sellingPrice: 14000,
-      quantity: 45,
-      minThreshold: 10,
-      description: "Gold-embroidered breast pocket insignia",
-      createdAt: 1718000000000
-    },
-    {
-      id: "STK-DEMO-002",
-      name: "Junior Secondary Uniform Complete Set",
-      category: "Uniform",
-      unit: "set",
-      costPrice: 7000,
-      sellingPrice: 10500,
-      quantity: 60,
-      minThreshold: 15,
-      description: "Sky-blue shirt with charcoal trousers/skirt",
-      createdAt: 1718000001000
-    },
-    {
-      id: "STK-DEMO-003",
-      name: "Primary School Uniform Set",
-      category: "Uniform",
-      unit: "set",
-      costPrice: 5500,
-      sellingPrice: 8500,
-      quantity: 50,
-      minThreshold: 12,
-      description: "Gingham checkered fabric with school badge",
-      createdAt: 1718000002000
-    },
-    {
-      id: "STK-DEMO-004",
-      name: "Inter-House Sports Wear Kit",
-      category: "Sport Wear",
-      unit: "set",
-      costPrice: 3800,
-      sellingPrice: 6000,
-      quantity: 75,
-      minThreshold: 20,
-      description: "Four house colors: Sapphire, Ruby, Emerald, Topaz",
-      createdAt: 1718000003000
-    },
-    {
-      id: "STK-DEMO-005",
-      name: "60-Leaves Branded Exercise Books (Pack of 10)",
-      category: "Exercise Books",
-      unit: "pack",
-      costPrice: 3200,
-      sellingPrice: 5000,
-      quantity: 120,
-      minThreshold: 30,
-      description: "Laminated full-color school cover",
-      createdAt: 1718000004000
-    },
-    {
-      id: "STK-DEMO-006",
-      name: "Senior Secondary New General Mathematics",
-      category: "Textbooks",
-      unit: "piece",
-      costPrice: 4500,
-      sellingPrice: 6500,
-      quantity: 35,
-      minThreshold: 10,
-      description: "Revised National Edition",
-      createdAt: 1718000005000
-    },
-    {
-      id: "STK-DEMO-007",
-      name: "White Science Laboratory Coat",
-      category: "Uniform",
-      unit: "piece",
-      costPrice: 4000,
-      sellingPrice: 6000,
-      quantity: 28,
-      minThreshold: 8,
-      description: "Heavy cotton laboratory protective wear",
-      createdAt: 1718000006000
-    }
-  ],
-
+  students: [],
+  payments: [],
+  expenses: [],
+  stocks: [],
   stockSales: [],
   stockRestocks: [],
-
-  staff: [
-    {
-      id: "STF-DEMO-001",
-      staffId: "STF/001",
-      name: "Dr. Anthony Balogun",
-      role: "Principal Administrator",
-      section: "general",
-      phone: "08031112233",
-      email: "principal@excellencemodel.edu.ng",
-      salary: 220000,
-      loanBalance: 0,
-      totalLoanTaken: 0,
-      totalLoanRepaid: 0,
-      status: "Active",
-      createdAt: 1718000000000
-    },
-    {
-      id: "STF-DEMO-002",
-      staffId: "STF/002",
-      name: "Mrs. Olufunke Adeleke",
-      role: "Headmistress (Primary Section)",
-      section: "primary",
-      phone: "08032223344",
-      email: "primary.lead@excellencemodel.edu.ng",
-      salary: 145000,
-      loanBalance: 0,
-      totalLoanTaken: 0,
-      totalLoanRepaid: 0,
-      status: "Active",
-      createdAt: 1718000001000
-    },
-    {
-      id: "STF-DEMO-003",
-      staffId: "STF/003",
-      name: "Mr. Chukwudi Nnamdi",
-      role: "Senior Physics & Mathematics Lead",
-      section: "senior",
-      phone: "08033334455",
-      email: "c.nnamdi@excellencemodel.edu.ng",
-      salary: 135000,
-      loanBalance: 30000,
-      totalLoanTaken: 50000,
-      totalLoanRepaid: 20000,
-      status: "Active",
-      createdAt: 1718000002000
-    },
-    {
-      id: "STF-DEMO-004",
-      staffId: "STF/004",
-      name: "Miss Amina Sanni",
-      role: "English Language & Literature Teacher",
-      section: "junior",
-      phone: "08034445566",
-      email: "a.sanni@excellencemodel.edu.ng",
-      salary: 115000,
-      loanBalance: 15000,
-      totalLoanTaken: 25000,
-      totalLoanRepaid: 10000,
-      status: "Active",
-      createdAt: 1718000003000
-    },
-    {
-      id: "STF-DEMO-005",
-      staffId: "STF/005",
-      name: "Mr. Tunde Bakare",
-      role: "Chief Bursary & Accounts Officer",
-      section: "general",
-      phone: "08035556677",
-      email: "bursar@excellencemodel.edu.ng",
-      salary: 130000,
-      loanBalance: 0,
-      totalLoanTaken: 0,
-      totalLoanRepaid: 0,
-      status: "Active",
-      createdAt: 1718000004000
-    }
-  ],
-
-  salaries: [
-    {
-      id: "SAL-DEMO-001",
-      staffId: "STF-DEMO-001",
-      staffName: "Dr. Anthony Balogun",
-      section: "general",
-      role: "Principal Administrator",
-      month: "October",
-      year: 2026,
-      amount: 220000,
-      grossAmount: 220000,
-      loanDeduction: 0,
-      netAmount: 220000,
-      method: "Bank Transfer",
-      date: "2026-10-28",
-      notes: "October payroll settlement",
-      createdAt: 1729000000000
-    },
-    {
-      id: "SAL-DEMO-002",
-      staffId: "STF-DEMO-003",
-      staffName: "Mr. Chukwudi Nnamdi",
-      section: "senior",
-      role: "Senior Physics & Mathematics Lead",
-      month: "October",
-      year: 2026,
-      amount: 125000,
-      grossAmount: 135000,
-      loanDeduction: 10000,
-      netAmount: 125000,
-      method: "Bank Transfer",
-      date: "2026-10-28",
-      notes: "Gross ₦135,000 less ₦10,000 loan repayment deduction = Net ₦125,000",
-      createdAt: 1729000001000
-    }
-  ],
-
-  staffLoans: [
-    {
-      id: "LOAN-DEMO-001",
-      staffId: "STF-DEMO-003",
-      staffName: "Mr. Chukwudi Nnamdi",
-      type: "disbursement",
-      amount: 50000,
-      balanceAfter: 50000,
-      date: "2026-09-15",
-      method: "Bank Transfer",
-      notes: "Personal emergency loan",
-      createdAt: 1726400000000
-    },
-    {
-      id: "LOAN-DEMO-002",
-      staffId: "STF-DEMO-003",
-      staffName: "Mr. Chukwudi Nnamdi",
-      type: "repayment",
-      amount: 10000,
-      balanceAfter: 40000,
-      date: "2026-09-28",
-      method: "Salary Deduction",
-      notes: "September salary automated deduction",
-      createdAt: 1727500000000
-    },
-    {
-      id: "LOAN-DEMO-003",
-      staffId: "STF-DEMO-003",
-      staffName: "Mr. Chukwudi Nnamdi",
-      type: "repayment",
-      amount: 10000,
-      balanceAfter: 30000,
-      date: "2026-10-28",
-      method: "Salary Deduction",
-      notes: "October salary automated deduction",
-      createdAt: 1729000000000
-    }
-  ],
-
-  cbtSubmissions: [
-    {
-      id: "CBT-DEMO-001",
-      studentId: "EMC-2026-009",
-      regNo: "EMC/2026/009",
-      studentName: "Nwachukwu Somtochukwu",
-      class: "SSS 3 Science",
-      subject: "General Mathematics (Senior Mock)",
-      score: 38,
-      totalQuestions: 40,
-      percentage: 95,
-      grade: "A1",
-      timeTaken: "28 mins",
-      date: "2026-10-25",
-      createdAt: 1729800000000
-    },
-    {
-      id: "CBT-DEMO-002",
-      studentId: "EMC-2026-008",
-      regNo: "EMC/2026/008",
-      studentName: "Williams Victor Ayomide",
-      class: "SSS 2 Commercial",
-      subject: "General Mathematics (Senior Mock)",
-      score: 34,
-      totalQuestions: 40,
-      percentage: 85,
-      grade: "B2",
-      timeTaken: "34 mins",
-      date: "2026-10-25",
-      createdAt: 1729800001000
-    }
-  ],
-  teachers: [
-    {
-      id: "TCH-001",
-      staffId: "STF/003",
-      name: "Mr. Emmanuel Adebayo",
-      phone: "08012345678",
-      password: "password123",
-      assignedClass: "SSS 1 Science",
-      assignedClasses: ["SSS 1 Science", "SSS 1 Art", "SSS 1 Commercial"],
-      role: "Class Teacher",
-      subjects: ["Mathematics", "Physics"],
-      status: "Active",
-      createdAt: 1729000000000
-    },
-    {
-      id: "TCH-002",
-      staffId: "STF/004",
-      name: "Mrs. Funmilayo Adeleke",
-      phone: "08023456789",
-      password: "password123",
-      assignedClass: "JSS 2B",
-      assignedClasses: ["JSS 2B", "JSS 2A"],
-      role: "Class Teacher",
-      subjects: ["English Language", "Literature in English"],
-      status: "Active",
-      createdAt: 1729000001000
-    },
-    {
-      id: "TCH-003",
-      staffId: "STF/005",
-      name: "Mr. Chukwudi Okafor",
-      phone: "08034567890",
-      password: "password123",
-      assignedClass: "SSS 2 Commercial",
-      assignedClasses: ["SSS 2 Commercial", "SSS 2 Art"],
-      role: "Class Teacher",
-      subjects: ["Economics", "Commerce"],
-      status: "Active",
-      createdAt: 1729000002000
-    }
-  ],
-  attendance: [
-    {
-      id: "ATT-2026-11-13-SSS-1-Science-Morning",
-      date: "2026-11-13",
-      class: "SSS 1 Science",
-      session: "Morning",
-      markedBy: "Mr. Emmanuel Adebayo",
-      timestamp: 1731481200000,
-      records: [
-        { studentId: "EMC-2026-007", studentName: "Adeyemi Tunde", status: "Present", remark: "Prompt arrival" },
-        { studentId: "EMC-2026-008", studentName: "Williams Victor Ayomide", status: "Present", remark: "" }
-      ],
-      presentCount: 2,
-      absentCount: 0,
-      lateCount: 0,
-      excusedCount: 0,
-      totalCount: 2,
-      rate: 100
-    },
-    {
-      id: "ATT-2026-11-13-SSS-1-Science-Afternoon",
-      date: "2026-11-13",
-      class: "SSS 1 Science",
-      session: "Afternoon",
-      markedBy: "Mr. Emmanuel Adebayo",
-      timestamp: 1731502800000,
-      records: [
-        { studentId: "EMC-2026-007", studentName: "Adeyemi Tunde", status: "Present", remark: "" },
-        { studentId: "EMC-2026-008", studentName: "Williams Victor Ayomide", status: "Late", remark: "Returned from library late" }
-      ],
-      presentCount: 1,
-      absentCount: 0,
-      lateCount: 1,
-      excusedCount: 0,
-      totalCount: 2,
-      rate: 50
-    }
-  ],
-  examRecords: [
-    {
-      id: "EXM-EMC-2026-009-MATH",
-      studentId: "EMC-2026-009",
-      studentName: "Nwachukwu Somtochukwu",
-      class: "SSS 3 Science",
-      session: "2026/2027",
-      term: "1st Term",
-      subject: "Mathematics",
-      ca1: 19,
-      ca2: 18,
-      exam: 57,
-      total: 94,
-      grade: "A1",
-      remark: "Excellent Distinction",
-      syncedFromCbt: true,
-      updatedAt: 1731400000000
-    },
-    {
-      id: "EXM-EMC-2026-009-ENG",
-      studentId: "EMC-2026-009",
-      studentName: "Nwachukwu Somtochukwu",
-      class: "SSS 3 Science",
-      session: "2026/2027",
-      term: "1st Term",
-      subject: "English Language",
-      ca1: 17,
-      ca2: 18,
-      exam: 53,
-      total: 88,
-      grade: "A1",
-      remark: "Excellent",
-      syncedFromCbt: false,
-      updatedAt: 1731400000000
-    },
-    {
-      id: "EXM-EMC-2026-009-PHY",
-      studentId: "EMC-2026-009",
-      studentName: "Nwachukwu Somtochukwu",
-      class: "SSS 3 Science",
-      session: "2026/2027",
-      term: "1st Term",
-      subject: "Physics",
-      ca1: 18,
-      ca2: 17,
-      exam: 55,
-      total: 90,
-      grade: "A1",
-      remark: "Outstanding",
-      syncedFromCbt: false,
-      updatedAt: 1731400000000
-    },
-    {
-      id: "EXM-EMC-2026-009-CHM",
-      studentId: "EMC-2026-009",
-      studentName: "Nwachukwu Somtochukwu",
-      class: "SSS 3 Science",
-      session: "2026/2027",
-      term: "1st Term",
-      subject: "Chemistry",
-      ca1: 18,
-      ca2: 19,
-      exam: 54,
-      total: 91,
-      grade: "A1",
-      remark: "Brilliant Mastery",
-      syncedFromCbt: false,
-      updatedAt: 1731400000000
-    },
-    {
-      id: "EXM-EMC-2026-009-BIO",
-      studentId: "EMC-2026-009",
-      studentName: "Nwachukwu Somtochukwu",
-      class: "SSS 3 Science",
-      session: "2026/2027",
-      term: "1st Term",
-      subject: "Biology",
-      ca1: 16,
-      ca2: 18,
-      exam: 51,
-      total: 85,
-      grade: "A1",
-      remark: "Excellent",
-      syncedFromCbt: false,
-      updatedAt: 1731400000000
-    },
-    {
-      id: "EXM-EMC-2026-008-MATH",
-      studentId: "EMC-2026-008",
-      studentName: "Williams Victor Ayomide",
-      class: "SSS 2 Commercial",
-      session: "2026/2027",
-      term: "1st Term",
-      subject: "Mathematics",
-      ca1: 16,
-      ca2: 17,
-      exam: 51,
-      total: 84,
-      grade: "A1",
-      remark: "Excellent",
-      syncedFromCbt: true,
-      updatedAt: 1731400000000
-    },
-    {
-      id: "EXM-EMC-2026-008-ENG",
-      studentId: "EMC-2026-008",
-      studentName: "Williams Victor Ayomide",
-      class: "SSS 2 Commercial",
-      session: "2026/2027",
-      term: "1st Term",
-      subject: "English Language",
-      ca1: 15,
-      ca2: 16,
-      exam: 48,
-      total: 79,
-      grade: "A1",
-      remark: "Very Good",
-      syncedFromCbt: false,
-      updatedAt: 1731400000000
-    },
-    {
-      id: "EXM-EMC-2026-008-ECO",
-      studentId: "EMC-2026-008",
-      studentName: "Williams Victor Ayomide",
-      class: "SSS 2 Commercial",
-      session: "2026/2027",
-      term: "1st Term",
-      subject: "Economics",
-      ca1: 18,
-      ca2: 17,
-      exam: 53,
-      total: 88,
-      grade: "A1",
-      remark: "Outstanding",
-      syncedFromCbt: false,
-      updatedAt: 1731400000000
-    },
-    {
-      id: "EXM-EMC-2026-008-COM",
-      studentId: "EMC-2026-008",
-      studentName: "Williams Victor Ayomide",
-      class: "SSS 2 Commercial",
-      session: "2026/2027",
-      term: "1st Term",
-      subject: "Commerce",
-      ca1: 17,
-      ca2: 18,
-      exam: 52,
-      total: 87,
-      grade: "A1",
-      remark: "Very Commendable",
-      syncedFromCbt: false,
-      updatedAt: 1731400000000
-    },
-    {
-      id: "EXM-EMC-2026-008-GOV",
-      studentId: "EMC-2026-008",
-      studentName: "Williams Victor Ayomide",
-      class: "SSS 2 Commercial",
-      session: "2026/2027",
-      term: "1st Term",
-      subject: "Government",
-      ca1: 15,
-      ca2: 16,
-      exam: 49,
-      total: 80,
-      grade: "A1",
-      remark: "Commendable",
-      syncedFromCbt: false,
-      updatedAt: 1731400000000
-    }
-  ],
+  cbtSubmissions: [],
+  staff: [],
+  salaries: [],
+  staffLoans: [],
+  tutorialStudents: [],
+  tutorialPayments: [],
   auditLogs: [
     {
       id: "LOG-INIT",
@@ -1076,9 +209,8 @@ class RichVineDB {
       if (!data.staff) data.staff = [];
       if (!data.salaries) data.salaries = [];
       if (!data.staffLoans) data.staffLoans = [];
-      if (!data.teachers || data.teachers.length === 0) data.teachers = JSON.parse(JSON.stringify(DEFAULT_DATA.teachers || []));
-      if (!data.attendance) data.attendance = JSON.parse(JSON.stringify(DEFAULT_DATA.attendance || []));
-      if (!data.examRecords) data.examRecords = JSON.parse(JSON.stringify(DEFAULT_DATA.examRecords || []));
+      if (!data.tutorialStudents) data.tutorialStudents = [];
+      if (!data.tutorialPayments) data.tutorialPayments = [];
 
       // Auto-purge any legacy test student profiles (RVC-2026-001 through 006)
       const testStudentIds = new Set(["RVC-2026-001", "RVC-2026-002", "RVC-2026-003", "RVC-2026-004", "RVC-2026-005", "RVC-2026-006"]);
@@ -1371,8 +503,8 @@ class RichVineDB {
 
     return {
       studentId: student.id,
-      name: student.name || `${student.firstName || ""} ${student.lastName || ""}`.trim() || "Student",
-      class: student.class || student.currentClass || "General",
+      name: `${student.firstName} ${student.lastName}`,
+      class: student.currentClass,
       termFeeExpected: termFee,
       termFeePaid: termPaid,
       termFeeBalance: termFeeBalance,
@@ -1537,26 +669,11 @@ class RichVineDB {
   }
 
   // ── Students ────────────────────────────────────────────────────────────
-  static _normalizeStudent(s) {
-    if (!s) return s;
-    if (!s.name && (s.firstName || s.lastName)) {
-      s.name = `${s.firstName || ""} ${s.lastName || ""}`.trim();
-    }
-    if (!s.firstName && s.name) {
-      const parts = String(s.name).trim().split(/\s+/);
-      s.firstName = parts[0] || "";
-      s.lastName = parts.slice(1).join(" ") || "";
-    }
-    if (!s.currentClass && s.class) s.currentClass = s.class;
-    if (!s.class && s.currentClass) s.class = s.currentClass;
-    return s;
-  }
-
   static getStudents(filter = {}) {
     const db = this.get();
-    let students = (db.students || []).map(s => this._normalizeStudent(s));
+    let students = [...db.students];
     if (filter.class && filter.class !== "All") {
-      students = students.filter(s => (s.currentClass === filter.class || s.class === filter.class));
+      students = students.filter(s => s.currentClass === filter.class);
     }
     if (filter.section && filter.section !== "All") {
       students = students.filter(s => s.section === filter.section);
@@ -1568,8 +685,7 @@ class RichVineDB {
   }
 
   static getStudentById(id) {
-    const s = this.get().students.find(s => s.id === id || s.regNo === id) || null;
-    return s ? this._normalizeStudent(s) : null;
+    return this.get().students.find(s => s.id === id) || null;
   }
 
   static addStudent(student) {
@@ -2950,7 +2066,11 @@ class RichVineDB {
     const stockSalesRevenue = Math.round(independentStockSales.reduce((s, sl) => s + (Number(sl.totalRevenue) || 0), 0) * 100) / 100;
     const stockRestockCost = Math.round(allStockRestocks.reduce((s, r) => s + (Number(r.totalCost) || 0), 0) * 100) / 100;
 
-    const overallTotalRevenue  = Math.round((allPayments.reduce((s, p) => s + (Number(p.amount) || 0), 0) + stockSalesRevenue) * 100) / 100;
+        // Stakeholders (Tutorial Division) Revenue: included in overall school total, tracked separately from school fees
+    const allTutorialPayments = this.getTutorialPayments ? this.getTutorialPayments(baseFilter) : [];
+    const tutorialRevenue = Math.round(allTutorialPayments.reduce((s, p) => s + (Number(p.amount) || 0), 0) * 100) / 100;
+
+    const overallTotalRevenue  = Math.round((allPayments.reduce((s, p) => s + (Number(p.amount) || 0), 0) + stockSalesRevenue + tutorialRevenue) * 100) / 100;
     const overallTotalExpenses = Math.round((allExpenses.reduce((s, e) => s + (Number(e.amount) || 0), 0) + stockRestockCost) * 100) / 100;
 
     // Helper for robust matching across section key, account, or accountName (case-insensitive)
@@ -3060,6 +2180,9 @@ class RichVineDB {
       totalRevenue: overallTotalRevenue,
       stockSalesRevenue,
       stockRestockCost,
+      tutorialRevenue,
+      stakeholdersRevenue: tutorialRevenue,
+      tutorialPaymentCount: allTutorialPayments.length,
       totalExpenses: overallTotalExpenses,
       generalExpenses: generalTotal,
       directExpenses: Math.round((overallTotalExpenses - generalTotal) * 100) / 100,
@@ -3089,7 +2212,7 @@ class RichVineDB {
     return list.sort((a, b) => (Number(b.timestamp) || 0) - (Number(a.timestamp) || 0));
   }
 
-  static getCbtSubmissionByStudent(identifier, subject) {
+  static getCbtSubmissionByStudent(identifier) {
     if (!identifier) return null;
     const cleanId = String(identifier).trim().toLowerCase();
     const cleanAlphanum = cleanId.replace(/[^A-Za-z0-9]/g, "");
@@ -3099,7 +2222,7 @@ class RichVineDB {
       const sId = (s.studentId || "").toLowerCase();
       const sReg = (s.regNo || "").toLowerCase();
       const sRegAlpha = sReg.replace(/[^A-Za-z0-9]/g, "");
-      const matchStu = (sId === cleanId || sReg === cleanId || (cleanAlphanum && sRegAlpha === cleanAlphanum)); if (!matchStu) return false; if (subject) return (s.subject || "").toLowerCase().trim() === String(subject).toLowerCase().trim(); return true;
+      return sId === cleanId || sReg === cleanId || (cleanAlphanum && sRegAlpha === cleanAlphanum);
     }) || null;
   }
 
@@ -3109,7 +2232,7 @@ class RichVineDB {
     if (!db.cbtSubmissions) db.cbtSubmissions = [];
 
     // Enforce single attempt rule: check if student has already submitted
-    const existing = this.getCbtSubmissionByStudent(submission.studentId, submission.subject) || (submission.regNo ? this.getCbtSubmissionByStudent(submission.regNo, submission.subject) : null);
+    const existing = this.getCbtSubmissionByStudent(submission.studentId) || (submission.regNo ? this.getCbtSubmissionByStudent(submission.regNo) : null);
     if (existing && existing.id !== submission.id) {
       return { success: false, error: "Student has already completed this examination", submission: existing };
     }
@@ -3169,6 +2292,405 @@ class RichVineDB {
     return true;
   }
 
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // ── TUTORIAL SECTION & STAKEHOLDERS REVENUE (JSS3 BECE & SS3 WAEC) ───────
+  // ══════════════════════════════════════════════════════════════════════════
+
+  static getTutorialClasses() {
+    return TUTORIAL_CLASSES;
+  }
+
+  static getTutorialMonths() {
+    return TUTORIAL_MONTHS;
+  }
+
+  static getTutorialFeeCategories() {
+    return TUTORIAL_FEE_CATEGORIES;
+  }
+
+  // ── Tutorial Students ────────────────────────────────────────────────────
+  static getTutorialStudents(filter = {}) {
+    const db = this.get();
+    let list = Array.isArray(db.tutorialStudents) ? [...db.tutorialStudents] : [];
+
+    if (filter.class && filter.class !== "All") {
+      list = list.filter(s => s.tutorialClass === filter.class);
+    }
+    if (filter.status && filter.status !== "All") {
+      list = list.filter(s => s.status === filter.status);
+    }
+    if (filter.search && String(filter.search).trim() !== "") {
+      const q = String(filter.search).toLowerCase().trim();
+      list = list.filter(s =>
+        (s.firstName && s.firstName.toLowerCase().includes(q)) ||
+        (s.lastName && s.lastName.toLowerCase().includes(q)) ||
+        (s.regNo && s.regNo.toLowerCase().includes(q)) ||
+        (s.phone && s.phone.includes(q)) ||
+        (s.parentPhone && s.parentPhone.includes(q))
+      );
+    }
+    return list;
+  }
+
+  static getTutorialStudentById(id) {
+    if (!id) return null;
+    const db = this.get();
+    const list = Array.isArray(db.tutorialStudents) ? db.tutorialStudents : [];
+    return list.find(s => s.id === id || s.regNo === id) || null;
+  }
+
+  static addTutorialStudent(data) {
+    const db = this.get();
+    if (!Array.isArray(db.tutorialStudents)) db.tutorialStudents = [];
+
+    const num = db.tutorialStudents.length + 1;
+    const pad = String(num).padStart(3, "0");
+    const id = "RVC-TUT-" + Date.now().toString().slice(-4) + "-" + pad;
+    const regNo = "TUT/2026/" + pad;
+
+    const tutClass = data.tutorialClass === "SS 3" ? "SS 3" : "JSS 3";
+    const defaultFee = tutClass === "SS 3" ? 15000 : 10000;
+
+    const student = {
+      id,
+      regNo: data.regNo || regNo,
+      firstName: String(data.firstName || "").trim(),
+      lastName: String(data.lastName || "").trim(),
+      gender: data.gender || "Male",
+      tutorialClass: tutClass,
+      className: tutClass === "SS 3" ? "SS 3 (WAEC Exam)" : "JSS 3 (BECE Exam)",
+      monthlyFee: Number(data.monthlyFee) > 0 ? Number(data.monthlyFee) : defaultFee,
+      startMonth: data.startMonth || "october",
+      phone: String(data.phone || "").trim(),
+      parentName: String(data.parentName || "").trim(),
+      parentPhone: String(data.parentPhone || "").trim(),
+      parentEmail: String(data.parentEmail || "").trim(),
+      schoolAttended: String(data.schoolAttended || "").trim(),
+      status: data.status || "Active",
+      enrolledDate: data.enrolledDate || new Date().toISOString().slice(0, 10),
+      notes: String(data.notes || "").trim(),
+      createdAt: Date.now()
+    };
+
+    db.tutorialStudents.unshift(student);
+
+    const log = this._buildLog("ENROL_TUTORIAL_STUDENT", `Enrolled tutorial learner ${student.firstName} ${student.lastName} (${student.className}) with monthly fee ${student.monthlyFee}`);
+    if (!Array.isArray(db.auditLogs)) db.auditLogs = [];
+    db.auditLogs.unshift(log);
+
+    this.save(db);
+
+    if (window.RichVineFirebase && window.RichVineFirebase.saveLog) {
+      window.RichVineFirebase.saveLog(log);
+    }
+    return student;
+  }
+
+  static updateTutorialStudent(id, updates) {
+    const db = this.get();
+    if (!Array.isArray(db.tutorialStudents)) return null;
+
+    const idx = db.tutorialStudents.findIndex(s => s.id === id);
+    if (idx === -1) return null;
+
+    const current = db.tutorialStudents[idx];
+    const updated = {
+      ...current,
+      ...updates,
+      id: current.id,
+      monthlyFee: Number(updates.monthlyFee) > 0 ? Number(updates.monthlyFee) : current.monthlyFee,
+      updatedAt: Date.now()
+    };
+
+    if (updates.tutorialClass) {
+      updated.className = updates.tutorialClass === "SS 3" ? "SS 3 (WAEC Exam)" : "JSS 3 (BECE Exam)";
+    }
+
+    db.tutorialStudents[idx] = updated;
+
+    const log = this._buildLog("UPDATE_TUTORIAL_STUDENT", `Updated tutorial learner ${updated.firstName} ${updated.lastName} (${updated.className})`);
+    if (!Array.isArray(db.auditLogs)) db.auditLogs = [];
+    db.auditLogs.unshift(log);
+
+    this.save(db);
+    return updated;
+  }
+
+  static deleteTutorialStudent(id) {
+    const db = this.get();
+    if (!Array.isArray(db.tutorialStudents)) return false;
+
+    const student = db.tutorialStudents.find(s => s.id === id);
+    if (!student) return false;
+
+    db.tutorialStudents = db.tutorialStudents.filter(s => s.id !== id);
+
+    // Also remove any linked payments
+    if (Array.isArray(db.tutorialPayments)) {
+      db.tutorialPayments = db.tutorialPayments.filter(p => p.studentId !== id);
+    }
+
+    const log = this._buildLog("DELETE_TUTORIAL_STUDENT", `Deleted tutorial learner ${student.firstName} ${student.lastName} (${student.regNo})`);
+    if (!Array.isArray(db.auditLogs)) db.auditLogs = [];
+    db.auditLogs.unshift(log);
+
+    this.save(db);
+    return true;
+  }
+
+  // ── Tutorial Payments (Stakeholders Revenue) ─────────────────────────────
+  static getTutorialPayments(filter = {}) {
+    const db = this.get();
+    let list = Array.isArray(db.tutorialPayments) ? [...db.tutorialPayments] : [];
+
+    if (filter.studentId) {
+      list = list.filter(p => p.studentId === filter.studentId);
+    }
+    if (filter.tutorialClass && filter.tutorialClass !== "All") {
+      list = list.filter(p => p.tutorialClass === filter.tutorialClass);
+    }
+    if (filter.category && filter.category !== "All") {
+      list = list.filter(p => p.category === filter.category);
+    }
+    if (filter.month && filter.month !== "All") {
+      list = list.filter(p => p.month === filter.month || (Array.isArray(p.monthsCovered) && p.monthsCovered.includes(filter.month)));
+    }
+    if (filter.startDate) {
+      list = list.filter(p => p.date >= filter.startDate);
+    }
+    if (filter.endDate) {
+      list = list.filter(p => p.date <= filter.endDate);
+    }
+    if (filter.search && String(filter.search).trim() !== "") {
+      const q = String(filter.search).toLowerCase().trim();
+      list = list.filter(p =>
+        (p.studentName && p.studentName.toLowerCase().includes(q)) ||
+        (p.receiptNo && p.receiptNo.toLowerCase().includes(q)) ||
+        (p.reference && p.reference.toLowerCase().includes(q)) ||
+        (p.categoryName && p.categoryName.toLowerCase().includes(q))
+      );
+    }
+
+    // Sort by date descending
+    list.sort((a, b) => (b.date > a.date ? 1 : b.date < a.date ? -1 : (b.createdAt || 0) - (a.createdAt || 0)));
+    return list;
+  }
+
+  static getTutorialPaymentById(id) {
+    if (!id) return null;
+    const db = this.get();
+    const list = Array.isArray(db.tutorialPayments) ? db.tutorialPayments : [];
+    return list.find(p => p.id === id || p.receiptNo === id) || null;
+  }
+
+  static addTutorialPayment(data) {
+    const db = this.get();
+    if (!Array.isArray(db.tutorialPayments)) db.tutorialPayments = [];
+
+    const num = db.tutorialPayments.length + 1;
+    const pad = String(num).padStart(4, "0");
+    const id = "PAY-TUT-" + Date.now().toString().slice(-4) + "-" + pad;
+    const receiptNo = "TUT-" + new Date().getFullYear() + "-" + pad;
+
+    const amount = Number(data.amount) || 0;
+    const payment = {
+      id,
+      receiptNo: data.receiptNo || receiptNo,
+      studentId: data.studentId,
+      studentName: String(data.studentName || "").trim(),
+      tutorialClass: data.tutorialClass || "SS 3",
+      className: data.tutorialClass === "SS 3" ? "SS 3 (WAEC Exam)" : "JSS 3 (BECE Exam)",
+      category: data.category || "monthly_tuition",
+      categoryName: String(data.categoryName || "Monthly Tutorial Fee").trim(),
+      month: data.month || (data.category === "monthly_tuition" ? "october" : null),
+      monthLabel: data.monthLabel || null,
+      monthsCovered: Array.isArray(data.monthsCovered) && data.monthsCovered.length > 0 ? data.monthsCovered : (data.month ? [data.month] : []),
+      amount: amount,
+      paymentMethod: data.paymentMethod || "Bank Transfer",
+      reference: String(data.reference || "").trim(),
+      date: data.date || new Date().toISOString().slice(0, 10),
+      recordedBy: data.recordedBy || sessionStorage.getItem("richvine_admin_username") || "Super Admin",
+      notes: String(data.notes || "").trim(),
+      createdAt: Date.now()
+    };
+
+    db.tutorialPayments.unshift(payment);
+
+    const log = this._buildLog("RECORD_TUTORIAL_PAYMENT", `Recorded tutorial payment of ₦${payment.amount.toLocaleString()} for ${payment.studentName} (${payment.categoryName})`);
+    if (!Array.isArray(db.auditLogs)) db.auditLogs = [];
+    db.auditLogs.unshift(log);
+
+    this.save(db);
+
+    if (window.RichVineFirebase && window.RichVineFirebase.saveLog) {
+      window.RichVineFirebase.saveLog(log);
+    }
+    return payment;
+  }
+
+  static deleteTutorialPayment(id) {
+    const db = this.get();
+    if (!Array.isArray(db.tutorialPayments)) return false;
+
+    const payment = db.tutorialPayments.find(p => p.id === id);
+    if (!payment) return false;
+
+    db.tutorialPayments = db.tutorialPayments.filter(p => p.id !== id);
+
+    const log = this._buildLog("DELETE_TUTORIAL_PAYMENT", `Deleted tutorial payment ${payment.receiptNo} of ₦${payment.amount} for ${payment.studentName}`);
+    if (!Array.isArray(db.auditLogs)) db.auditLogs = [];
+    db.auditLogs.unshift(log);
+
+    this.save(db);
+    return true;
+  }
+
+  // ── Tutorial Student Balance & Monthly Status ────────────────────────────
+  static getTutorialStudentBalance(studentId) {
+    const student = typeof studentId === "object" ? studentId : this.getTutorialStudentById(studentId);
+    if (!student) return null;
+
+    const payments = this.getTutorialPayments({ studentId: student.id });
+    const allMonths = TUTORIAL_MONTHS;
+
+    // Start month resolution (started in October 2026)
+    const startMonthObj = allMonths.find(m => m.id === student.startMonth) || allMonths[0];
+    const startIndex = allMonths.findIndex(m => m.id === startMonthObj.id);
+
+    // Current month determination (current date or October 2026 at least)
+    const now = new Date();
+    const curYear = now.getFullYear();
+    const curMonthIndex = now.getMonth();
+
+    // Determine how many months have elapsed from start month up to now
+    let activeUpToIndex = startIndex;
+    for (let i = startIndex; i < allMonths.length; i++) {
+      const m = allMonths[i];
+      if (curYear > m.year || (curYear === m.year && curMonthIndex >= m.monthIndex)) {
+        activeUpToIndex = i;
+      }
+    }
+    // At least ensure October is billed
+    if (activeUpToIndex < startIndex) activeUpToIndex = startIndex;
+
+    const monthsExpected = allMonths.slice(startIndex, activeUpToIndex + 1);
+
+    // Track paid months
+    const paidMonthIds = new Set();
+    let monthlyTuitionPaid = 0;
+    let examFeesPaid = 0;
+    let optionalFeesPaid = 0;
+
+    payments.forEach(p => {
+      const amt = Number(p.amount) || 0;
+      if (p.category === "monthly_tuition") {
+        monthlyTuitionPaid += amt;
+        if (p.month) paidMonthIds.add(p.month);
+        if (Array.isArray(p.monthsCovered)) {
+          p.monthsCovered.forEach(m => paidMonthIds.add(m));
+        }
+      } else if (p.category === "exam_fee" || (p.categoryName && p.categoryName.toLowerCase().includes("exam"))) {
+        examFeesPaid += amt;
+      } else {
+        optionalFeesPaid += amt;
+      }
+    });
+
+    const monthlyFee = Number(student.monthlyFee) || (student.tutorialClass === "SS 3" ? 15000 : 10000);
+    const totalMonthlyBilled = monthsExpected.length * monthlyFee;
+    const monthsPaidList = monthsExpected.filter(m => paidMonthIds.has(m.id));
+    const monthsUnpaidList = monthsExpected.filter(m => !paidMonthIds.has(m.id));
+
+    const totalMonthlyDue = Math.max(0, totalMonthlyBilled - monthlyTuitionPaid);
+    const totalPaid = monthlyTuitionPaid + examFeesPaid + optionalFeesPaid;
+
+    return {
+      student,
+      monthlyFee,
+      monthsExpected,
+      monthsPaid: monthsPaidList,
+      monthsUnpaid: monthsUnpaidList,
+      paidMonthIds: Array.from(paidMonthIds),
+      totalMonthlyBilled,
+      totalMonthlyPaid: monthlyTuitionPaid,
+      totalMonthlyDue,
+      examFeesPaid,
+      optionalFeesPaid,
+      totalPaid,
+      totalOutstanding: totalMonthlyDue,
+      isFullyPaid: monthsUnpaidList.length === 0,
+      paymentsCount: payments.length
+    };
+  }
+
+  // ── Tutorial & Stakeholders Summary Metric Computations ───────────────────
+  static getTutorialSummary(filter = {}) {
+    const allStudents = this.getTutorialStudents();
+    const payments = this.getTutorialPayments(filter);
+
+    let totalStakeholdersRevenue = 0;
+    let monthlyTuitionRevenue = 0;
+    let examFeesRevenue = 0;
+    let optionalFeesRevenue = 0;
+
+    let jss3Revenue = 0;
+    let ss3Revenue = 0;
+
+    const byMonthRevenue = {};
+    TUTORIAL_MONTHS.forEach(m => { byMonthRevenue[m.id] = 0; });
+
+    payments.forEach(p => {
+      const amt = Number(p.amount) || 0;
+      totalStakeholdersRevenue += amt;
+
+      if (p.tutorialClass === "JSS 3") jss3Revenue += amt;
+      else ss3Revenue += amt;
+
+      if (p.category === "monthly_tuition") {
+        monthlyTuitionRevenue += amt;
+        if (p.month && byMonthRevenue[p.month] !== undefined) {
+          byMonthRevenue[p.month] += amt;
+        }
+      } else if (p.category === "exam_fee" || (p.categoryName && p.categoryName.toLowerCase().includes("exam"))) {
+        examFeesRevenue += amt;
+      } else {
+        optionalFeesRevenue += amt;
+      }
+    });
+
+    // Compute total unpaid dues across active learners
+    let totalUnpaidMonthlyDues = 0;
+    let fullyPaidStudentsCount = 0;
+    let owingStudentsCount = 0;
+
+    allStudents.forEach(s => {
+      const bal = this.getTutorialStudentBalance(s.id);
+      if (bal) {
+        totalUnpaidMonthlyDues += bal.totalMonthlyDue;
+        if (bal.totalMonthlyDue === 0) fullyPaidStudentsCount++;
+        else owingStudentsCount++;
+      }
+    });
+
+    return {
+      totalStakeholdersRevenue: Math.round(totalStakeholdersRevenue * 100) / 100,
+      monthlyTuitionRevenue: Math.round(monthlyTuitionRevenue * 100) / 100,
+      examFeesRevenue: Math.round(examFeesRevenue * 100) / 100,
+      optionalFeesRevenue: Math.round(optionalFeesRevenue * 100) / 100,
+      jss3Revenue: Math.round(jss3Revenue * 100) / 100,
+      ss3Revenue: Math.round(ss3Revenue * 100) / 100,
+      byMonthRevenue,
+      totalStudents: allStudents.length,
+      jss3Count: allStudents.filter(s => s.tutorialClass === "JSS 3").length,
+      ss3Count: allStudents.filter(s => s.tutorialClass === "SS 3").length,
+      totalUnpaidMonthlyDues: Math.round(totalUnpaidMonthlyDues * 100) / 100,
+      fullyPaidStudentsCount,
+      owingStudentsCount,
+      paymentsCount: payments.length
+    };
+  }
+
   // ── Internal Helper ──────────────────────────────────────────────────────
   static _buildLog(action, details) {
     return {
@@ -3199,234 +2721,15 @@ const DAYCARE_BILLING_CYCLES = [
   { id: "Month 12", label: "Month 12 (14 Aug – 13 Sep 2027)", shortLabel: "Month 12 (14 Aug – 13 Sep)", term: "Summer / Holiday", startDate: "2027-08-14", endDate: "2027-09-13" }
 ];
 
-// ── Teacher Management Methods ────────────────────────────────────────────────
-RichVineDB.getTeachers = function() {
-  const data = RichVineDB.get();
-  return data.teachers || [];
-};
-
-RichVineDB.getTeacherById = function(id) {
-  return RichVineDB.getTeachers().find(t => t.id === id) || null;
-};
-
-RichVineDB.getTeacherByPhone = function(phone) {
-  return RichVineDB.getTeachers().find(t => t.phone === String(phone).trim()) || null;
-};
-
-RichVineDB.saveTeacher = function(teacherData) {
-  const data = RichVineDB.get();
-  if (!data.teachers) data.teachers = [];
-  if (teacherData.id) {
-    const idx = data.teachers.findIndex(t => t.id === teacherData.id);
-    if (idx !== -1) {
-      data.teachers[idx] = { ...data.teachers[idx], ...teacherData, updatedAt: new Date().toISOString() };
-    } else {
-      data.teachers.push({ ...teacherData, createdAt: new Date().toISOString() });
-    }
-  } else {
-    const newTeacher = {
-      id: 'TCH-' + Date.now(),
-      ...teacherData,
-      status: teacherData.status || 'active',
-      createdAt: new Date().toISOString()
-    };
-    data.teachers.push(newTeacher);
-  }
-  RichVineDB.save(data);
-  return true;
-};
-
-RichVineDB.deleteTeacher = function(id) {
-  const data = RichVineDB.get();
-  if (!data.teachers) return false;
-  data.teachers = data.teachers.filter(t => t.id !== id);
-  RichVineDB.save(data);
-  return true;
-};
-
-RichVineDB.authenticateTeacher = function(phone, password) {
-  const teacher = RichVineDB.getTeacherByPhone(phone);
-  if (!teacher) return { success: false, message: 'Phone number not found.' };
-  if (teacher.status && teacher.status.toLowerCase() === 'suspended') return { success: false, message: 'Account suspended. Contact admin.' };
-  if (teacher.password !== String(password).trim()) return { success: false, message: 'Incorrect password.' };
-  return { success: true, teacher };
-};
-
-// ── Attendance Methods ─────────────────────────────────────────────────────────
-RichVineDB.getDailyAttendance = function(className, date, session) {
-  const data = RichVineDB.get();
-  const att = data.attendance || [];
-  return att.find(a => a.className === className && a.date === date && a.session === session) || null;
-};
-
-RichVineDB.saveDailyAttendance = function(record) {
-  const data = RichVineDB.get();
-  if (!data.attendance) data.attendance = [];
-  const idx = data.attendance.findIndex(
-    a => a.className === record.className && a.date === record.date && a.session === record.session
-  );
-  if (idx !== -1) {
-    data.attendance[idx] = { ...data.attendance[idx], ...record, updatedAt: new Date().toISOString() };
-  } else {
-    data.attendance.push({ ...record, id: 'ATT-' + Date.now(), createdAt: new Date().toISOString() });
-  }
-  RichVineDB.save(data);
-  return true;
-};
-
-RichVineDB.getAttendanceHistory = function(className, days) {
-  const data = RichVineDB.get();
-  const att = data.attendance || [];
-  const cutoff = new Date();
-  cutoff.setDate(cutoff.getDate() - (days || 30));
-  return att.filter(a => {
-    const matchClass = !className || className === 'All' || a.className === className;
-    const matchDate = new Date(a.date) >= cutoff;
-    return matchClass && matchDate;
-  }).sort((a, b) => b.date.localeCompare(a.date));
-};
-
-RichVineDB.getStudentAttendanceSummary = function(studentId, days) {
-  const data = RichVineDB.get();
-  const att = data.attendance || [];
-  const cutoff = new Date();
-  cutoff.setDate(cutoff.getDate() - (days || 30));
-  let present = 0, absent = 0, late = 0, total = 0;
-  att.forEach(session => {
-    if (new Date(session.date) < cutoff) return;
-    const rec = (session.records || []).find(r => r.studentId === studentId);
-    if (!rec) return;
-    total++;
-    if (rec.status === 'Present') present++;
-    else if (rec.status === 'Absent') absent++;
-    else if (rec.status === 'Late') late++;
-  });
-  return { present, absent, late, total, rate: total ? Math.round((present / total) * 100) : 0 };
-};
-
-// ── Exam Record Methods ────────────────────────────────────────────────────────
-RichVineDB.getExamRecords = function(filters) {
-  const data = RichVineDB.get();
-  let records = data.examRecords || [];
-  if (filters) {
-    if (filters.className) records = records.filter(r => r.className === filters.className);
-    if (filters.term) records = records.filter(r => r.term === filters.term);
-    if (filters.session) records = records.filter(r => r.session === filters.session);
-    if (filters.studentId) records = records.filter(r => r.studentId === filters.studentId);
-    if (filters.subject) records = records.filter(r => r.subject === filters.subject);
-  }
-  return records;
-};
-
-RichVineDB.calculateGrade = function(total) {
-  if (total >= 75) return { grade: 'A1', remark: 'Excellent' };
-  if (total >= 70) return { grade: 'B2', remark: 'Very Good' };
-  if (total >= 65) return { grade: 'B3', remark: 'Good' };
-  if (total >= 60) return { grade: 'C4', remark: 'Credit' };
-  if (total >= 55) return { grade: 'C5', remark: 'Credit' };
-  if (total >= 50) return { grade: 'C6', remark: 'Credit' };
-  if (total >= 45) return { grade: 'D7', remark: 'Pass' };
-  if (total >= 40) return { grade: 'E8', remark: 'Pass' };
-  return { grade: 'F9', remark: 'Fail' };
-};
-
-RichVineDB.saveExamRecord = function(record) {
-  const data = RichVineDB.get();
-  if (!data.examRecords) data.examRecords = [];
-  record.total = (record.ca1 || 0) + (record.ca2 || 0) + (record.exam || 0);
-  const gradeInfo = RichVineDB.calculateGrade(record.total);
-  record.grade = gradeInfo.grade;
-  record.remark = gradeInfo.remark;
-  const idx = data.examRecords.findIndex(
-    r => r.studentId === record.studentId && r.subject === record.subject &&
-         r.term === record.term && r.session === record.session
-  );
-  if (idx !== -1) {
-    data.examRecords[idx] = { ...data.examRecords[idx], ...record, updatedAt: new Date().toISOString() };
-  } else {
-    data.examRecords.push({ ...record, id: 'ER-' + Date.now(), createdAt: new Date().toISOString() });
-  }
-  RichVineDB.save(data);
-  return true;
-};
-
-RichVineDB.syncScoresFromCbt = function() {
-  const data = RichVineDB.get();
-  const cbtResults = data.cbtResults || [];
-  let synced = 0;
-  cbtResults.forEach(result => {
-    if (!result.studentId || !result.subject || !result.className) return;
-    const scaledExamScore = Math.round((result.score / result.total) * 60);
-    RichVineDB.saveExamRecord({
-      studentId: result.studentId,
-      studentName: result.studentName || '',
-      className: result.className,
-      subject: result.subject,
-      term: result.term || '1st Term',
-      session: result.session || '2025/2026',
-      ca1: 0, ca2: 0,
-      exam: scaledExamScore
-    });
-    synced++;
-  });
-  return synced;
-};
-
-RichVineDB.getClassBroadsheet = function(className, term, session) {
-  const records = RichVineDB.getExamRecords({ className, term, session });
-  const students = RichVineDB.getStudents ? RichVineDB.getStudents({ class: className }) : [];
-  const subjects = [...new Set(records.map(r => r.subject))].sort();
-  const rows = students.map(student => {
-    const studentRecords = records.filter(r => r.studentId === student.id);
-    const subjectScores = {};
-    subjects.forEach(sub => {
-      const rec = studentRecords.find(r => r.subject === sub);
-      subjectScores[sub] = rec ? { ca1: rec.ca1, ca2: rec.ca2, exam: rec.exam, total: rec.total, grade: rec.grade } : null;
-    });
-    const totals = Object.values(subjectScores).filter(Boolean).map(s => s.total);
-    const avg = totals.length ? Math.round(totals.reduce((a, b) => a + b, 0) / totals.length) : 0;
-    return { student, subjectScores, avg, subjects: totals.length };
-  });
-  rows.sort((a, b) => b.avg - a.avg);
-  rows.forEach((row, i) => { row.position = i + 1; row.positionLabel = i + 1 + RichVineDB._getOrdinalSuffix(i + 1); });
-  return { className, term, session, subjects, rows };
-};
-
-RichVineDB.getStudentReportCard = function(studentId, term, session) {
-  const students = RichVineDB.getStudents ? RichVineDB.getStudents() : [];
-  const student = students.find(s => s.id === studentId);
-  if (!student) return null;
-  const records = RichVineDB.getExamRecords({ studentId, term, session });
-  const broadsheet = RichVineDB.getClassBroadsheet(student.class, term, session);
-  const myRow = broadsheet.rows.find(r => r.student.id === studentId);
-  const totalScore = records.reduce((sum, r) => sum + (r.total || 0), 0);
-  const avg = records.length ? Math.round(totalScore / records.length) : 0;
-  return {
-    student,
-    term,
-    session,
-    records,
-    avg,
-    position: myRow ? myRow.position : '-',
-    positionLabel: myRow ? myRow.positionLabel : '-',
-    classSize: broadsheet.rows.length,
-    gradeInfo: RichVineDB.calculateGrade(avg)
-  };
-};
-
-RichVineDB._getOrdinalSuffix = function(n) {
-  const s = ['th', 'st', 'nd', 'rd'];
-  const v = n % 100;
-  return s[(v - 20) % 10] || s[v] || s[0];
-};
-
-
 // Global exposure
 window.RichVineDB = RichVineDB;
 window.SCHOOL_SECTIONS = SCHOOL_SECTIONS;
 window.ALL_CLASSES = ALL_CLASSES;
 window.getSectionByClass = getSectionByClass;
 window.DAYCARE_BILLING_CYCLES = DAYCARE_BILLING_CYCLES;
+window.TUTORIAL_CLASSES = TUTORIAL_CLASSES;
+window.TUTORIAL_MONTHS = TUTORIAL_MONTHS;
+window.TUTORIAL_FEE_CATEGORIES = TUTORIAL_FEE_CATEGORIES;
 
 // Boot
 RichVineDB.init();
