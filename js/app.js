@@ -183,6 +183,9 @@ const RichVineApp = (() => {
     else if (tab === "cbt-assessment") loadCbtAssessmentTab();
     else if (tab === "salary") loadSalaryTab();
     else if (tab === "tutorial") loadTutorialTab();
+    else if (tab === "teachers") loadTeachersTab();
+    else if (tab === "attendance") loadAttendanceTab();
+    else if (tab === "exams-records") loadExamsRecordsTab();
 
     const sidebar = document.getElementById("sidebar");
     if (sidebar && window.innerWidth < 768) {
@@ -5911,6 +5914,686 @@ const RichVineApp = (() => {
     openModal("modal-stakeholders-breakdown");
   }
 
+  // ── TEACHER MANAGEMENT TAB ───────────────────────────────────────────────
+  function loadTeachersTab() {
+    const teachers = RichVineDB.getTeachers();
+    const search = (document.getElementById("tch-search-filter")?.value || "").toLowerCase().trim();
+    
+    // KPI Counters
+    const activeCount = teachers.filter(t => t.status !== "suspended").length;
+    const assignedCount = teachers.filter(t => t.assignedClass).length;
+    const suspendedCount = teachers.filter(t => t.status === "suspended").length;
+
+    const elTotal = document.getElementById("tch-kpi-total");
+    const elActive = document.getElementById("tch-kpi-active");
+    const elAssigned = document.getElementById("tch-kpi-assigned");
+    const elSuspended = document.getElementById("tch-kpi-suspended");
+    const elCount = document.getElementById("tch-table-count");
+    if (elTotal) elTotal.textContent = teachers.length;
+    if (elActive) elActive.textContent = activeCount;
+    if (elAssigned) elAssigned.textContent = assignedCount;
+    if (elSuspended) elSuspended.textContent = suspendedCount;
+    if (elCount) elCount.textContent = teachers.length;
+
+    const filtered = teachers.filter(t => {
+      if (!search) return true;
+      return (t.name || "").toLowerCase().includes(search) || 
+             (t.phone || "").toLowerCase().includes(search) ||
+             (t.assignedClass || "").toLowerCase().includes(search);
+    });
+
+    const tbody = document.getElementById("tch-table-body");
+    if (!tbody) return;
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" class="empty-cell">No teacher credentials found. Click "Generate Teacher Login" to create one.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = filtered.map(t => {
+      const isActive = t.status !== "suspended";
+      const statusBadge = isActive 
+        ? '<span class="status-badge" style="background:#ecfdf5;color:#059669;border:1px solid #a7f3d0"><i class="fas fa-check-circle"></i> Active</span>'
+        : '<span class="status-badge" style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca"><i class="fas fa-ban"></i> Suspended</span>';
+      
+      const subjs = (t.subjects || []).join(", ") || "General";
+
+      return `
+        <tr>
+          <td>
+            <div style="font-weight:700;color:var(--gray-900)">${t.name}</div>
+            <div style="font-size:11px;color:var(--gray-500)">ID: ${t.id}</div>
+          </td>
+          <td style="font-family:monospace;font-weight:700;color:#0284c7">${t.phone}</td>
+          <td>
+            <span class="status-badge" style="background:#eff6ff;color:#1d4ed8;font-weight:700">${t.assignedClass || "None"}</span>
+          </td>
+          <td style="font-size:12px;color:var(--gray-600)">${subjs}</td>
+          <td style="text-align:center">
+            <span style="font-family:monospace;font-weight:800;background:#f8fafc;padding:3px 8px;border-radius:6px;border:1px solid #e2e8f0;color:#0f172a">${t.password}</span>
+          </td>
+          <td style="text-align:center">${statusBadge}</td>
+          <td style="text-align:center;white-space:nowrap">
+            <button class="btn-icon" title="Edit Teacher" onclick="RichVineApp.openAddTeacherModal('${t.id}')">
+              <i class="fas fa-edit" style="color:#0284c7"></i>
+            </button>
+            <button class="btn-icon" title="${isActive ? 'Suspend' : 'Activate'}" onclick="RichVineApp.toggleTeacherStatus('${t.id}')">
+              <i class="fas ${isActive ? 'fa-user-slash text-amber-500' : 'fa-user-check text-emerald-500'}"></i>
+            </button>
+            <button class="btn-icon" title="Delete" onclick="RichVineApp.deleteTeacher('${t.id}')">
+              <i class="fas fa-trash-alt" style="color:#dc2626"></i>
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  function generateTeacherPassword() {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let pwd = "TCH#";
+    for (let i = 0; i < 4; i++) {
+      pwd += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    const input = document.getElementById("tch-form-password");
+    if (input) input.value = pwd;
+    return pwd;
+  }
+
+  function openAddTeacherModal(teacherId) {
+    const modalTitle = document.getElementById("modal-teacher-title");
+    const idInput = document.getElementById("tch-form-id");
+    const nameInput = document.getElementById("tch-form-name");
+    const phoneInput = document.getElementById("tch-form-phone");
+    const classSelect = document.getElementById("tch-form-class");
+    const statusSelect = document.getElementById("tch-form-status");
+    const subjectsInput = document.getElementById("tch-form-subjects");
+    const pwdInput = document.getElementById("tch-form-password");
+
+    if (teacherId) {
+      const t = RichVineDB.getTeacherById(teacherId);
+      if (!t) return;
+      if (modalTitle) modalTitle.innerHTML = '<i class="fas fa-user-edit" style="color:#f59e0b"></i> Edit Teacher Account';
+      if (idInput) idInput.value = t.id;
+      if (nameInput) nameInput.value = t.name || "";
+      if (phoneInput) phoneInput.value = t.phone || "";
+      if (classSelect) classSelect.value = t.assignedClass || "SSS 1";
+      if (statusSelect) statusSelect.value = t.status || "active";
+      if (subjectsInput) subjectsInput.value = (t.subjects || []).join(", ");
+      if (pwdInput) pwdInput.value = t.password || "";
+    } else {
+      if (modalTitle) modalTitle.innerHTML = '<i class="fas fa-user-plus" style="color:#f59e0b"></i> Generate Teacher Login';
+      if (idInput) idInput.value = "";
+      if (nameInput) nameInput.value = "";
+      if (phoneInput) phoneInput.value = "";
+      if (classSelect) classSelect.value = "SSS 1";
+      if (statusSelect) statusSelect.value = "active";
+      if (subjectsInput) subjectsInput.value = "";
+      generateTeacherPassword();
+    }
+    openModal("modal-add-teacher");
+  }
+
+  function saveTeacherModal() {
+    const id = document.getElementById("tch-form-id")?.value;
+    const name = document.getElementById("tch-form-name")?.value.trim();
+    const phone = document.getElementById("tch-form-phone")?.value.trim();
+    const assignedClass = document.getElementById("tch-form-class")?.value;
+    const status = document.getElementById("tch-form-status")?.value || "active";
+    const subjectsRaw = document.getElementById("tch-form-subjects")?.value || "";
+    const password = document.getElementById("tch-form-password")?.value.trim();
+
+    if (!name || !phone || !password) {
+      showToast("Please fill in Name, Phone, and Password", "error");
+      return;
+    }
+
+    const subjects = subjectsRaw.split(",").map(s => s.trim()).filter(Boolean);
+
+    const payload = {
+      name,
+      phone,
+      assignedClass,
+      assignedClasses: [assignedClass],
+      subjects,
+      password,
+      status
+    };
+    if (id) payload.id = id;
+
+    RichVineDB.saveTeacher(payload);
+    closeModal("modal-add-teacher");
+    showToast(`Teacher credentials for ${name} saved successfully!`, "success");
+    loadTeachersTab();
+  }
+
+  function deleteTeacher(id) {
+    showConfirm("Are you sure you want to delete this teacher credential? They will no longer be able to log in to the attendance portal.", () => {
+      RichVineDB.deleteTeacher(id);
+      showToast("Teacher credentials deleted", "info");
+      loadTeachersTab();
+    });
+  }
+
+  function toggleTeacherStatus(id) {
+    const t = RichVineDB.getTeacherById(id);
+    if (!t) return;
+    const newStatus = t.status === "suspended" ? "active" : "suspended";
+    RichVineDB.saveTeacher({ ...t, status: newStatus });
+    showToast(`Teacher account ${newStatus === "active" ? "activated" : "suspended"}`, "info");
+    loadTeachersTab();
+  }
+
+  // ── DAILY ATTENDANCE TAB (ADMIN) ──────────────────────────────────────────
+  function loadAttendanceTab() {
+    const filterClass = document.getElementById("att-filter-class")?.value || "All";
+    const filterSession = document.getElementById("att-filter-session")?.value || "All";
+    const days = parseInt(document.getElementById("att-filter-days")?.value || "30", 10);
+
+    let logs = RichVineDB.getAttendanceHistory(filterClass, days);
+    if (filterSession !== "All") {
+      logs = logs.filter(l => l.session === filterSession);
+    }
+
+    const countEl = document.getElementById("att-table-count");
+    if (countEl) countEl.textContent = logs.length;
+
+    const tbody = document.getElementById("att-table-body");
+    if (!tbody) return;
+
+    if (logs.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="9" class="empty-cell">No attendance sessions logged for the selected filter. Teachers mark roll call via the Teacher Portal.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = logs.map(l => {
+      const records = l.records || [];
+      const total = records.length;
+      const present = records.filter(r => r.status === "Present").length;
+      const absent = records.filter(r => r.status === "Absent").length;
+      const late = records.filter(r => r.status === "Late").length;
+      const rate = total ? Math.round((present / total) * 100) : 0;
+
+      const sessionBadge = l.session === "Morning"
+        ? '<span class="status-badge" style="background:#fffbeb;color:#b45309;font-weight:700"><i class="fas fa-sun"></i> Morning</span>'
+        : '<span class="status-badge" style="background:#f0f9ff;color:#0369a1;font-weight:700"><i class="fas fa-cloud-sun"></i> Afternoon</span>';
+
+      const rateColor = rate >= 75 ? "#059669" : (rate >= 50 ? "#d97706" : "#dc2626");
+
+      return `
+        <tr>
+          <td style="font-weight:700;color:var(--gray-900)">${l.date}</td>
+          <td><span class="status-badge" style="background:#eff6ff;color:#1e40af;font-weight:700">${l.className}</span></td>
+          <td>${sessionBadge}</td>
+          <td style="text-align:center;font-weight:800;color:#059669">${present}</td>
+          <td style="text-align:center;font-weight:800;color:#dc2626">${absent}</td>
+          <td style="text-align:center;font-weight:800;color:#d97706">${late}</td>
+          <td style="text-align:center">
+            <span style="font-weight:800;color:${rateColor}">${rate}%</span>
+          </td>
+          <td style="font-size:12px;color:var(--gray-700)">${l.markedBy || "Teacher"}</td>
+          <td style="text-align:center">
+            <button class="btn-secondary" style="font-size:10px;padding:3px 8px" onclick="RichVineApp.viewAttendanceBreakdown('${l.id || (l.className + '_' + l.date + '_' + l.session)}')">
+              <i class="fas fa-list"></i> Details
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  function viewAttendanceBreakdown(idOrKey) {
+    const data = RichVineDB.get();
+    const attList = data.attendance || [];
+    const record = attList.find(a => (a.id === idOrKey) || ((a.className + '_' + a.date + '_' + a.session) === idOrKey));
+    if (!record) {
+      showAlert("Notice", "Attendance detail not found.");
+      return;
+    }
+
+    const rows = (record.records || []).map((r, i) => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f1f5f9;font-size:12px">
+        <div>
+          <span style="color:#64748b;margin-right:6px">${i+1}.</span>
+          <strong style="color:#0f172a">${r.studentName || 'Student'}</strong>
+          <span style="font-family:monospace;font-size:11px;color:#0284c7;margin-left:4px">(${r.regNo || r.studentId})</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-weight:700;padding:2px 8px;border-radius:6px;font-size:11px;${r.status === 'Present' ? 'background:#ecfdf5;color:#059669' : (r.status === 'Absent' ? 'background:#fef2f2;color:#dc2626' : 'background:#fffbeb;color:#b45309')}">${r.status}</span>
+          ${r.remark ? `<span style="font-size:11px;color:#64748b;font-style:italic">"${r.remark}"</span>` : ''}
+        </div>
+      </div>
+    `).join("");
+
+    showAlert(`${record.className} • ${record.date} (${record.session})`, `
+      <div style="margin-bottom:10px;font-size:12px;color:#64748b">
+        Marked by: <strong>${record.markedBy || 'Teacher'}</strong> (${record.markedByPhone || ''})
+      </div>
+      <div style="max-height:350px;overflow-y:auto;padding-right:4px">
+        ${rows || '<p>No student detail</p>'}
+      </div>
+    `);
+  }
+
+  // ── EXAMS & RECORDS TAB ───────────────────────────────────────────────────
+  let currentErSubTab = 'broadsheet';
+
+  function loadExamsRecordsTab() {
+    populateErSelectors();
+    switchErSubTab(currentErSubTab);
+  }
+
+  function populateErSelectors() {
+    const students = RichVineDB.getStudents ? RichVineDB.getStudents() : [];
+    
+    // Populate report card student selector
+    const rcStudent = document.getElementById("er-rc-student");
+    if (rcStudent && rcStudent.options.length === 0) {
+      rcStudent.innerHTML = students.map(s => `
+        <option value="${s.id}">${s.name || s.fullName} (${s.class || 'No Class'})</option>
+      `).join("");
+    }
+
+    // Populate score entry student selector
+    const scoreStudent = document.getElementById("score-form-student");
+    if (scoreStudent && scoreStudent.options.length === 0) {
+      scoreStudent.innerHTML = students.map(s => `
+        <option value="${s.id}">${s.name || s.fullName} - ${s.class || ''} (${s.regNo || s.id})</option>
+      `).join("");
+    }
+  }
+
+  function switchErSubTab(tab) {
+    currentErSubTab = tab;
+    const viewBs = document.getElementById("er-view-broadsheet");
+    const viewRc = document.getElementById("er-view-report");
+    const viewLg = document.getElementById("er-view-ledger");
+    const btnBs = document.getElementById("er-subtab-broadsheet-btn");
+    const btnRc = document.getElementById("er-subtab-report-btn");
+    const btnLg = document.getElementById("er-subtab-ledger-btn");
+
+    if (viewBs) viewBs.classList.toggle("hidden", tab !== "broadsheet");
+    if (viewRc) viewRc.classList.toggle("hidden", tab !== "report");
+    if (viewLg) viewLg.classList.toggle("hidden", tab !== "ledger");
+
+    if (btnBs) btnBs.className = tab === "broadsheet" ? "btn-primary" : "btn-secondary";
+    if (btnRc) btnRc.className = tab === "report" ? "btn-primary" : "btn-secondary";
+    if (btnLg) btnLg.className = tab === "ledger" ? "btn-primary" : "btn-secondary";
+
+    if (tab === "broadsheet") renderBroadsheet();
+    else if (tab === "report") renderReportCard();
+    else if (tab === "ledger") renderRawScoreLedger();
+  }
+
+  function renderBroadsheet() {
+    const cls = document.getElementById("er-bs-class")?.value || "SSS 3";
+    const term = document.getElementById("er-bs-term")?.value || "1st Term";
+    const session = document.getElementById("er-bs-session")?.value || "2026/2027";
+
+    const titleEl = document.getElementById("broadsheet-header-title");
+    if (titleEl) {
+      titleEl.innerHTML = `<i class="fas fa-scroll" style="color:#a855f7"></i> &nbsp;Class Broadsheet: <strong>${cls}</strong> &bull; ${term} (${session})`;
+    }
+
+    const broadsheet = RichVineDB.getClassBroadsheet(cls, term, session);
+    const table = document.getElementById("broadsheet-table");
+    if (!table) return;
+
+    if (!broadsheet || broadsheet.rows.length === 0) {
+      table.innerHTML = `
+        <thead><tr><th>Class Broadsheet</th></tr></thead>
+        <tbody><tr><td class="empty-cell">No students or examination scores recorded for ${cls} in ${term}. Enter scores or sync from CBT.</td></tr></tbody>
+      `;
+      return;
+    }
+
+    const subjects = broadsheet.subjects.length > 0 ? broadsheet.subjects : ["Mathematics", "English Language", "Biology", "Physics", "Chemistry"];
+
+    // Table Header
+    let thead = `
+      <tr>
+        <th style="width:40px;text-align:center">Pos</th>
+        <th>Student Name</th>
+        <th style="font-family:monospace">Reg No</th>
+        ${subjects.map(sub => `<th style="text-align:center;font-size:11px">${sub}</th>`).join("")}
+        <th style="text-align:center;background:#f8fafc">Avg %</th>
+        <th style="text-align:center;background:#f8fafc">Overall</th>
+      </tr>
+    `;
+
+    // Table Rows
+    let tbody = broadsheet.rows.map(row => {
+      const posBadge = row.position === 1 
+        ? '<span style="background:#fef3c7;color:#b45309;padding:2px 6px;border-radius:4px;font-weight:800"><i class="fas fa-crown text-amber-500"></i> 1st</span>'
+        : (row.position === 2 
+            ? '<span style="background:#f1f5f9;color:#475569;padding:2px 6px;border-radius:4px;font-weight:800">2nd</span>'
+            : (row.position === 3 
+                ? '<span style="background:#ffedd5;color:#9a3412;padding:2px 6px;border-radius:4px;font-weight:800">3rd</span>'
+                : `<span style="font-weight:700;color:#64748b">${row.positionLabel}</span>`));
+
+      const gradeInfo = RichVineDB.calculateGrade(row.avg);
+
+      const subjCells = subjects.map(sub => {
+        const scoreObj = row.subjectScores[sub];
+        if (!scoreObj) return '<td style="text-align:center;color:#cbd5e1">-</td>';
+        return `
+          <td style="text-align:center">
+            <span style="font-weight:800;color:#0f172a">${scoreObj.total}</span>
+            <span style="font-size:10px;font-weight:700;color:#64748b;margin-left:2px">${scoreObj.grade}</span>
+          </td>
+        `;
+      }).join("");
+
+      return `
+        <tr>
+          <td style="text-align:center">${posBadge}</td>
+          <td style="font-weight:700;color:var(--gray-900)">${row.student.name || row.student.fullName}</td>
+          <td style="font-family:monospace;font-size:11px;color:#0284c7">${row.student.regNo || row.student.id}</td>
+          ${subjCells}
+          <td style="text-align:center;font-weight:800;color:#0284c7;background:#f8fafc">${row.avg}%</td>
+          <td style="text-align:center;font-weight:800;background:#f8fafc">
+            <span style="padding:2px 6px;border-radius:4px;background:${row.avg >= 60 ? '#ecfdf5' : '#fffbeb'};color:${row.avg >= 60 ? '#059669' : '#b45309'}">${gradeInfo.grade}</span>
+          </td>
+        </tr>
+      `;
+    }).join("");
+
+    table.innerHTML = `<thead>${thead}</thead><tbody>${tbody}</tbody>`;
+  }
+
+  function exportBroadsheetCsv() {
+    const cls = document.getElementById("er-bs-class")?.value || "SSS 3";
+    const term = document.getElementById("er-bs-term")?.value || "1st Term";
+    const session = document.getElementById("er-bs-session")?.value || "2026/2027";
+
+    const broadsheet = RichVineDB.getClassBroadsheet(cls, term, session);
+    if (!broadsheet || broadsheet.rows.length === 0) {
+      showToast("No data to export", "warning");
+      return;
+    }
+
+    const subjects = broadsheet.subjects;
+    let csv = ["Position,Reg No,Student Name," + subjects.join(",") + ",Average %,Overall Grade"].join("\n");
+
+    broadsheet.rows.forEach(r => {
+      const subjVals = subjects.map(s => {
+        const sc = r.subjectScores[s];
+        return sc ? `${sc.total}(${sc.grade})` : "-";
+      });
+      const g = RichVineDB.calculateGrade(r.avg).grade;
+      csv += `\n${r.position},"${r.student.regNo || r.student.id}","${r.student.name || r.student.fullName}",${subjVals.join(",")},${r.avg}%,${g}`;
+    });
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `Broadsheet_${cls.replace(/\s+/g, '_')}_${term}_${session.replace(/\//g, '-')}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    showToast("Broadsheet CSV downloaded successfully", "success");
+  }
+
+  function printBroadsheet() {
+    window.print();
+  }
+
+  function renderReportCard() {
+    const studentId = document.getElementById("er-rc-student")?.value;
+    const term = document.getElementById("er-rc-term")?.value || "1st Term";
+    const session = document.getElementById("er-bs-session")?.value || "2026/2027";
+    const container = document.getElementById("report-card-container");
+    if (!container) return;
+
+    if (!studentId) {
+      container.innerHTML = '<div style="text-align:center;padding:30px;color:#94a3b8">No student selected.</div>';
+      return;
+    }
+
+    const card = RichVineDB.getStudentReportCard(studentId, term, session);
+    if (!card) {
+      container.innerHTML = '<div style="text-align:center;padding:30px;color:#94a3b8">Student academic records not found.</div>';
+      return;
+    }
+
+    const attSummary = RichVineDB.getStudentAttendanceSummary(studentId, 90);
+    const st = card.student;
+
+    const subjectsHtml = card.records.map((r, i) => `
+      <tr style="border-bottom:1px solid #e2e8f0;text-align:center">
+        <td style="text-align:left;padding:8px 10px;font-weight:700;color:#0f172a">${r.subject}</td>
+        <td style="padding:8px;color:#475569">${r.ca1 || 0}</td>
+        <td style="padding:8px;color:#475569">${r.ca2 || 0}</td>
+        <td style="padding:8px;font-weight:700;color:#0284c7">${r.exam || 0}</td>
+        <td style="padding:8px;font-weight:800;color:#0f172a">${r.total}</td>
+        <td style="padding:8px;font-weight:800;color:#059669">${r.grade}</td>
+        <td style="padding:8px;font-size:11px;color:#64748b;text-align:left">${r.remark || 'Good'}</td>
+      </tr>
+    `).join("");
+
+    container.innerHTML = `
+      <div id="printable-report-sheet">
+        <!-- School Header -->
+        <div style="border-bottom:3px double #0284c7;padding-bottom:14px;margin-bottom:16px;text-align:center;position:relative">
+          <div style="display:flex;align-items:center;justify-content:center;gap:14px">
+            <div style="width:54px;height:54px;border-radius:12px;background:linear-gradient(135deg,#0284c7,#0369a1);color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900">
+              <i class="fas fa-graduation-cap"></i>
+            </div>
+            <div>
+              <h2 style="font-size:20px;font-weight:900;color:#0f172a;letter-spacing:0.5px;margin:0">EXCELLENCE MODEL COLLEGE</h2>
+              <p style="font-size:11px;color:#64748b;margin:2px 0 0;font-weight:600">Government Approved &bull; WAEC, NECO &amp; JAMB CBT Center</p>
+              <p style="font-size:10px;color:#0284c7;margin:2px 0 0;font-weight:700">Official Continuous Assessment &amp; Terminal Examination Report</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Student Bio Card -->
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px 16px;margin-bottom:16px">
+          <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:10px;font-size:12px">
+            <div><span style="color:#64748b">Student Name:</span> <strong style="color:#0f172a">${st.name || st.fullName}</strong></div>
+            <div><span style="color:#64748b">Registration No:</span> <strong style="color:#0284c7;font-family:monospace">${st.regNo || st.id}</strong></div>
+            <div><span style="color:#64748b">Class &amp; Arm:</span> <strong style="color:#0f172a">${st.class || 'Senior'}</strong></div>
+            <div><span style="color:#64748b">Academic Session:</span> <strong>${session}</strong></div>
+            <div><span style="color:#64748b">Academic Term:</span> <strong style="color:#0284c7">${term}</strong></div>
+            <div><span style="color:#64748b">Gender:</span> <strong>${st.gender || 'M'}</strong></div>
+          </div>
+        </div>
+
+        <!-- KPI Performance Summary -->
+        <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:10px;margin-bottom:16px;text-align:center">
+          <div style="background:#eff6ff;padding:10px;border-radius:8px;border:1px solid #bfdbfe">
+            <div style="font-size:10px;font-weight:700;color:#1e40af;text-transform:uppercase">Position in Class</div>
+            <div style="font-size:18px;font-weight:900;color:#1d4ed8">${card.positionLabel} / ${card.classSize}</div>
+          </div>
+          <div style="background:#ecfdf5;padding:10px;border-radius:8px;border:1px solid #a7f3d0">
+            <div style="font-size:10px;font-weight:700;color:#065f46;text-transform:uppercase">Terminal Average</div>
+            <div style="font-size:18px;font-weight:900;color:#059669">${card.avg}%</div>
+          </div>
+          <div style="background:#fdf4ff;padding:10px;border-radius:8px;border:1px solid #f5d0fe">
+            <div style="font-size:10px;font-weight:700;color:#86198f;text-transform:uppercase">Overall Grade</div>
+            <div style="font-size:18px;font-weight:900;color:#a21caf">${card.gradeInfo.grade} (${card.gradeInfo.remark})</div>
+          </div>
+          <div style="background:#fffbeb;padding:10px;border-radius:8px;border:1px solid #fde68a">
+            <div style="font-size:10px;font-weight:700;color:#92400e;text-transform:uppercase">Term Attendance</div>
+            <div style="font-size:18px;font-weight:900;color:#b45309">${attSummary.present} / ${attSummary.total} (${attSummary.rate}%)</div>
+          </div>
+        </div>
+
+        <!-- Academic Subjects Performance Table -->
+        <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px">
+          <thead>
+            <tr style="background:#0f172a;color:#fff;text-align:center;font-size:11px">
+              <th style="padding:8px 10px;text-align:left">Subject Title</th>
+              <th style="padding:8px;width:70px">CA 1 (20)</th>
+              <th style="padding:8px;width:70px">CA 2 (20)</th>
+              <th style="padding:8px;width:75px">Exam (60)</th>
+              <th style="padding:8px;width:75px">Total (100)</th>
+              <th style="padding:8px;width:60px">Grade</th>
+              <th style="padding:8px 10px;text-align:left">Remark</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${subjectsHtml || '<tr><td colspan="7" style="text-align:center;padding:16px;color:#94a3b8">No subject scores entered yet for this term.</td></tr>'}
+          </tbody>
+        </table>
+
+        <!-- Behavioural & Psychomotor Ratings -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px">
+            <div style="font-size:11px;font-weight:800;color:#0f172a;margin-bottom:6px;border-bottom:1px solid #e2e8f0;padding-bottom:3px">BEHAVIOURAL TRAITS</div>
+            <div style="font-size:11px;color:#475569;display:flex;justify-content:space-between;padding:2px 0"><span>Punctuality:</span> <strong style="color:#059669">5 / 5 (Excellent)</strong></div>
+            <div style="font-size:11px;color:#475569;display:flex;justify-content:space-between;padding:2px 0"><span>Neatness &amp; Uniform:</span> <strong style="color:#059669">5 / 5 (Excellent)</strong></div>
+            <div style="font-size:11px;color:#475569;display:flex;justify-content:space-between;padding:2px 0"><span>Relationship with Peers:</span> <strong style="color:#0284c7">4 / 5 (Very Good)</strong></div>
+            <div style="font-size:11px;color:#475569;display:flex;justify-content:space-between;padding:2px 0"><span>Politeness &amp; Honesty:</span> <strong style="color:#059669">5 / 5 (Excellent)</strong></div>
+          </div>
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px">
+            <div style="font-size:11px;font-weight:800;color:#0f172a;margin-bottom:6px;border-bottom:1px solid #e2e8f0;padding-bottom:3px">PSYCHOMOTOR &amp; SKILLS</div>
+            <div style="font-size:11px;color:#475569;display:flex;justify-content:space-between;padding:2px 0"><span>Handwriting:</span> <strong style="color:#0284c7">4 / 5 (Very Good)</strong></div>
+            <div style="font-size:11px;color:#475569;display:flex;justify-content:space-between;padding:2px 0"><span>Sports &amp; Games:</span> <strong style="color:#059669">5 / 5 (Excellent)</strong></div>
+            <div style="font-size:11px;color:#475569;display:flex;justify-content:space-between;padding:2px 0"><span>Computer &amp; CBT Skills:</span> <strong style="color:#059669">5 / 5 (Excellent)</strong></div>
+            <div style="font-size:11px;color:#475569;display:flex;justify-content:space-between;padding:2px 0"><span>Classroom Attentiveness:</span> <strong style="color:#0284c7">4 / 5 (Very Good)</strong></div>
+          </div>
+        </div>
+
+        <!-- Remarks & Signatures -->
+        <div style="border-top:1px solid #cbd5e1;padding-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:20px;font-size:11px">
+          <div>
+            <div style="color:#64748b">Form Teacher's Remark:</div>
+            <div style="font-weight:700;color:#0f172a;margin-top:2px;font-style:italic">"An outstanding and consistent performance this term. Highly disciplined."</div>
+            <div style="margin-top:16px;border-top:1px dashed #94a3b8;width:160px;padding-top:2px;color:#64748b;font-size:10px">Class Teacher Signature</div>
+          </div>
+          <div style="text-align:right">
+            <div style="color:#64748b">Principal's Decision &amp; Stamp:</div>
+            <div style="font-weight:700;color:#059669;margin-top:2px">PROMOTED / COMMENDED WITH HONORS</div>
+            <div style="margin-top:16px;border-top:1px dashed #94a3b8;width:160px;margin-left:auto;padding-top:2px;color:#64748b;font-size:10px">Principal / Registrar Signature</div>
+          </div>
+        </div>
+
+        <!-- Security Footer -->
+        <div style="margin-top:16px;padding-top:8px;border-top:1px solid #f1f5f9;display:flex;justify-content:space-between;font-size:9px;color:#94a3b8">
+          <span>Generated by BursarIQ School ERP System</span>
+          <span>Official Verification Hash: RVC-${card.student.id.substring(0,8).toUpperCase()}-VERIFIED</span>
+        </div>
+      </div>
+    `;
+  }
+
+  function printReportCard() {
+    window.print();
+  }
+
+  function syncCbtScoresToExams() {
+    const synced = RichVineDB.syncScoresFromCbt();
+    showToast(`Synced ${synced} CBT examination score(s) to Academic Records!`, "success");
+    renderBroadsheet();
+    if (currentErSubTab === "ledger") renderRawScoreLedger();
+  }
+
+  function renderRawScoreLedger() {
+    const records = RichVineDB.getExamRecords();
+    const countEl = document.getElementById("ledger-count");
+    if (countEl) countEl.textContent = records.length;
+
+    const tbody = document.getElementById("er-ledger-tbody");
+    if (!tbody) return;
+
+    if (records.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="10" class="empty-cell">No score records logged. Click "Add Score Record" or "Sync CBT Scores".</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = records.map(r => `
+      <tr>
+        <td style="font-weight:700;color:var(--gray-900)">${r.studentName || 'Student'}</td>
+        <td><span class="status-badge" style="background:#eff6ff;color:#1e40af">${r.className}</span></td>
+        <td style="font-weight:700;color:#0284c7">${r.subject}</td>
+        <td>${r.term}</td>
+        <td style="text-align:center">${r.ca1 || 0}</td>
+        <td style="text-align:center">${r.ca2 || 0}</td>
+        <td style="text-align:center;font-weight:700">${r.exam || 0}</td>
+        <td style="text-align:center;font-weight:800;color:#0f172a">${r.total}</td>
+        <td style="text-align:center;font-weight:800;color:#059669">${r.grade}</td>
+        <td style="text-align:center">
+          <button class="btn-icon" title="Edit Score" onclick="RichVineApp.openEditScoreModal('${r.id}')">
+            <i class="fas fa-edit" style="color:#0284c7"></i>
+          </button>
+        </td>
+      </tr>
+    `).join("");
+  }
+
+  function openAddScoreModal() {
+    populateErSelectors();
+    document.getElementById("score-form-ca1").value = 0;
+    document.getElementById("score-form-ca2").value = 0;
+    document.getElementById("score-form-exam").value = 0;
+    calcScoreModalTotal();
+    openModal("modal-add-score");
+  }
+
+  function openEditScoreModal(id) {
+    const records = RichVineDB.getExamRecords();
+    const rec = records.find(r => r.id === id);
+    if (!rec) return;
+    populateErSelectors();
+    const stSelect = document.getElementById("score-form-student");
+    const subSelect = document.getElementById("score-form-subject");
+    const termSelect = document.getElementById("score-form-term");
+    if (stSelect) stSelect.value = rec.studentId;
+    if (subSelect) subSelect.value = rec.subject;
+    if (termSelect) termSelect.value = rec.term;
+    document.getElementById("score-form-ca1").value = rec.ca1 || 0;
+    document.getElementById("score-form-ca2").value = rec.ca2 || 0;
+    document.getElementById("score-form-exam").value = rec.exam || 0;
+    calcScoreModalTotal();
+    openModal("modal-add-score");
+  }
+
+  function calcScoreModalTotal() {
+    const ca1 = parseInt(document.getElementById("score-form-ca1")?.value || "0", 10) || 0;
+    const ca2 = parseInt(document.getElementById("score-form-ca2")?.value || "0", 10) || 0;
+    const exam = parseInt(document.getElementById("score-form-exam")?.value || "0", 10) || 0;
+    const total = ca1 + ca2 + exam;
+    const g = RichVineDB.calculateGrade(total);
+    const compEl = document.getElementById("score-modal-computed");
+    if (compEl) {
+      compEl.textContent = `${total} / 100 — Grade ${g.grade} (${g.remark})`;
+    }
+  }
+
+  function saveScoreModal() {
+    const studentId = document.getElementById("score-form-student")?.value;
+    const subject = document.getElementById("score-form-subject")?.value;
+    const term = document.getElementById("score-form-term")?.value;
+    const ca1 = parseInt(document.getElementById("score-form-ca1")?.value || "0", 10) || 0;
+    const ca2 = parseInt(document.getElementById("score-form-ca2")?.value || "0", 10) || 0;
+    const exam = parseInt(document.getElementById("score-form-exam")?.value || "0", 10) || 0;
+
+    const students = RichVineDB.getStudents ? RichVineDB.getStudents() : [];
+    const st = students.find(s => s.id === studentId);
+
+    RichVineDB.saveExamRecord({
+      studentId,
+      studentName: st ? (st.name || st.fullName) : "Student",
+      className: st ? st.class : "Senior",
+      subject,
+      term,
+      session: "2026/2027",
+      ca1,
+      ca2,
+      exam
+    });
+
+    closeModal("modal-add-score");
+    showToast("Score record saved successfully", "success");
+    renderBroadsheet();
+    if (currentErSubTab === "ledger") renderRawScoreLedger();
+  }
+
+
+
+  
+
   return {
     exportDatabaseBackup,
     importDatabaseBackup,
@@ -6055,6 +6738,27 @@ const RichVineApp = (() => {
     openTutorialProfile,
     openStakeholdersModal,
     calcSalaryNetPay,
+    loadTeachersTab,
+    generateTeacherPassword,
+    openAddTeacherModal,
+    saveTeacherModal,
+    deleteTeacher,
+    toggleTeacherStatus,
+    loadAttendanceTab,
+    viewAttendanceBreakdown,
+    loadExamsRecordsTab,
+    switchErSubTab,
+    renderBroadsheet,
+    exportBroadsheetCsv,
+    printBroadsheet,
+    renderReportCard,
+    printReportCard,
+    syncCbtScoresToExams,
+    renderRawScoreLedger,
+    openAddScoreModal,
+    openEditScoreModal,
+    calcScoreModalTotal,
+    saveScoreModal,
   };
 })();
 

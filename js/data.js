@@ -71,6 +71,8 @@ if (typeof window !== "undefined") window.EXPENSE_ACCOUNTS = EXPENSE_ACCOUNTS;
 
 // ─── Clean Initial State (Zero Dummy Data) ────────────────────────────────
 
+const _bursarCfg = (typeof window !== "undefined" && window.BURSARIQ_CONFIG) ? window.BURSARIQ_CONFIG : {};
+
 // ─── Tutorial & Stakeholders Configuration (JSS 3 BECE & SS 3 WAEC) ────────
 const TUTORIAL_CLASSES = [
   { id: "JSS 3", name: "JSS 3 (BECE Exam)", exam: "BECE", defaultMonthlyFee: 10000, description: "Junior Secondary BECE Intensive Preparation" },
@@ -158,6 +160,257 @@ const DEFAULT_DATA = {
   staff: [],
   salaries: [],
   staffLoans: [],
+    teachers: [
+    {
+      id: "TCH-001",
+      staffId: "STF/003",
+      name: "Mr. Emmanuel Adebayo",
+      phone: "08012345678",
+      password: "password123",
+      assignedClass: "SSS 1 Science",
+      assignedClasses: ["SSS 1 Science", "SSS 1 Art", "SSS 1 Commercial"],
+      role: "Class Teacher",
+      subjects: ["Mathematics", "Physics"],
+      status: "Active",
+      createdAt: 1729000000000
+    },
+    {
+      id: "TCH-002",
+      staffId: "STF/004",
+      name: "Mrs. Funmilayo Adeleke",
+      phone: "08023456789",
+      password: "password123",
+      assignedClass: "JSS 2B",
+      assignedClasses: ["JSS 2B", "JSS 2A"],
+      role: "Class Teacher",
+      subjects: ["English Language", "Literature in English"],
+      status: "Active",
+      createdAt: 1729000001000
+    },
+    {
+      id: "TCH-003",
+      staffId: "STF/005",
+      name: "Mr. Chukwudi Okafor",
+      phone: "08034567890",
+      password: "password123",
+      assignedClass: "SSS 2 Commercial",
+      assignedClasses: ["SSS 2 Commercial", "SSS 2 Art"],
+      role: "Class Teacher",
+      subjects: ["Economics", "Commerce"],
+      status: "Active",
+      createdAt: 1729000002000
+    }
+  ],
+    attendance: [
+    {
+      id: "ATT-2026-11-13-SSS-1-Science-Morning",
+      date: "2026-11-13",
+      class: "SSS 1 Science",
+      session: "Morning",
+      markedBy: "Mr. Emmanuel Adebayo",
+      timestamp: 1731481200000,
+      records: [
+        { studentId: "EMC-2026-007", studentName: "Adeyemi Tunde", status: "Present", remark: "Prompt arrival" },
+        { studentId: "EMC-2026-008", studentName: "Williams Victor Ayomide", status: "Present", remark: "" }
+      ],
+      presentCount: 2,
+      absentCount: 0,
+      lateCount: 0,
+      excusedCount: 0,
+      totalCount: 2,
+      rate: 100
+    },
+    {
+      id: "ATT-2026-11-13-SSS-1-Science-Afternoon",
+      date: "2026-11-13",
+      class: "SSS 1 Science",
+      session: "Afternoon",
+      markedBy: "Mr. Emmanuel Adebayo",
+      timestamp: 1731502800000,
+      records: [
+        { studentId: "EMC-2026-007", studentName: "Adeyemi Tunde", status: "Present", remark: "" },
+        { studentId: "EMC-2026-008", studentName: "Williams Victor Ayomide", status: "Late", remark: "Returned from library late" }
+      ],
+      presentCount: 1,
+      absentCount: 0,
+      lateCount: 1,
+      excusedCount: 0,
+      totalCount: 2,
+      rate: 50
+    }
+  ],
+    examRecords: [
+    {
+      id: "EXM-EMC-2026-009-MATH",
+      studentId: "EMC-2026-009",
+      studentName: "Nwachukwu Somtochukwu",
+      class: "SSS 3 Science",
+      session: "2026/2027",
+      term: "1st Term",
+      subject: "Mathematics",
+      ca1: 19,
+      ca2: 18,
+      exam: 57,
+      total: 94,
+      grade: "A1",
+      remark: "Excellent Distinction",
+      syncedFromCbt: true,
+      updatedAt: 1731400000000
+    },
+    {
+      id: "EXM-EMC-2026-009-ENG",
+      studentId: "EMC-2026-009",
+      studentName: "Nwachukwu Somtochukwu",
+      class: "SSS 3 Science",
+      session: "2026/2027",
+      term: "1st Term",
+      subject: "English Language",
+      ca1: 17,
+      ca2: 18,
+      exam: 53,
+      total: 88,
+      grade: "A1",
+      remark: "Excellent",
+      syncedFromCbt: false,
+      updatedAt: 1731400000000
+    },
+    {
+      id: "EXM-EMC-2026-009-PHY",
+      studentId: "EMC-2026-009",
+      studentName: "Nwachukwu Somtochukwu",
+      class: "SSS 3 Science",
+      session: "2026/2027",
+      term: "1st Term",
+      subject: "Physics",
+      ca1: 18,
+      ca2: 17,
+      exam: 55,
+      total: 90,
+      grade: "A1",
+      remark: "Outstanding",
+      syncedFromCbt: false,
+      updatedAt: 1731400000000
+    },
+    {
+      id: "EXM-EMC-2026-009-CHM",
+      studentId: "EMC-2026-009",
+      studentName: "Nwachukwu Somtochukwu",
+      class: "SSS 3 Science",
+      session: "2026/2027",
+      term: "1st Term",
+      subject: "Chemistry",
+      ca1: 18,
+      ca2: 19,
+      exam: 54,
+      total: 91,
+      grade: "A1",
+      remark: "Brilliant Mastery",
+      syncedFromCbt: false,
+      updatedAt: 1731400000000
+    },
+    {
+      id: "EXM-EMC-2026-009-BIO",
+      studentId: "EMC-2026-009",
+      studentName: "Nwachukwu Somtochukwu",
+      class: "SSS 3 Science",
+      session: "2026/2027",
+      term: "1st Term",
+      subject: "Biology",
+      ca1: 16,
+      ca2: 18,
+      exam: 51,
+      total: 85,
+      grade: "A1",
+      remark: "Excellent",
+      syncedFromCbt: false,
+      updatedAt: 1731400000000
+    },
+    {
+      id: "EXM-EMC-2026-008-MATH",
+      studentId: "EMC-2026-008",
+      studentName: "Williams Victor Ayomide",
+      class: "SSS 2 Commercial",
+      session: "2026/2027",
+      term: "1st Term",
+      subject: "Mathematics",
+      ca1: 16,
+      ca2: 17,
+      exam: 51,
+      total: 84,
+      grade: "A1",
+      remark: "Excellent",
+      syncedFromCbt: true,
+      updatedAt: 1731400000000
+    },
+    {
+      id: "EXM-EMC-2026-008-ENG",
+      studentId: "EMC-2026-008",
+      studentName: "Williams Victor Ayomide",
+      class: "SSS 2 Commercial",
+      session: "2026/2027",
+      term: "1st Term",
+      subject: "English Language",
+      ca1: 15,
+      ca2: 16,
+      exam: 48,
+      total: 79,
+      grade: "A1",
+      remark: "Very Good",
+      syncedFromCbt: false,
+      updatedAt: 1731400000000
+    },
+    {
+      id: "EXM-EMC-2026-008-ECO",
+      studentId: "EMC-2026-008",
+      studentName: "Williams Victor Ayomide",
+      class: "SSS 2 Commercial",
+      session: "2026/2027",
+      term: "1st Term",
+      subject: "Economics",
+      ca1: 18,
+      ca2: 17,
+      exam: 53,
+      total: 88,
+      grade: "A1",
+      remark: "Outstanding",
+      syncedFromCbt: false,
+      updatedAt: 1731400000000
+    },
+    {
+      id: "EXM-EMC-2026-008-COM",
+      studentId: "EMC-2026-008",
+      studentName: "Williams Victor Ayomide",
+      class: "SSS 2 Commercial",
+      session: "2026/2027",
+      term: "1st Term",
+      subject: "Commerce",
+      ca1: 17,
+      ca2: 18,
+      exam: 52,
+      total: 87,
+      grade: "A1",
+      remark: "Very Commendable",
+      syncedFromCbt: false,
+      updatedAt: 1731400000000
+    },
+    {
+      id: "EXM-EMC-2026-008-GOV",
+      studentId: "EMC-2026-008",
+      studentName: "Williams Victor Ayomide",
+      class: "SSS 2 Commercial",
+      session: "2026/2027",
+      term: "1st Term",
+      subject: "Government",
+      ca1: 15,
+      ca2: 16,
+      exam: 49,
+      total: 80,
+      grade: "A1",
+      remark: "Commendable",
+      syncedFromCbt: false,
+      updatedAt: 1731400000000
+    }
+  ],
   tutorialStudents: [],
   tutorialPayments: [],
   auditLogs: [
@@ -209,6 +462,9 @@ class RichVineDB {
       if (!data.staff) data.staff = [];
       if (!data.salaries) data.salaries = [];
       if (!data.staffLoans) data.staffLoans = [];
+    if (!data.teachers || data.teachers.length === 0) data.teachers = JSON.parse(JSON.stringify(DEFAULT_DATA.teachers || []));
+    if (!data.attendance) data.attendance = JSON.parse(JSON.stringify(DEFAULT_DATA.attendance || []));
+    if (!data.examRecords) data.examRecords = JSON.parse(JSON.stringify(DEFAULT_DATA.examRecords || []));
       if (!data.tutorialStudents) data.tutorialStudents = [];
       if (!data.tutorialPayments) data.tutorialPayments = [];
 
@@ -2720,6 +2976,232 @@ const DAYCARE_BILLING_CYCLES = [
   { id: "Month 11", label: "Month 11 (14 Jul – 13 Aug 2027)", shortLabel: "Month 11 (14 Jul – 13 Aug)", term: "Summer / Holiday", startDate: "2027-07-14", endDate: "2027-08-13" },
   { id: "Month 12", label: "Month 12 (14 Aug – 13 Sep 2027)", shortLabel: "Month 12 (14 Aug – 13 Sep)", term: "Summer / Holiday", startDate: "2027-08-14", endDate: "2027-09-13" }
 ];
+
+// ── Teacher Management Methods ────────────────────────────────────────────────
+RichVineDB.getTeachers = function() {
+  const data = RichVineDB.get();
+  return data.teachers || [];
+};
+
+RichVineDB.getTeacherById = function(id) {
+  return RichVineDB.getTeachers().find(t => t.id === id) || null;
+};
+
+RichVineDB.getTeacherByPhone = function(phone) {
+  return RichVineDB.getTeachers().find(t => t.phone === String(phone).trim()) || null;
+};
+
+RichVineDB.saveTeacher = function(teacherData) {
+  const data = RichVineDB.get();
+  if (!data.teachers) data.teachers = [];
+  if (teacherData.id) {
+    const idx = data.teachers.findIndex(t => t.id === teacherData.id);
+    if (idx !== -1) {
+      data.teachers[idx] = { ...data.teachers[idx], ...teacherData, updatedAt: new Date().toISOString() };
+    } else {
+      data.teachers.push({ ...teacherData, createdAt: new Date().toISOString() });
+    }
+  } else {
+    const newTeacher = {
+      id: 'TCH-' + Date.now(),
+      ...teacherData,
+      status: teacherData.status || 'active',
+      createdAt: new Date().toISOString()
+    };
+    data.teachers.push(newTeacher);
+  }
+  RichVineDB.save(data);
+  return true;
+};
+
+RichVineDB.deleteTeacher = function(id) {
+  const data = RichVineDB.get();
+  if (!data.teachers) return false;
+  data.teachers = data.teachers.filter(t => t.id !== id);
+  RichVineDB.save(data);
+  return true;
+};
+
+RichVineDB.authenticateTeacher = function(phone, password) {
+  const teacher = RichVineDB.getTeacherByPhone(phone);
+  if (!teacher) return { success: false, message: 'Phone number not found.' };
+  if (teacher.status && teacher.status.toLowerCase() === 'suspended') return { success: false, message: 'Account suspended. Contact admin.' };
+  if (teacher.password !== String(password).trim()) return { success: false, message: 'Incorrect password.' };
+  return { success: true, teacher };
+};
+
+// ── Attendance Methods ─────────────────────────────────────────────────────────
+RichVineDB.getDailyAttendance = function(className, date, session) {
+  const data = RichVineDB.get();
+  const att = data.attendance || [];
+  return att.find(a => a.className === className && a.date === date && a.session === session) || null;
+};
+
+RichVineDB.saveDailyAttendance = function(record) {
+  const data = RichVineDB.get();
+  if (!data.attendance) data.attendance = [];
+  const idx = data.attendance.findIndex(
+    a => a.className === record.className && a.date === record.date && a.session === record.session
+  );
+  if (idx !== -1) {
+    data.attendance[idx] = { ...data.attendance[idx], ...record, updatedAt: new Date().toISOString() };
+  } else {
+    data.attendance.push({ ...record, id: 'ATT-' + Date.now(), createdAt: new Date().toISOString() });
+  }
+  RichVineDB.save(data);
+  return true;
+};
+
+RichVineDB.getAttendanceHistory = function(className, days) {
+  const data = RichVineDB.get();
+  const att = data.attendance || [];
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - (days || 30));
+  return att.filter(a => {
+    const matchClass = !className || className === 'All' || a.className === className;
+    const matchDate = new Date(a.date) >= cutoff;
+    return matchClass && matchDate;
+  }).sort((a, b) => b.date.localeCompare(a.date));
+};
+
+RichVineDB.getStudentAttendanceSummary = function(studentId, days) {
+  const data = RichVineDB.get();
+  const att = data.attendance || [];
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - (days || 30));
+  let present = 0, absent = 0, late = 0, total = 0;
+  att.forEach(session => {
+    if (new Date(session.date) < cutoff) return;
+    const rec = (session.records || []).find(r => r.studentId === studentId);
+    if (!rec) return;
+    total++;
+    if (rec.status === 'Present') present++;
+    else if (rec.status === 'Absent') absent++;
+    else if (rec.status === 'Late') late++;
+  });
+  return { present, absent, late, total, rate: total ? Math.round((present / total) * 100) : 0 };
+};
+
+// ── Exam Record Methods ────────────────────────────────────────────────────────
+RichVineDB.getExamRecords = function(filters) {
+  const data = RichVineDB.get();
+  let records = data.examRecords || [];
+  if (filters) {
+    if (filters.className) records = records.filter(r => r.className === filters.className);
+    if (filters.term) records = records.filter(r => r.term === filters.term);
+    if (filters.session) records = records.filter(r => r.session === filters.session);
+    if (filters.studentId) records = records.filter(r => r.studentId === filters.studentId);
+    if (filters.subject) records = records.filter(r => r.subject === filters.subject);
+  }
+  return records;
+};
+
+RichVineDB.calculateGrade = function(total) {
+  if (total >= 75) return { grade: 'A1', remark: 'Excellent' };
+  if (total >= 70) return { grade: 'B2', remark: 'Very Good' };
+  if (total >= 65) return { grade: 'B3', remark: 'Good' };
+  if (total >= 60) return { grade: 'C4', remark: 'Credit' };
+  if (total >= 55) return { grade: 'C5', remark: 'Credit' };
+  if (total >= 50) return { grade: 'C6', remark: 'Credit' };
+  if (total >= 45) return { grade: 'D7', remark: 'Pass' };
+  if (total >= 40) return { grade: 'E8', remark: 'Pass' };
+  return { grade: 'F9', remark: 'Fail' };
+};
+
+RichVineDB.saveExamRecord = function(record) {
+  const data = RichVineDB.get();
+  if (!data.examRecords) data.examRecords = [];
+  record.total = (record.ca1 || 0) + (record.ca2 || 0) + (record.exam || 0);
+  const gradeInfo = RichVineDB.calculateGrade(record.total);
+  record.grade = gradeInfo.grade;
+  record.remark = gradeInfo.remark;
+  const idx = data.examRecords.findIndex(
+    r => r.studentId === record.studentId && r.subject === record.subject &&
+         r.term === record.term && r.session === record.session
+  );
+  if (idx !== -1) {
+    data.examRecords[idx] = { ...data.examRecords[idx], ...record, updatedAt: new Date().toISOString() };
+  } else {
+    data.examRecords.push({ ...record, id: 'ER-' + Date.now(), createdAt: new Date().toISOString() });
+  }
+  RichVineDB.save(data);
+  if (typeof window !== "undefined" && window.RichVineFirebase && window.RichVineFirebase.saveExamRecord) {
+    window.RichVineFirebase.saveExamRecord(record);
+  }
+  return true;
+};
+
+RichVineDB.syncScoresFromCbt = function() {
+  const data = RichVineDB.get();
+  const cbtResults = data.cbtResults || [];
+  let synced = 0;
+  cbtResults.forEach(result => {
+    if (!result.studentId || !result.subject || !result.className) return;
+    const scaledExamScore = Math.round((result.score / result.total) * 60);
+    RichVineDB.saveExamRecord({
+      studentId: result.studentId,
+      studentName: result.studentName || '',
+      className: result.className,
+      subject: result.subject,
+      term: result.term || '1st Term',
+      session: result.session || '2025/2026',
+      ca1: 0, ca2: 0,
+      exam: scaledExamScore
+    });
+    synced++;
+  });
+  return synced;
+};
+
+RichVineDB.getClassBroadsheet = function(className, term, session) {
+  const records = RichVineDB.getExamRecords({ className, term, session });
+  const students = RichVineDB.getStudents ? RichVineDB.getStudents({ class: className }) : [];
+  const subjects = [...new Set(records.map(r => r.subject))].sort();
+  const rows = students.map(student => {
+    const studentRecords = records.filter(r => r.studentId === student.id);
+    const subjectScores = {};
+    subjects.forEach(sub => {
+      const rec = studentRecords.find(r => r.subject === sub);
+      subjectScores[sub] = rec ? { ca1: rec.ca1, ca2: rec.ca2, exam: rec.exam, total: rec.total, grade: rec.grade } : null;
+    });
+    const totals = Object.values(subjectScores).filter(Boolean).map(s => s.total);
+    const avg = totals.length ? Math.round(totals.reduce((a, b) => a + b, 0) / totals.length) : 0;
+    return { student, subjectScores, avg, subjects: totals.length };
+  });
+  rows.sort((a, b) => b.avg - a.avg);
+  rows.forEach((row, i) => { row.position = i + 1; row.positionLabel = i + 1 + RichVineDB._getOrdinalSuffix(i + 1); });
+  return { className, term, session, subjects, rows };
+};
+
+RichVineDB.getStudentReportCard = function(studentId, term, session) {
+  const students = RichVineDB.getStudents ? RichVineDB.getStudents() : [];
+  const student = students.find(s => s.id === studentId);
+  if (!student) return null;
+  const records = RichVineDB.getExamRecords({ studentId, term, session });
+  const broadsheet = RichVineDB.getClassBroadsheet(student.class, term, session);
+  const myRow = broadsheet.rows.find(r => r.student.id === studentId);
+  const totalScore = records.reduce((sum, r) => sum + (r.total || 0), 0);
+  const avg = records.length ? Math.round(totalScore / records.length) : 0;
+  return {
+    student,
+    term,
+    session,
+    records,
+    avg,
+    position: myRow ? myRow.position : '-',
+    positionLabel: myRow ? myRow.positionLabel : '-',
+    classSize: broadsheet.rows.length,
+    gradeInfo: RichVineDB.calculateGrade(avg)
+  };
+};
+
+RichVineDB._getOrdinalSuffix = function(n) {
+  const s = ['th', 'st', 'nd', 'rd'];
+  const v = n % 100;
+  return s[(v - 20) % 10] || s[v] || s[0];
+};
+
+
 
 // Global exposure
 window.RichVineDB = RichVineDB;
