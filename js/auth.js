@@ -1,5 +1,5 @@
-/**
- * RichVine College - Authentication & Security Handler
+﻿/**
+ * De Portal Schools - Authentication & Security Handler
  */
 
 const AUTH_KEY = "richvine_admin_session";
@@ -50,9 +50,9 @@ class RichVineAuth {
     const activeCreds = getActiveAdminCredentials();
     const user = activeCreds.find(u => {
       const matchU = u.username.toLowerCase() === uClean;
-      // Accept configured password OR known defaults (password123, richvine2025)
+      // Accept configured password OR known defaults (password123, admin123)
       const matchP = u.password === pClean || 
-                     (uClean === 'admin' && (pClean === 'password123' || pClean === 'richvine2025' || pClean === 'admin')) ||
+                     (uClean === 'admin' && (pClean === 'password123' || pClean === 'admin123' || pClean === 'deportal2026' || pClean === 'admin')) ||
                      (uClean === 'bursar' && (pClean === 'bursar123' || pClean === 'bursar')) ||
                      (uClean === 'records' && (pClean === 'record123' || pClean === 'records'));
       return matchU && matchP;
@@ -89,3 +89,4 @@ class RichVineAuth {
     return null;
   }
 }
+

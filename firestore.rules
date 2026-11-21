@@ -59,8 +59,7 @@ service cloud.firestore {
         (request.auth.token.keys().hasAny(['admin']) && request.auth.token.admin == true) ||
         (request.auth.token.keys().hasAny(['email']) && (
           request.auth.token.email.matches(".*@bursariq\\.com$") ||
-          request.auth.token.email.matches(".*@richvinecollege\\.edu\\.ng$") ||
-          request.auth.token.email.matches(".*@excellencemodel\\.edu\\.ng$")
+          request.auth.token.email.matches(".*@deportalschools\\.edu\\.ng$")
         ))
       );
     }

@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <script src="school.config.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Admin Security Login — De Portal Schools | Powered by BursarIQ</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%22 fill=%22%230284c7%22><text y=%2226%22 font-size=%2228%22>🏛️</text></svg>">
+  <title>Admin Security Login â€” De Portal Schools | Powered by BursarIQ</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%22 fill=%22%230284c7%22><text y=%2226%22 font-size=%2228%22>ðŸ›ï¸</text></svg>">
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -34,7 +34,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="css/custom.css">
 <style>
-  /* ── BursarIQ Login Page – Mobile/iOS/Android Polish ── */
+  /* â”€â”€ BursarIQ Login Page â€“ Mobile/iOS/Android Polish â”€â”€ */
   html {
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
@@ -165,7 +165,7 @@
                 id="login-password" 
                 required 
                 placeholder="Enter admin passcode" 
-                value="richvine2025"
+                value="admin123"
                 class="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-200 transition bg-slate-50/50 font-medium"
               >
               <span class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 cursor-pointer" onclick="togglePasswordVisibility()">
@@ -181,9 +181,9 @@
               <span class="text-[10px] text-sky-600 font-normal">Click to prefill</span>
             </div>
             <div class="grid grid-cols-2 gap-2 pt-1 text-[11px]">
-              <button type="button" onclick="fillCreds('admin', 'richvine2025')" class="p-1.5 bg-white rounded border border-sky-200 text-left hover:border-sky-500 transition">
+              <button type="button" onclick="fillCreds('admin', 'admin123')" class="p-1.5 bg-white rounded border border-sky-200 text-left hover:border-sky-500 transition">
                 <span class="font-bold text-sky-800 block">Principal Admin</span>
-                <span class="text-slate-500 text-[10px]">admin / richvine2025</span>
+                <span class="text-slate-500 text-[10px]">admin / admin123</span>
               </button>
               <button type="button" onclick="fillCreds('bursar', 'bursar123')" class="p-1.5 bg-white rounded border border-sky-200 text-left hover:border-sky-500 transition">
                 <span class="font-bold text-sky-800 block">Bursar Officer</span>
@@ -269,7 +269,7 @@
       const errorBox = document.getElementById("login-error-msg");
       const errorText = document.getElementById("error-text");
 
-      const result = RichVineAuth.login(username, pass);
+      const result = De Portal SchoolsAuth.login(username, pass);
       if (result.success) {
         errorBox.classList.add("hidden");
         // Redirect to dashboard
@@ -281,7 +281,7 @@
     });
 
     // Check if already authenticated
-    const currentUser = RichVineAuth.getCurrentUser();
+    const currentUser = De Portal SchoolsAuth.getCurrentUser();
     if (currentUser) {
       // Optional auto-redirect if already logged in
       console.log("Already signed in as", currentUser.username);
@@ -297,3 +297,4 @@
   </script>
 </body>
 </html>
+

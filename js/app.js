@@ -3781,7 +3781,7 @@ const RichVineApp = (() => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `RichVine_CBT_Results_${new Date().toISOString().split("T")[0]}.csv`;
+    a.download = `DPS_CBT_Results_${new Date().toISOString().split("T")[0]}.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -3832,7 +3832,7 @@ const RichVineApp = (() => {
       </head>
       <body>
         <div class="header">
-          <h1>RICHVINE COLLEGE</h1>
+          <h1>DE PORTAL SCHOOLS</h1>
           <p><strong>Motto: Soaring High</strong></p>
           <p>5-7 Olukayode Street, Imoro, Ogijo, Shagamu - Ikorodu Road, Shagamu, Ogun State</p>
           <p>Admin Contact: 09053126809 | Email: admissions@richvinecollege.edu.ng</p>
@@ -3897,7 +3897,7 @@ const RichVineApp = (() => {
         </div>
 
         <div style="margin-top:40px;text-align:center;font-size:10px;color:#888;border-top:1px solid #eee;padding-top:8px">
-          Verified RichVine College CBT Document • Serial: ${_escape(sub.id)} • Valid across school records.
+          Verified De Portal Schools CBT Document • Serial: ${_escape(sub.id)} • Valid across school records.
         </div>
       </body>
       </html>
@@ -3967,6 +3967,218 @@ const RichVineApp = (() => {
     "other":            { id: "misc_1",            name: "Miscellaneous" }
   };
 
+
+  // ── CSV BULK STUDENT IMPORT ──────────────────────────────────────────────
+  let _bulkStudentRows = [];
+
+  function openBulkStudentImport() {
+    _bulkStudentRows = [];
+    const preview = document.getElementById("bulk-student-preview");
+    if (preview) preview.style.display = "none";
+    const confirmBtn = document.getElementById("bulk-student-confirm-btn");
+    if (confirmBtn) confirmBtn.style.display = "none";
+    const textarea = document.getElementById("bulk-student-csv-text");
+    if (textarea) textarea.value = "";
+    const fileInput = document.getElementById("bulk-student-csv-file-input");
+    if (fileInput) fileInput.value = "";
+    const fileNameSpan = document.getElementById("bulk-student-file-name");
+    if (fileNameSpan) fileNameSpan.textContent = "No file chosen";
+    const errorsDiv = document.getElementById("bulk-student-errors");
+    if (errorsDiv) { errorsDiv.style.display = "none"; errorsDiv.innerHTML = ""; }
+    document.getElementById("modal-bulk-student-import")?.classList.remove("hidden");
+  }
+
+  function downloadStudentCsvTemplate() {
+    const csvContent = "Name,Class,Gender,Parent Name,Parent Phone,Address,Term Fee,Past Arrears\n" +
+      "Adeleke Chukwuemeka,Primary 1,Male,Engr. Adeleke,08023456781,5 Olukayode St Imoro Ogijo,55000,0\n" +
+      "Ibrahim Zainab Folashade,JSS 2A,Female,Alhaji Ibrahim,08034567892,12 Imoro Ogijo Ogun State,85000,0\n" +
+      "Balogun Aisha Temitope,SSS 1 Science,Female,Dr. Balogun,08078901236,18 Ogijo Central Road,105000,0\n" +
+      "Okonkwo Somtochukwu,JSS 1A,Male,Chief Okonkwo,08056789014,Imoro Ogijo,80000,5000\n";
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "De_Portal_Schools_Student_Import_Template.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function handleStudentCsvFileUpload(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const fileNameSpan = document.getElementById("bulk-student-file-name");
+    if (fileNameSpan) fileNameSpan.textContent = file.name;
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      const text = evt.target.result;
+      const textarea = document.getElementById("bulk-student-csv-text");
+      if (textarea) textarea.value = text;
+      parseBulkStudentCsv();
+    };
+    reader.readAsText(file);
+  }
+
+  function parseBulkStudentCsv() {
+    const textarea = document.getElementById("bulk-student-csv-text");
+    const rawText = (textarea?.value || "").trim();
+    if (!rawText) {
+      showAlert("Please upload a CSV file or paste CSV text to preview.", "warning");
+      return;
+    }
+
+    const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    if (lines.length < 2) {
+      showAlert("CSV must contain a header row and at least one student row.", "error");
+      return;
+    }
+
+    function parseCsvLine(line) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"' || char === "'") {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          result.push(current.trim());
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      result.push(current.trim());
+      return result.map(s => s.replace(/^["']|["']$/g, '').trim());
+    }
+
+    const headers = parseCsvLine(lines[0]).map(h => h.toLowerCase());
+    
+    let nameIdx = headers.findIndex(h => h.includes("name") && !h.includes("parent") && !h.includes("guardian"));
+    let classIdx = headers.findIndex(h => h.includes("class") || h.includes("grade"));
+    let genderIdx = headers.findIndex(h => h.includes("gender") || h.includes("sex"));
+    let parentNameIdx = headers.findIndex(h => (h.includes("parent") && h.includes("name")) || h.includes("guardian"));
+    let parentPhoneIdx = headers.findIndex(h => h.includes("phone") || h.includes("mobile") || h.includes("contact"));
+    let addressIdx = headers.findIndex(h => h.includes("address") || h.includes("location"));
+    let feeIdx = headers.findIndex(h => h.includes("fee") || h.includes("tuition") || h.includes("amount"));
+    let arrearsIdx = headers.findIndex(h => h.includes("arrear") || h.includes("debt") || h.includes("outstanding"));
+
+    if (nameIdx === -1) nameIdx = 0;
+    if (classIdx === -1 && headers.length > 1) classIdx = 1;
+
+    _bulkStudentRows = [];
+    const errors = [];
+
+    for (let i = 1; i < lines.length; i++) {
+      const row = parseCsvLine(lines[i]);
+      if (row.length === 0 || (row.length === 1 && !row[0])) continue;
+
+      const rawName = row[nameIdx] || "";
+      const rawClass = classIdx !== -1 ? (row[classIdx] || "Primary 1") : "Primary 1";
+      const rawGender = genderIdx !== -1 ? (row[genderIdx] || "Male") : "Male";
+      const rawParentName = parentNameIdx !== -1 ? (row[parentNameIdx] || "") : "";
+      const rawParentPhone = parentPhoneIdx !== -1 ? (row[parentPhoneIdx] || "") : "";
+      const rawAddress = addressIdx !== -1 ? (row[addressIdx] || "") : "";
+      const rawFee = feeIdx !== -1 ? parseFloat(String(row[feeIdx]).replace(/[^0-9.]/g, '')) || 0 : 0;
+      const rawArrears = arrearsIdx !== -1 ? parseFloat(String(row[arrearsIdx]).replace(/[^0-9.]/g, '')) || 0 : 0;
+
+      if (!rawName.trim()) {
+        errors.push(`Row ${i + 1}: Missing student name.`);
+        continue;
+      }
+
+      const sec = (typeof getSectionByClass === "function" && getSectionByClass(rawClass)?.id) || "primary";
+
+      _bulkStudentRows.push({
+        name: rawName.trim(),
+        currentClass: rawClass.trim(),
+        class: rawClass.trim(),
+        section: sec,
+        gender: rawGender.trim().toLowerCase().startsWith("f") ? "Female" : "Male",
+        parentName: rawParentName.trim(),
+        parentPhone: rawParentPhone.trim(),
+        address: rawAddress.trim(),
+        termFee: rawFee,
+        pastArrears: rawArrears,
+        openingArrears: rawArrears,
+        arrears: rawArrears,
+        status: "Active"
+      });
+    }
+
+    const preview = document.getElementById("bulk-student-preview");
+    const summary = document.getElementById("bulk-student-summary");
+    const errorsDiv = document.getElementById("bulk-student-errors");
+    const tbody = document.getElementById("bulk-student-preview-body");
+    const confirmBtn = document.getElementById("bulk-student-confirm-btn");
+    const confirmLabel = document.getElementById("bulk-student-confirm-label");
+
+    if (preview) preview.style.display = "block";
+    if (summary) {
+      summary.innerHTML = `✓ <strong>${_bulkStudentRows.length}</strong> valid student records parsed and ready for enrollment into De Portal Schools.`;
+    }
+    if (errorsDiv) {
+      if (errors.length > 0) {
+        errorsDiv.style.display = "block";
+        errorsDiv.innerHTML = `<strong>Warnings (${errors.length}):</strong><br>` + errors.slice(0, 5).join("<br>");
+      } else {
+        errorsDiv.style.display = "none";
+      }
+    }
+
+    if (tbody) {
+      tbody.innerHTML = _bulkStudentRows.map((st, idx) => `
+        <tr style="border-bottom:1px solid #f1f5f9">
+          <td style="padding:6px 10px">${idx + 1}</td>
+          <td style="padding:6px 10px;font-weight:700;color:#0f172a">${st.name}</td>
+          <td style="padding:6px 10px"><span style="background:#e0f2fe;color:#0369a1;padding:1px 6px;border-radius:4px;font-weight:600">${st.currentClass}</span></td>
+          <td style="padding:6px 10px;text-transform:capitalize">${st.section}</td>
+          <td style="padding:6px 10px">${st.gender}</td>
+          <td style="padding:6px 10px">${st.parentPhone || '—'}</td>
+          <td style="padding:6px 10px;font-weight:600">₦${formatAmount(st.termFee, true)}</td>
+          <td style="padding:6px 10px;color:${st.pastArrears > 0 ? '#b45309' : '#16a34a'};font-weight:600">₦${formatAmount(st.pastArrears, true)}</td>
+          <td style="padding:6px 10px"><span style="color:#16a34a;font-weight:700">✓ Ready</span></td>
+        </tr>
+      `).join("");
+    }
+
+    if (confirmBtn && _bulkStudentRows.length > 0) {
+      confirmBtn.style.display = "inline-flex";
+      if (confirmLabel) confirmLabel.textContent = `Import ${_bulkStudentRows.length} Students Now`;
+    }
+  }
+
+  function confirmBulkStudentImport() {
+    if (!_bulkStudentRows || _bulkStudentRows.length === 0) {
+      showAlert("No parsed student records to import.", "warning");
+      return;
+    }
+
+    const result = RichVineDB.addStudentsBatch(_bulkStudentRows);
+    closeModal("modal-bulk-student-import");
+    showToast(`✓ Successfully enrolled ${result.added} student(s) into De Portal Schools!`, "success", 4000);
+    loadLearnersTab();
+    loadClassHub();
+    loadDashboard();
+  }
+
+  function confirmResetDatabase() {
+    confirmModal(
+      "Are you sure you want to completely reset and clear the database? All test and sample records will be cleared for a 100% fresh start.",
+      () => {
+        RichVineDB.resetDatabase();
+        showToast("✓ Database successfully reset. All records are clean and fresh.", "info", 4000);
+        loadLearnersTab();
+        loadClassHub();
+        loadPaymentsTab();
+        loadExpensesTab();
+        loadDashboard();
+      }
+    );
+  }
+
   function openBulkPaymentImport() {
     // Reset state
     _bulkCsvRows = [];
@@ -4010,7 +4222,7 @@ const RichVineApp = (() => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "RichVine_Payment_Import_Template.csv";
+    a.download = "DPS_Payment_Import_Template.csv";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -4299,7 +4511,7 @@ const RichVineApp = (() => {
     }
     const cleanBackup = {
       backupDate: new Date().toISOString(),
-      schoolName: data.config?.schoolName || "RichVine College",
+      schoolName: data.config?.schoolName || "DE PORTAL SCHOOLS",
       session: data.config?.currentSession || "2026/2027",
       config: data.config,
       students: data.students || [],
@@ -4315,7 +4527,7 @@ const RichVineApp = (() => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `RichVine_Database_Backup_${new Date().toISOString().split("T")[0]}.json`;
+    a.download = `DPS_Database_Backup_${new Date().toISOString().split("T")[0]}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -6753,6 +6965,12 @@ const RichVineApp = (() => {
   return {
     exportDatabaseBackup,
     importDatabaseBackup,
+    openBulkStudentImport,
+    downloadStudentCsvTemplate,
+    handleStudentCsvFileUpload,
+    parseBulkStudentCsv,
+    confirmBulkStudentImport,
+    confirmResetDatabase,
     openBulkPaymentImport,
     downloadPaymentCsvTemplate,
     loadBulkCsvFile,

@@ -112,7 +112,7 @@ const DEFAULT_DATA = {
     schoolShortName: _bursarCfg.schoolShortName || "DE PORTAL",
     acronym: _bursarCfg.acronym || "DPS",
     motto: _bursarCfg.motto || "Gateway to Academic Excellence & Moral Integrity",
-    address: _bursarCfg.address || "12 Education Boulevard, Victoria Island / Ikeja, Lagos State, Nigeria",
+    address: _bursarCfg.address || "5-7 Olukayode Street, Imoro, Ogijo, Ogun State, Nigeria",
     contactEmail: _bursarCfg.contactEmail || "admin@deportalschools.edu.ng",
     phone: _bursarCfg.phone || "08012345678",
     adminContact: _bursarCfg.adminContact || "08012345678",
@@ -134,10 +134,8 @@ const DEFAULT_DATA = {
     { id: "textbook", name: "Textbooks", hasMeta: true, metaType: "textbook" },
     { id: "misc_1", name: "Miscellaneous 1 (Development / PTA)", hasMeta: false },
     { id: "misc_2", name: "Miscellaneous 2 (ICT / Computer Lab)", hasMeta: false },
-    // JSS 3 Special Examination Fees
     { id: "bece_fee", name: "BECE Examination Fee", hasMeta: false, forClass: "JSS 3" },
     { id: "bece_lesson_fee", name: "BECE Lesson Fee", hasMeta: false, forClass: "JSS 3" },
-    // SS3 Special Senior School Fees & Official Pricing
     { id: "waec_fee", name: "WAEC Examination Fee", defaultAmount: 65000, hasMeta: false, forClass: "SSS 3" },
     { id: "neco_fee", name: "NECO Examination Fee", defaultAmount: 60000, hasMeta: false, forClass: "SSS 3" },
     { id: "waec_logistics", name: "WAEC Logistics Fee", defaultAmount: 20000, hasMeta: false, forClass: "SSS 3" },
@@ -151,189 +149,8 @@ const DEFAULT_DATA = {
     { id: "other_special_fee", name: "Other SS3 Special / Optional Fees", hasMeta: true, metaType: "other_special", forClass: "SSS 3" }
   ],
 
-  // Fresh, empty collections
-  students: [
-    {
-      id: "DPS-2026-001",
-      regNo: "DPS/2026/001",
-      name: "Adeleke Chukwuemeka",
-      class: "Primary 1",
-      section: "primary",
-      gender: "Male",
-      parentName: "Engr. & Mrs. Adeleke",
-      parentPhone: "08023456781",
-      address: "14 Palm Avenue, Lagos",
-      termFee: 55000,
-      pastArrears: 0,
-      status: "Active",
-      createdAt: 1718000000000
-    },
-    {
-      id: "DPS-2026-002",
-      regNo: "DPS/2026/002",
-      name: "Ibrahim Zainab Folashade",
-      class: "Primary 4",
-      section: "primary",
-      gender: "Female",
-      parentName: "Alhaji Ibrahim",
-      parentPhone: "08034567892",
-      address: "22 Victoria Island, Lagos",
-      termFee: 65000,
-      pastArrears: 0,
-      status: "Active",
-      createdAt: 1718000001000
-    },
-    {
-      id: "DPS-2026-003",
-      regNo: "DPS/2026/003",
-      name: "Okonkwo Somtochukwu",
-      class: "JSS 2B",
-      section: "junior_secondary",
-      gender: "Male",
-      parentName: "Chief Okonkwo",
-      parentPhone: "08056789014",
-      address: "8 Airport Road, Ikeja, Lagos",
-      termFee: 85000,
-      pastArrears: 0,
-      status: "Active",
-      createdAt: 1718000003000
-    },
-    {
-      id: "DPS-2026-004",
-      regNo: "DPS/2026/004",
-      name: "Bello Faruq Alabi",
-      class: "JSS 2B",
-      section: "junior_secondary",
-      gender: "Male",
-      parentName: "Mr. K. Bello",
-      parentPhone: "08061234567",
-      address: "5 Allen Avenue, Ikeja, Lagos",
-      termFee: 85000,
-      pastArrears: 0,
-      status: "Active",
-      createdAt: 1718000003500
-    },
-    {
-      id: "DPS-2026-005",
-      regNo: "DPS/2026/005",
-      name: "Balogun Aisha Temitope",
-      class: "SSS 1 Science",
-      section: "senior_secondary",
-      gender: "Female",
-      parentName: "Dr. & Mrs. Balogun",
-      parentPhone: "08078901236",
-      address: "18 Admiralty Way, Lekki, Lagos",
-      termFee: 105000,
-      pastArrears: 0,
-      status: "Active",
-      createdAt: 1718000005000
-    },
-    {
-      id: "DPS-2026-006",
-      regNo: "DPS/2026/006",
-      name: "Chukwuma David Nnamdi",
-      class: "SSS 1 Science",
-      section: "senior_secondary",
-      gender: "Male",
-      parentName: "Engr. Chukwuma",
-      parentPhone: "08090123458",
-      address: "24 Bode Thomas, Surulere, Lagos",
-      termFee: 105000,
-      pastArrears: 0,
-      status: "Active",
-      createdAt: 1718000005500
-    },
-    {
-      id: "DPS-2026-007",
-      regNo: "DPS/2026/007",
-      name: "Danjuma Maryam Hauwa",
-      class: "SSS 1 Science",
-      section: "senior_secondary",
-      gender: "Female",
-      parentName: "Alhaji Danjuma",
-      parentPhone: "08081234569",
-      address: "12 GRA, Ikeja, Lagos",
-      termFee: 105000,
-      pastArrears: 0,
-      status: "Active",
-      createdAt: 1718000006000
-    },
-    {
-      id: "DPS-2026-008",
-      regNo: "DPS/2026/008",
-      name: "Eze Princewill Obinna",
-      class: "SSS 1 Science",
-      section: "senior_secondary",
-      gender: "Male",
-      parentName: "Mr. & Mrs. Eze",
-      parentPhone: "08039876543",
-      address: "7 Maryland Crescent, Lagos",
-      termFee: 105000,
-      pastArrears: 0,
-      status: "Active",
-      createdAt: 1718000006500
-    },
-    {
-      id: "DPS-2026-009",
-      regNo: "DPS/2026/009",
-      name: "Fashola Daniel Ayomide",
-      class: "SSS 1 Art",
-      section: "senior_secondary",
-      gender: "Male",
-      parentName: "Barrister Fashola",
-      parentPhone: "08021112233",
-      address: "15 Yaba College Road, Lagos",
-      termFee: 100000,
-      pastArrears: 0,
-      status: "Active",
-      createdAt: 1718000007000
-    },
-    {
-      id: "DPS-2026-010",
-      regNo: "DPS/2026/010",
-      name: "Garba Amina Sani",
-      class: "SSS 1 Art",
-      section: "senior_secondary",
-      gender: "Female",
-      parentName: "Malam Garba",
-      parentPhone: "08033334455",
-      address: "9 Ikoyi Crescent, Lagos",
-      termFee: 100000,
-      pastArrears: 0,
-      status: "Active",
-      createdAt: 1718000007500
-    },
-    {
-      id: "DPS-2026-011",
-      regNo: "DPS/2026/011",
-      name: "Williams Kehinde Michael",
-      class: "SSS 2 Commercial",
-      section: "senior_secondary",
-      gender: "Male",
-      parentName: "Pastor Williams",
-      parentPhone: "08089012347",
-      address: "41 Ikorodu Road, Maryland, Lagos",
-      termFee: 110000,
-      pastArrears: 0,
-      status: "Active",
-      createdAt: 1718000008000
-    },
-    {
-      id: "DPS-2026-012",
-      regNo: "DPS/2026/012",
-      name: "Yusuf Fatima Zahra",
-      class: "SSS 2 Commercial",
-      section: "senior_secondary",
-      gender: "Female",
-      parentName: "Alhaji Yusuf",
-      parentPhone: "08077778899",
-      address: "3 Opebi Road, Ikeja, Lagos",
-      termFee: 110000,
-      pastArrears: 0,
-      status: "Active",
-      createdAt: 1718000008500
-    }
-  ],
+  // 100% Clean Slate: Zero dummy students, zero dummy payments, zero dummy expenses
+  students: [],
   payments: [],
   expenses: [],
   stocks: [],
@@ -343,308 +160,10 @@ const DEFAULT_DATA = {
   staff: [],
   salaries: [],
   staffLoans: [],
-    weeklyPerformance: [
-    {
-      id: "WKP-DPS-2026-005-Math-W1",
-      studentId: "DPS-2026-005",
-      studentName: "Balogun Aisha Temitope",
-      regNo: "DPS/2026/005",
-      className: "SSS 1 Science",
-      subject: "Mathematics",
-      week: "1",
-      term: "1st Term",
-      session: "2026/2027",
-      notes: "Submitted",
-      behaviour: "Excellent",
-      attentiveness: "High",
-      testScore: 18,
-      testMax: 20,
-      teacherRemark: "Very sharp and participatory in quadratic equations.",
-      recordedBy: "Mr. Emmanuel Adebayo"
-    },
-    {
-      id: "WKP-DPS-2026-006-Math-W1",
-      studentId: "DPS-2026-006",
-      studentName: "Chukwuma David Nnamdi",
-      regNo: "DPS/2026/006",
-      className: "SSS 1 Science",
-      subject: "Mathematics",
-      week: "1",
-      term: "1st Term",
-      session: "2026/2027",
-      notes: "Submitted",
-      behaviour: "Good",
-      attentiveness: "High",
-      testScore: 16,
-      testMax: 20,
-      teacherRemark: "Neat notes and solved practice drills correctly.",
-      recordedBy: "Mr. Emmanuel Adebayo"
-    }
-  ],
-  teachers: [
-    {
-      id: "TCH-001",
-      staffId: "STF/003",
-      name: "Mr. Emmanuel Adebayo",
-      phone: "08012345678",
-      password: "password123",
-      assignedClass: "SSS 1 Science",
-      assignedClasses: ["SSS 1 Science", "SSS 1 Art", "SSS 1 Commercial"],
-      role: "Class & Subject Teacher",
-      subjects: ["Mathematics", "Physics"],
-      status: "Active",
-      createdAt: 1729000000000
-    },
-    {
-      id: "TCH-002",
-      staffId: "STF/004",
-      name: "Mrs. Funmilayo Adeleke",
-      phone: "08023456789",
-      password: "password123",
-      assignedClass: "JSS 2B",
-      assignedClasses: ["JSS 2B", "JSS 2A"],
-      role: "Class & Subject Teacher",
-      subjects: ["English Language", "Literature in English"],
-      status: "Active",
-      createdAt: 1729000001000
-    },
-    {
-      id: "TCH-003",
-      staffId: "STF/005",
-      name: "Mr. Chukwudi Okafor",
-      phone: "08034567890",
-      password: "password123",
-      assignedClass: "SSS 2 Commercial",
-      assignedClasses: ["SSS 2 Commercial", "SSS 2 Art"],
-      role: "Class & Subject Teacher",
-      subjects: ["Economics", "Commerce"],
-      status: "Active",
-      createdAt: 1729000002000
-    },
-    {
-      id: "TCH-004",
-      staffId: "STF/006",
-      name: "Dr. (Mrs) Ngozi Eze",
-      phone: "08045678901",
-      password: "password123",
-      assignedClass: null,
-      assignedClasses: ["SSS 1 Science", "SSS 2 Science", "SSS 3 Science"],
-      role: "Subject Teacher",
-      subjects: ["Biology", "Chemistry"],
-      status: "Active",
-      createdAt: 1729000003000
-    }
-  ],
-    attendance: [
-    {
-      id: "ATT-2026-11-13-SSS-1-Science-Morning",
-      date: "2026-11-13",
-      class: "SSS 1 Science",
-      session: "Morning",
-      markedBy: "Mr. Emmanuel Adebayo",
-      timestamp: 1731481200000,
-      records: [
-        { studentId: "EMC-2026-007", studentName: "Adeyemi Tunde", status: "Present", remark: "Prompt arrival" },
-        { studentId: "EMC-2026-008", studentName: "Williams Victor Ayomide", status: "Present", remark: "" }
-      ],
-      presentCount: 2,
-      absentCount: 0,
-      lateCount: 0,
-      excusedCount: 0,
-      totalCount: 2,
-      rate: 100
-    },
-    {
-      id: "ATT-2026-11-13-SSS-1-Science-Afternoon",
-      date: "2026-11-13",
-      class: "SSS 1 Science",
-      session: "Afternoon",
-      markedBy: "Mr. Emmanuel Adebayo",
-      timestamp: 1731502800000,
-      records: [
-        { studentId: "EMC-2026-007", studentName: "Adeyemi Tunde", status: "Present", remark: "" },
-        { studentId: "EMC-2026-008", studentName: "Williams Victor Ayomide", status: "Late", remark: "Returned from library late" }
-      ],
-      presentCount: 1,
-      absentCount: 0,
-      lateCount: 1,
-      excusedCount: 0,
-      totalCount: 2,
-      rate: 50
-    }
-  ],
-    examRecords: [
-    {
-      id: "EXM-EMC-2026-009-MATH",
-      studentId: "EMC-2026-009",
-      studentName: "Nwachukwu Somtochukwu",
-      class: "SSS 3 Science",
-      session: "2026/2027",
-      term: "1st Term",
-      subject: "Mathematics",
-      ca1: 19,
-      ca2: 18,
-      exam: 57,
-      total: 94,
-      grade: "A1",
-      remark: "Excellent Distinction",
-      syncedFromCbt: true,
-      updatedAt: 1731400000000
-    },
-    {
-      id: "EXM-EMC-2026-009-ENG",
-      studentId: "EMC-2026-009",
-      studentName: "Nwachukwu Somtochukwu",
-      class: "SSS 3 Science",
-      session: "2026/2027",
-      term: "1st Term",
-      subject: "English Language",
-      ca1: 17,
-      ca2: 18,
-      exam: 53,
-      total: 88,
-      grade: "A1",
-      remark: "Excellent",
-      syncedFromCbt: false,
-      updatedAt: 1731400000000
-    },
-    {
-      id: "EXM-EMC-2026-009-PHY",
-      studentId: "EMC-2026-009",
-      studentName: "Nwachukwu Somtochukwu",
-      class: "SSS 3 Science",
-      session: "2026/2027",
-      term: "1st Term",
-      subject: "Physics",
-      ca1: 18,
-      ca2: 17,
-      exam: 55,
-      total: 90,
-      grade: "A1",
-      remark: "Outstanding",
-      syncedFromCbt: false,
-      updatedAt: 1731400000000
-    },
-    {
-      id: "EXM-EMC-2026-009-CHM",
-      studentId: "EMC-2026-009",
-      studentName: "Nwachukwu Somtochukwu",
-      class: "SSS 3 Science",
-      session: "2026/2027",
-      term: "1st Term",
-      subject: "Chemistry",
-      ca1: 18,
-      ca2: 19,
-      exam: 54,
-      total: 91,
-      grade: "A1",
-      remark: "Brilliant Mastery",
-      syncedFromCbt: false,
-      updatedAt: 1731400000000
-    },
-    {
-      id: "EXM-EMC-2026-009-BIO",
-      studentId: "EMC-2026-009",
-      studentName: "Nwachukwu Somtochukwu",
-      class: "SSS 3 Science",
-      session: "2026/2027",
-      term: "1st Term",
-      subject: "Biology",
-      ca1: 16,
-      ca2: 18,
-      exam: 51,
-      total: 85,
-      grade: "A1",
-      remark: "Excellent",
-      syncedFromCbt: false,
-      updatedAt: 1731400000000
-    },
-    {
-      id: "EXM-EMC-2026-008-MATH",
-      studentId: "EMC-2026-008",
-      studentName: "Williams Victor Ayomide",
-      class: "SSS 2 Commercial",
-      session: "2026/2027",
-      term: "1st Term",
-      subject: "Mathematics",
-      ca1: 16,
-      ca2: 17,
-      exam: 51,
-      total: 84,
-      grade: "A1",
-      remark: "Excellent",
-      syncedFromCbt: true,
-      updatedAt: 1731400000000
-    },
-    {
-      id: "EXM-EMC-2026-008-ENG",
-      studentId: "EMC-2026-008",
-      studentName: "Williams Victor Ayomide",
-      class: "SSS 2 Commercial",
-      session: "2026/2027",
-      term: "1st Term",
-      subject: "English Language",
-      ca1: 15,
-      ca2: 16,
-      exam: 48,
-      total: 79,
-      grade: "A1",
-      remark: "Very Good",
-      syncedFromCbt: false,
-      updatedAt: 1731400000000
-    },
-    {
-      id: "EXM-EMC-2026-008-ECO",
-      studentId: "EMC-2026-008",
-      studentName: "Williams Victor Ayomide",
-      class: "SSS 2 Commercial",
-      session: "2026/2027",
-      term: "1st Term",
-      subject: "Economics",
-      ca1: 18,
-      ca2: 17,
-      exam: 53,
-      total: 88,
-      grade: "A1",
-      remark: "Outstanding",
-      syncedFromCbt: false,
-      updatedAt: 1731400000000
-    },
-    {
-      id: "EXM-EMC-2026-008-COM",
-      studentId: "EMC-2026-008",
-      studentName: "Williams Victor Ayomide",
-      class: "SSS 2 Commercial",
-      session: "2026/2027",
-      term: "1st Term",
-      subject: "Commerce",
-      ca1: 17,
-      ca2: 18,
-      exam: 52,
-      total: 87,
-      grade: "A1",
-      remark: "Very Commendable",
-      syncedFromCbt: false,
-      updatedAt: 1731400000000
-    },
-    {
-      id: "EXM-EMC-2026-008-GOV",
-      studentId: "EMC-2026-008",
-      studentName: "Williams Victor Ayomide",
-      class: "SSS 2 Commercial",
-      session: "2026/2027",
-      term: "1st Term",
-      subject: "Government",
-      ca1: 15,
-      ca2: 16,
-      exam: 49,
-      total: 80,
-      grade: "A1",
-      remark: "Commendable",
-      syncedFromCbt: false,
-      updatedAt: 1731400000000
-    }
-  ],
+  weeklyPerformance: [],
+  teachers: [],
+  attendance: [],
+  examRecords: [],
   tutorialStudents: [],
   tutorialPayments: [],
   auditLogs: [
@@ -652,21 +171,21 @@ const DEFAULT_DATA = {
       id: "LOG-INIT",
       timestamp: Date.now(),
       date: new Date().toLocaleString("en-GB"),
-      action: "DATABASE_RESET",
+      action: "DATABASE_INITIALIZED",
       user: "System",
-      details: "RichVine College Database Reset Clean. Ready for live records."
+      details: "De Portal Schools Database Initialized. Ready for live records."
     }
   ]
 };
 
 // ─── LocalStorage + Firebase DB Manager (High-Performance In-Memory Caching) ──
 class RichVineDB {
-  static KEY = "BURSARIQ_SCHOOL_DB_V1";
+  static KEY = "DPS_PORTAL_SCHOOLS_DB_V2";
   static _cache = null;
 
   static init() {
     try {
-      ["RICHVINE_COLLEGE_DB_V2026", "RICHVINE_COLLEGE_DB_V3", "RICHVINE_COLLEGE_DB_V4_FRESH", "RICHVINE_COLLEGE_DB_V5_LIVE"].forEach(k => {
+      ["BURSARIQ_SCHOOL_DB_V1", "RICHVINE_COLLEGE_DB_V2026", "RICHVINE_COLLEGE_DB_V3", "RICHVINE_COLLEGE_DB_V4_FRESH", "RICHVINE_COLLEGE_DB_V5_LIVE"].forEach(k => {
         if (localStorage.getItem(k)) localStorage.removeItem(k);
       });
     } catch(e) {}
@@ -696,16 +215,16 @@ class RichVineDB {
       if (!data.staff) data.staff = [];
       if (!data.salaries) data.salaries = [];
       if (!data.staffLoans) data.staffLoans = [];
-    if (!data.teachers || data.teachers.length === 0) data.teachers = JSON.parse(JSON.stringify(DEFAULT_DATA.teachers || []));
-    if (!data.attendance) data.attendance = JSON.parse(JSON.stringify(DEFAULT_DATA.attendance || []));
-    if (!data.examRecords) data.examRecords = JSON.parse(JSON.stringify(DEFAULT_DATA.examRecords || []));
-    if (!data.weeklyPerformance) data.weeklyPerformance = JSON.parse(JSON.stringify(DEFAULT_DATA.weeklyPerformance || []));
-    if (!data.students || data.students.length === 0) data.students = JSON.parse(JSON.stringify(DEFAULT_DATA.students || []));
+    if (!data.teachers) data.teachers = [];
+    if (!data.attendance) data.attendance = [];
+    if (!data.examRecords) data.examRecords = [];
+    if (!data.weeklyPerformance) data.weeklyPerformance = [];
+    if (!data.students) data.students = [];
       if (!data.tutorialStudents) data.tutorialStudents = [];
       if (!data.tutorialPayments) data.tutorialPayments = [];
 
       // Auto-purge any legacy test student profiles (RVC-2026-001 through 006)
-      const testStudentIds = new Set(["RVC-2026-001", "RVC-2026-002", "RVC-2026-003", "RVC-2026-004", "RVC-2026-005", "RVC-2026-006"]);
+      const testStudentIds = new Set(["RVC-2026-001", "RVC-2026-002", "RVC-2026-003", "RVC-2026-004", "RVC-2026-005", "RVC-2026-006", "DPS-2026-001", "DPS-2026-002", "DPS-2026-003", "DPS-2026-004", "DPS-2026-005", "DPS-2026-006", "DPS-2026-007", "DPS-2026-008", "DPS-2026-009", "DPS-2026-010", "DPS-2026-011", "DPS-2026-012"]);
       let needsSave = false;
       if (Array.isArray(data.students) && data.students.some(s => testStudentIds.has(s.id))) {
         data.students = data.students.filter(s => !testStudentIds.has(s.id));
@@ -737,7 +256,7 @@ class RichVineDB {
       // Ensure updated school credentials are reflected across all sessions
       if (!data.config) data.config = {};
       if (!data.config.motto || data.config.motto.includes("Wisdom") || data.config.motto !== "Soaring High") {
-        data.config.motto = "Soaring High";
+        data.config.motto = "Gateway to Academic Excellence & Moral Integrity";
       }
       if (!data.config.address || data.config.address.includes("Lekki") || !data.config.address.includes("Olukayode")) {
         data.config.address = "5-7 Olukayode Street, Imoro, Ogijo, Shagamu - Ikorodu Road, Shagamu, Ogun State";
@@ -1180,6 +699,69 @@ class RichVineDB {
     return this.get().students.find(s => s.id === id) || null;
   }
 
+  static addStudentsBatch(studentList = []) {
+    if (!Array.isArray(studentList) || studentList.length === 0) return { added: 0, students: [] };
+    const db = this.get();
+    const year = 2026;
+    const acronym = (typeof window !== "undefined" && window.BURSARIQ_CONFIG && window.BURSARIQ_CONFIG.acronym) ? window.BURSARIQ_CONFIG.acronym : "DPS";
+    let maxNum = 0;
+    (db.students || []).forEach(s => {
+      const match = s.regNo && String(s.regNo).match(/\/(\d+)$/);
+      if (match) {
+        const val = parseInt(match[1], 10);
+        if (val > maxNum) maxNum = val;
+      }
+    });
+
+    const addedStudents = [];
+    studentList.forEach(raw => {
+      maxNum++;
+      const numStr = String(maxNum).padStart(3, "0");
+      const s = Object.assign({}, raw);
+      s.id = s.id || `${acronym}-${year}-${numStr}-${Math.random().toString(36).substring(2, 7)}`;
+      s.regNo = s.regNo || `${acronym}/${year}/${numStr}`;
+      const cls = s.currentClass || s.class || "";
+      s.currentClass = cls;
+      s.class = cls;
+      s.section = (typeof getSectionByClass === "function" && getSectionByClass(cls)?.id) || s.section || "primary";
+
+      if (s.name && (!s.firstName || !s.lastName)) {
+        const parts = s.name.trim().split(/\s+/);
+        s.firstName = parts[0] || "";
+        s.lastName = parts.slice(1).join(" ") || "";
+      } else if (!s.name && (s.firstName || s.lastName)) {
+        s.name = `${s.firstName || ""} ${s.lastName || ""}`.trim();
+      }
+
+      s.termFee = Number(s.termFee) || 0;
+      s.openingArrears = Number(s.pastArrears !== undefined ? s.pastArrears : (s.openingArrears !== undefined ? s.openingArrears : (s.arrears || 0))) || 0;
+      s.arrears = s.openingArrears;
+      s.dob = s.dob || "";
+      s.parentName = s.parentName || "";
+      s.parentPhone = s.parentPhone || "";
+      s.parentEmail = s.parentEmail || "";
+      s.address = s.address || "";
+      s.gender = s.gender || "Male";
+      s.status = s.status || "Active";
+      s.enrolledDate = s.enrolledDate || new Date().toISOString().split("T")[0];
+      s.createdAt = s.createdAt || Date.now();
+      s._pendingUpload = true;
+
+      db.students.push(s);
+      addedStudents.push(s);
+    });
+
+    const log = this._buildLog("STUDENTS_IMPORTED_CSV", `Imported ${addedStudents.length} learner(s) via CSV bulk upload`);
+    db.auditLogs.unshift(log);
+    this.save(db);
+
+    if (window.RichVineFirebase && window.RichVineFirebase.saveStudent) {
+      addedStudents.forEach(st => window.RichVineFirebase.saveStudent(st));
+      window.RichVineFirebase.saveLog && window.RichVineFirebase.saveLog(log);
+    }
+    return { added: addedStudents.length, students: addedStudents };
+  }
+
   static addStudent(student) {
     const db = this.get();
     const year = 2026;
@@ -1193,8 +775,8 @@ class RichVineDB {
     });
     const nextNum = Math.max((db.students || []).length + 1, maxNum + 1);
     const numStr = String(nextNum).padStart(3, "0");
-    student.id = student.id || `RVC-${year}-${numStr}-${Date.now().toString(36)}`;
-    student.regNo = student.regNo || `RVC/${year}/${numStr}`;
+    student.id = student.id || `DPS-${year}-${numStr}-${Date.now().toString(36)}`;
+    student.regNo = student.regNo || `DPS/${year}/${numStr}`;
     student.section = getSectionByClass(student.currentClass)?.id || "junior";
     student.termFee = Number(student.termFee) || 0;
     student.openingArrears = Number(student.arrears) || 0;
@@ -3184,6 +2766,40 @@ class RichVineDB {
   }
 
   // ── Internal Helper ──────────────────────────────────────────────────────
+  static resetDatabase() {
+    this._cache = null;
+    const clean = JSON.parse(JSON.stringify(DEFAULT_DATA));
+    clean.students = [];
+    clean.payments = [];
+    clean.expenses = [];
+    clean.stocks = [];
+    clean.stockSales = [];
+    clean.stockRestocks = [];
+    clean.cbtSubmissions = [];
+    clean.staff = [];
+    clean.salaries = [];
+    clean.staffLoans = [];
+    clean.teachers = [];
+    clean.attendance = [];
+    clean.examRecords = [];
+    clean.weeklyPerformance = [];
+    clean.tutorialStudents = [];
+    clean.tutorialPayments = [];
+    clean.auditLogs = [{
+      id: "LOG-RESET-" + Date.now(),
+      timestamp: Date.now(),
+      date: new Date().toLocaleString("en-GB"),
+      action: "DATABASE_RESET",
+      user: sessionStorage.getItem("dps_admin_username") || "Admin",
+      details: "De Portal Schools Database cleared and reset to fresh state."
+    }];
+    try {
+      localStorage.setItem(this.KEY, JSON.stringify(clean));
+    } catch(e) {}
+    this._cache = clean;
+    return clean;
+  }
+
   static _buildLog(action, details) {
     return {
       id: "LOG-" + Date.now() + "-" + Math.floor(Math.random() * 10000),

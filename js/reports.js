@@ -1,10 +1,10 @@
 ﻿/**
- * RichVine College — Reports Module v3
+ * DE PORTAL SCHOOLS — Reports Module v3
  * Handles CSV export, receipts, ledger, expenses, student balance breakdown, and P&L overview
  */
 const RichVineReports = (() => {
   const currency = "₦";
-  const school   = "RICHVINE COLLEGE";
+  const school = config?.schoolName || 'DE PORTAL SCHOOLS';
   const addr     = "5-7 Olukayode Street, Imoro, Ogijo, Shagamu - Ikorodu Road, Shagamu, Ogun State";
 
   // ── Date range helpers ──────────────────────────────────────────────────
@@ -205,7 +205,7 @@ const RichVineReports = (() => {
       </div>
 
       <div class="footer">
-        <p>Official receipt generated from the RichVine College Automated Bursary System.</p>
+        <p>Official receipt generated from the DE PORTAL SCHOOLS Automated Bursary System.</p>
         <p>Enquiries: ${config.contactEmail} | ${config.phone}</p>
         <button onclick="window.print()" class="no-print" style="margin-top:12px;padding:10px 28px;background:#0080c8;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600">🖨 Print Receipt</button>
       </div>
@@ -357,7 +357,7 @@ const RichVineReports = (() => {
     rows.push(["", "", "", "", "", "", "", "", "TOTAL REVENUE", totalRevenue, "", "", "", "", ""]);
 
     const csv = rows.map(r => r.map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(",")).join("\n");
-    triggerDownload(csv, `RichVine_Payments_${timeframe}_${new Date().toISOString().split("T")[0]}.csv`);
+    triggerDownload(csv, `DPS_Payments_${timeframe}_${new Date().toISOString().split("T")[0]}.csv`);
   }
 
   // ── CSV Export (Expenses) ───────────────────────────────────────────────
@@ -399,7 +399,7 @@ const RichVineReports = (() => {
     rows.push(["", "", "", "", "", "TOTAL EXPENSES", total, "", "", "", ""]);
 
     const csv = rows.map(r => r.map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(",")).join("\n");
-    triggerDownload(csv, `RichVine_Expenses_${timeframe}_${new Date().toISOString().split("T")[0]}.csv`);
+    triggerDownload(csv, `DPS_Expenses_${timeframe}_${new Date().toISOString().split("T")[0]}.csv`);
   }
 
   // ── Print Ledger Statement ──────────────────────────────────────────────
@@ -688,12 +688,12 @@ const RichVineReports = (() => {
         <div style="text-align:center;width:220px">
           <div style="border-bottom:1px solid #334155;height:35px;margin-bottom:6px"></div>
           <div style="font-weight:700;font-size:12px">Bursar / Accounts Officer</div>
-          <div style="font-size:10.5px;color:#64748b">RichVine College Treasury</div>
+          <div style="font-size:10.5px;color:#64748b">DE PORTAL SCHOOLS Treasury</div>
         </div>
         <div style="text-align:center;width:220px">
           <div style="border-bottom:1px solid #334155;height:35px;margin-bottom:6px"></div>
           <div style="font-weight:700;font-size:12px">Principal / Director</div>
-          <div style="font-size:10.5px;color:#64748b">RichVine College Administration</div>
+          <div style="font-size:10.5px;color:#64748b">DE PORTAL SCHOOLS Administration</div>
         </div>
       </div>
 
@@ -767,7 +767,7 @@ const RichVineReports = (() => {
 
       // Build detailed transactions sheet & category summary
       const rows = [
-        [`RICHVINE COLLEGE — Category Bill Report per Class`],
+        [`DE PORTAL SCHOOLS — Category Bill Report per Class`],
         [`Timeframe: ${label}`, `Filter Section: ${secFilterLabel}`, `Filter Class: ${classFilter || 'All'}`, `Filter Category: ${catFilterLabel}`],
         [`Generated: ${new Date().toLocaleString('en-GB')}`],
         [],
@@ -844,7 +844,7 @@ const RichVineReports = (() => {
       });
 
       const csv = rows.map(r => r.map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
-      triggerDownload(csv, `RichVine_CategoryClass_${timeframe || 'all'}_${new Date().toISOString().split('T')[0]}.csv`);
+      triggerDownload(csv, `DPS_CategoryClass_${timeframe || 'all'}_${new Date().toISOString().split('T')[0]}.csv`);
     } else {
       // Printable HTML Report
       const sections = window.SCHOOL_SECTIONS || {};
@@ -1183,7 +1183,7 @@ const RichVineReports = (() => {
           </div>
 
           <div class="footer">
-            <div class="bursariq-audit-footer" style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:10px;border-top:1px dashed #94a3b8;font-size:10px;color:#475569;"><span><strong style="color:#0b2b48">POWERED BY BURSARIQ</strong> &bull; <em>Every naira accounted for.</em></span><span>Official Audit Verification &bull; Certified Document</span></div><p style="margin-top:6px">Official Bursary Financial Statement &bull; RichVine College Bursary Management System &bull; Generated on ${new Date().toLocaleString('en-GB')}</p>
+            <div class="bursariq-audit-footer" style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:10px;border-top:1px dashed #94a3b8;font-size:10px;color:#475569;"><span><strong style="color:#0b2b48">POWERED BY BURSARIQ</strong> &bull; <em>Every naira accounted for.</em></span><span>Official Audit Verification &bull; Certified Document</span></div><p style="margin-top:6px">Official Bursary Financial Statement &bull; DE PORTAL SCHOOLS Bursary Management System &bull; Generated on ${new Date().toLocaleString('en-GB')}</p>
             <button onclick="window.print()" class="btn-print no-print" style="margin-top:10px">🖨 Print / Save as PDF</button>
           </div>
         </div>
@@ -1332,7 +1332,7 @@ const RichVineReports = (() => {
           <div class="pass-footer-micro">
             <span>Issue Date: ${issueDate}</span>
             <span>Valid with official school stamp only &bull; Non-transferable</span>
-            <span>RichVine Bursary &bull; 2026/2027</span>
+            <span>De Portal Bursary &bull; 2026/2027</span>
           </div>
         </div>`;
 
@@ -1351,7 +1351,7 @@ const RichVineReports = (() => {
       <div class="a4-sheet">
         <div class="sheet-watermark-header no-print">
           <span>Sheet ${pIdx + 1} of ${totalPages} &bull; Class: <b>${page.className}</b> (${page.students.length} Pass${page.students.length > 1 ? 'es' : ''})</span>
-          <span style="font-size:11px;color:#64748b">RichVine College Clearance Passes &bull; 4 per A4</span>
+          <span style="font-size:11px;color:#64748b">DE PORTAL SCHOOLS Clearance Passes &bull; 4 per A4</span>
         </div>
         <div class="passes-container">
           ${passesHtml}
@@ -1466,7 +1466,7 @@ const RichVineReports = (() => {
 
         /* Subtle Security Watermark */
         .exam-pass::before {
-          content: "RICHVINE CLEARANCE";
+          content: "DPS Clearance";
           position: absolute;
           top: 35%;
           left: 10%;
@@ -1737,7 +1737,7 @@ const RichVineReports = (() => {
       <div class="controls-bar">
         <h2>
           <span>&#127891;</span>
-          <span>RichVine College &mdash; Examination Clearance Passes (${totalPasses} Cleared Learner${totalPasses > 1 ? 's' : ''} &bull; ${totalPages} A4 Sheet${totalPages > 1 ? 's' : ''})</span>
+          <span>DE PORTAL SCHOOLS &mdash; Examination Clearance Passes (${totalPasses} Cleared Learner${totalPasses > 1 ? 's' : ''} &bull; ${totalPages} A4 Sheet${totalPages > 1 ? 's' : ''})</span>
         </h2>
         <button class="btn-print" onclick="window.print()">
           <span>&#128424;</span> Print Passes (4 per A4)
@@ -1916,7 +1916,7 @@ const RichVineReports = (() => {
           <div class="slip-footer-micro">
             <span>Notice Date: ${issueDateStr}</span>
             <span>Ref: ${refSerial} &bull; Please disregard if payment was made in the last 24hrs</span>
-            <span>RichVine Bursary &bull; 2026/2027</span>
+            <span>De Portal Bursary &bull; 2026/2027</span>
           </div>
         </div>`;
 
@@ -1935,7 +1935,7 @@ const RichVineReports = (() => {
       <div class="a4-sheet">
         <div class="sheet-watermark-header no-print">
           <span>Sheet ${pIdx + 1} of ${totalPages} &bull; Class: <b>${page.className}</b> (${page.students.length} Reminder${page.students.length > 1 ? 's' : ''})</span>
-          <span style="font-size:11px;color:#dc2626;font-weight:700">RichVine College Fees Reminders &bull; 4 per A4</span>
+          <span style="font-size:11px;color:#dc2626;font-weight:700">DE PORTAL SCHOOLS Fees Reminders &bull; 4 per A4</span>
         </div>
         <div class="passes-container">
           ${remindersHtml}
@@ -2328,7 +2328,7 @@ const RichVineReports = (() => {
       <div class="controls-bar">
         <h2>
           <span>&#9888;</span>
-          <span>RichVine College &mdash; School Fees Reminders (${totalReminders} Debtor${totalReminders > 1 ? 's' : ''} &bull; ${totalPages} A4 Sheet${totalPages > 1 ? 's' : ''})</span>
+          <span>DE PORTAL SCHOOLS &mdash; School Fees Reminders (${totalReminders} Debtor${totalReminders > 1 ? 's' : ''} &bull; ${totalPages} A4 Sheet${totalPages > 1 ? 's' : ''})</span>
         </h2>
         <button class="btn-print" onclick="window.print()">
           <span>&#128424;</span> Print Reminders (4 per A4)
@@ -2460,7 +2460,7 @@ const RichVineReports = (() => {
 <body>
 <div class="page">
   <div class="header">
-    <h1><span style="font-size:16px">📋</span> RICHVINE COLLEGE — Expense Statement</h1>
+    <h1><span style="font-size:16px">📋</span> DE PORTAL SCHOOLS — Expense Statement</h1>
     <h2>Period: ${label}${sectionLabel}${periodTypeLabel}${categoryLabel}</h2>
   </div>
 
@@ -2514,7 +2514,7 @@ const RichVineReports = (() => {
 
   <div class="footer">
     <p>${config?.address || '5-7 Olukayode Street, Imoro, Ogijo, Shagamu - Ikorodu Road, Shagamu, Ogun State'}</p>
-    <p style="margin-top:4px">Generated on ${new Date().toLocaleString('en-GB')} by ${sessionStorage.getItem('richvine_admin_username') || 'Admin'}</p>
+    <p style="margin-top:4px">Generated on ${new Date().toLocaleString('en-GB')} by ${sessionStorage.getItem('dps_admin_username') || 'Admin'}</p>
     <button class="print-btn no-print" onclick="window.print()">🖨 Print / Save as PDF</button>
   </div>
 </div>
@@ -2528,7 +2528,7 @@ const RichVineReports = (() => {
   function printClassRecords(className) {
     className = className || 'All';
     const config = RichVineDB.getConfig();
-    const school = config?.schoolName || 'RICHVINE COLLEGE';
+    const school = config?.schoolName || 'DE PORTAL SCHOOLS';
     const motto = config?.motto || 'Excellence and Integrity';
     const addr = config?.address || '';
     const phone = config?.phone || '';
@@ -2733,7 +2733,7 @@ const RichVineReports = (() => {
     sectionFilter = sectionFilter || document.getElementById('clearance-section-filter')?.value || document.getElementById('report-section-filter')?.value || 'All';
 
     const config = RichVineDB.getConfig();
-    const school = config?.schoolName || 'RICHVINE COLLEGE';
+    const school = config?.schoolName || 'DE PORTAL SCHOOLS';
     const motto = config?.motto || 'Excellence and Integrity';
     const addr = config?.address || '';
     const phone = config?.phone || '';
@@ -2898,7 +2898,7 @@ const RichVineReports = (() => {
     sectionFilter = sectionFilter || document.getElementById('clearance-section-filter')?.value || document.getElementById('report-section-filter')?.value || 'All';
 
     const config = RichVineDB.getConfig();
-    const school = config?.schoolName || 'RICHVINE COLLEGE';
+    const school = config?.schoolName || 'DE PORTAL SCHOOLS';
     const motto = config?.motto || 'Excellence and Integrity';
     const addr = config?.address || '';
     const phone = config?.phone || '';
@@ -3109,7 +3109,7 @@ const RichVineReports = (() => {
     });
 
     const csv = rows.map(r => r.map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(",")).join("\n");
-    triggerDownload(csv, `RichVine_Cleared_Learners_${classFilter}_${new Date().toISOString().split("T")[0]}.csv`);
+    triggerDownload(csv, `DPS_Cleared_Learners_${classFilter}_${new Date().toISOString().split("T")[0]}.csv`);
   }
 
   function downloadDebtorsCSV(classFilter = 'All', sectionFilter = 'All') {
@@ -3147,7 +3147,7 @@ const RichVineReports = (() => {
     });
 
     const csv = rows.map(r => r.map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(",")).join("\n");
-    triggerDownload(csv, `RichVine_Debtors_List_${classFilter}_${new Date().toISOString().split("T")[0]}.csv`);
+    triggerDownload(csv, `DPS_Debtors_List_${classFilter}_${new Date().toISOString().split("T")[0]}.csv`);
   }
 
   // ── Salary / Payroll Statement (Excel Landscape Layout) ─────────────────
@@ -3350,7 +3350,7 @@ const RichVineReports = (() => {
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>RichVine College - Annual Staff Salary &amp; Payroll Schedule (${targetYear})</title>
+  <title>DE PORTAL SCHOOLS - Annual Staff Salary &amp; Payroll Schedule (${targetYear})</title>
   <style>
     @page {
       size: A4 landscape;
@@ -3578,7 +3578,7 @@ const RichVineReports = (() => {
     <!-- Ribbon Header -->
     <div class="excel-ribbon">
       <div class="excel-title">
-        <h1>RICHVINE COLLEGE &mdash; BURSARY DEPARTMENT</h1>
+        <h1>DE PORTAL SCHOOLS &mdash; BURSARY DEPARTMENT</h1>
         <p>STAFF SALARY &amp; PAYROLL SCHEDULE &mdash; ANNUAL DISBURSEMENT LEDGER (${targetYear})</p>
         <div class="sub-note">
           &bull; Accounting Rule: Section staff salaries are directly deducted from section revenue (Primary, Junior, Senior, General)
@@ -3588,7 +3588,7 @@ const RichVineReports = (() => {
         <b>Academic Year:</b> ${targetYear}<br>
         <b>Section Scope:</b> ${targetSection === "All" ? "All School Sections" : (SECTION_SHORT[targetSection] || targetSection)}<br>
         <b>Generated:</b> ${new Date().toLocaleDateString("en-GB", { day: '2-digit', month: 'short', year: 'numeric' })} at ${new Date().toLocaleTimeString("en-GB", { hour: '2-digit', minute: '2-digit' })}<br>
-        <b>Prepared by:</b> ${sessionStorage.getItem("richvine_admin_username") || "Super Admin"} (Bursar)
+        <b>Prepared by:</b> ${sessionStorage.getItem("dps_admin_username") || "Super Admin"} (Bursar)
       </div>
     </div>
 
@@ -3652,7 +3652,7 @@ const RichVineReports = (() => {
     <div class="excel-footer">
       <div>
         <b>Auditing &amp; Compliance:</b> All salary expenditures verified against bank transaction logs &amp; cash disbursement vouchers.<br>
-        RichVine College &bull; 5-7 Olukayode Street, Imoro, Ogijo, Ogun State &bull; Contact: 09053126809
+        DE PORTAL SCHOOLS &bull; 5-7 Olukayode Street, Imoro, Ogijo, Ogun State &bull; Contact: 09053126809
       </div>
       <div style="text-align:right">
         <b>Bursar Signature:</b> _________________________ &nbsp;&nbsp;&nbsp;
@@ -3663,7 +3663,7 @@ const RichVineReports = (() => {
 </body>
 </html>`;
 
-    printHtmlDocument(html, `RichVine_College_Salary_Report_${targetYear}`);
+    printHtmlDocument(html, `DPS_Salary_Report_${targetYear}`);
   }
 
   function triggerDownload(csvContent, filename) {
@@ -3684,8 +3684,8 @@ const RichVineReports = (() => {
     const summary = RichVineDB.getStaffLoanSummary(staffId);
     const loans = RichVineDB.getStaffLoans(staffId);
     const config = RichVineDB.getConfig();
-    const school = config.schoolName || "RICHVINE COLLEGE";
-    const addr = config.schoolAddress || "RichVine College Campus";
+    const school = config.schoolName || "DE PORTAL SCHOOLS";
+    const addr = config.schoolAddress || "DE PORTAL SCHOOLS Campus";
 
     const fmt = n => Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const isActive = (summary.loanBalance || 0) > 0;
@@ -3793,7 +3793,7 @@ const RichVineReports = (() => {
         <div class="sig-box">
           <div class="sig-line"></div>
           <div style="font-weight:700;font-size:12px">Bursar / Accounts Officer</div>
-          <div style="font-size:10.5px;color:#64748b">RichVine College Treasury</div>
+          <div style="font-size:10.5px;color:#64748b">DE PORTAL SCHOOLS Treasury</div>
         </div>
       </div>
 
@@ -3838,11 +3838,11 @@ const RichVineReports = (() => {
       ? window.BURSARIQ_CONFIG
       : dbConfig;
 
-    var schoolName  = cfg.schoolName  || 'RICHVINE COLLEGE';
+    var schoolName = cfg.schoolName || 'DE PORTAL SCHOOLS';
     var motto       = cfg.motto       || 'Soaring High';
     var address     = cfg.address     || '5-7 Olukayode Street, Imoro, Ogijo, Ogun State';
     var phone       = cfg.phone       || '09053126809';
-    var email       = cfg.contactEmail || cfg.email || 'admin@richvinecollege.edu.ng';
+    var email = cfg.contactEmail || cfg.email || 'admin@deportalschools.edu.ng';
     var currency    = cfg.currency    || '\u20a6';
 
     // Bank details resolution
@@ -3850,7 +3850,7 @@ const RichVineReports = (() => {
     var cfgBank = cfg.bankDetails || {};
     var bank = {
       name: optBank.name || cfgBank.name || 'Zenith Bank Plc',
-      accountName: optBank.accountName || cfgBank.accountName || 'RICHVINE COLLEGE',
+      accountName: optBank.accountName || cfgBank.accountName || 'DE PORTAL SCHOOLS',
       accountNumber: optBank.accountNumber || cfgBank.accountNumber || '1017482910'
     };
 
@@ -3939,7 +3939,7 @@ const RichVineReports = (() => {
 
       return '<div class="bill-invoice" id="invoice-' + idx + '">'
         + '<!-- Watermark Seal -->'
-        + '<div class="watermark-bg">RICHVINE COLLEGE</div>'
+        + '<div class="watermark-bg">DE PORTAL SCHOOLS</div>'
 
         + '<!-- Top School Identity -->'
         + '<div class="inv-head">'
@@ -4034,11 +4034,11 @@ const RichVineReports = (() => {
         +   '<div class="inv-sig-box">'
         +     '<div class="sig-line"></div>'
         +     '<div class="sig-title">Bursar / Accounts Officer</div>'
-        +     '<div class="sig-dept">RichVine College Treasury</div>'
+        +     '<div class="sig-dept">DE PORTAL SCHOOLS Treasury</div>'
         +   '</div>'
         +   '<div class="inv-stamp-box">'
         +     '<div class="stamp-circular">'
-        +       '<div class="stamp-txt-top">RICHVINE COLLEGE</div>'
+        +       '<div class="stamp-txt-top">DE PORTAL SCHOOLS</div>'
         +       '<div class="stamp-seal-badge">BURSARY<br>SEAL</div>'
         +       '<div class="stamp-txt-btm">TREASURY DEPT</div>'
         +     '</div>'
@@ -4524,7 +4524,7 @@ const RichVineReports = (() => {
 
       + '<div class="no-print-bar">'
       +   '<div>'
-      +     '<b style="font-size:14px;color:#2dd4bf">\uD83D\uDCCB RichVine College &bull; Official School Fees Bills &amp; Invoices</b>'
+      +     '<b style="font-size:14px;color:#2dd4bf">\uD83D\uDCCB DE PORTAL SCHOOLS &bull; Official School Fees Bills &amp; Invoices</b>'
       +     '<div style="font-size:11.5px;color:#94a3b8;margin-top:2px">Term: ' + termLabel + ' &nbsp;|&nbsp; ' + totalBills + ' learner(s) on ' + totalPages + ' A4 page(s) (4 per page)</div>'
       +   '</div>'
       +   '<div style="display:flex;gap:10px;align-items:center">'
@@ -4552,7 +4552,7 @@ const RichVineReports = (() => {
     var config   = RichVineDB.getConfig();
     var balInfo  = student ? RichVineDB.getTutorialStudentBalance(student.id) : null;
     var fmt = function(n){return Number(n||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});};
-    var cur = config.currency||'\u20a6'; var sName=config.schoolName||'RICHVINE COLLEGE';
+    var cur = config.currency||'\u20a6'; var sName=config.schoolName||'DE PORTAL SCHOOLS';
     var pDate = payment.date ? new Date(payment.date).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}) : new Date().toLocaleDateString('en-GB');
     var purposeText = payment.categoryName||'Tutorial Fee';
     if (payment.monthLabel) purposeText += ' &bull; '+payment.monthLabel;
@@ -4622,7 +4622,7 @@ const RichVineReports = (() => {
       +'<div class="sb"><div style="font-size:11px;color:#64748b">Balance Due</div><div style="font-size:16px;font-weight:800;color:'+(balInfo.totalMonthlyDue>0?'#dc2626':'#16a34a')+';margin-top:4px">'+cur+fmt(balInfo.totalMonthlyDue)+'</div></div></div>'
       +'<h4 style="margin:20px 0 8px;font-size:13px;font-weight:800">Transaction History</h4>'
       +(payments.length?'<table><thead><tr><th>#</th><th>Receipt No</th><th>Date</th><th>Category</th><th>Month</th><th>Method</th><th style="text-align:right">Amount</th></tr></thead><tbody>'+rows+'</tbody></table>':'<p style="color:#64748b;font-style:italic">No payments recorded yet.</p>')
-      +'<div style="margin-top:35px;border-top:1px solid #e2e8f0;padding-top:10px;display:flex;justify-content:space-between;font-size:11px;color:#94a3b8"><div>Powered by BursarIQ &bull; RichVine College</div><div>Every naira accounted for.</div></div>'
+      +'<div style="margin-top:35px;border-top:1px solid #e2e8f0;padding-top:10px;display:flex;justify-content:space-between;font-size:11px;color:#94a3b8"><div>Powered by BursarIQ &bull; DE PORTAL SCHOOLS</div><div>Every naira accounted for.</div></div>'
       +'</body></html>';
     printHtmlDocument(html, 'Tutorial Statement \u2014 '+student.firstName+' '+student.lastName);
   }
@@ -4716,3 +4716,4 @@ const RichVineReports = (() => {
 })();
 
 window.RichVineReports = RichVineReports;
+
