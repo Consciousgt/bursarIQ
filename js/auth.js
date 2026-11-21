@@ -3,13 +3,24 @@
  */
 
 const AUTH_KEY = "richvine_admin_session";
-const ADMIN_CREDENTIALS = (typeof window !== "undefined" && window.BURSARIQ_CONFIG && Array.isArray(window.BURSARIQ_CONFIG.adminCredentials))
-  ? window.BURSARIQ_CONFIG.adminCredentials
-  : [
-      { username: "admin", password: "password123", role: "Super Administrator", name: "Principal Administrator" },
-      { username: "bursar", password: "bursar123", role: "Chief Bursary Officer", name: "Mrs. A. Adeleke (Chief Bursar)" },
-      { username: "records", password: "record123", role: "Records Officer", name: "Mr. D. Okon (Academic Secretary)" }
-    ];
+function getActiveAdminCredentials() {
+  try {
+    const custom = localStorage.getItem("BURSARIQ_ADMIN_CREDS");
+    if (custom) {
+      const parsed = JSON.parse(custom);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch (_) {}
+
+  if (typeof window !== "undefined" && window.BURSARIQ_CONFIG && Array.isArray(window.BURSARIQ_CONFIG.adminCredentials)) {
+    return window.BURSARIQ_CONFIG.adminCredentials;
+  }
+  return [
+    { username: "admin", password: "password123", role: "Super Administrator", name: "Principal Administrator" },
+    { username: "bursar", password: "bursar123", role: "Chief Bursary Officer", name: "Mrs. A. Adeleke (Chief Bursar)" },
+    { username: "records", password: "record123", role: "Records Officer", name: "Mr. D. Okon (Academic Secretary)" }
+  ];
+}
 
 class RichVineAuth {
   static checkAuth() {
@@ -36,7 +47,8 @@ class RichVineAuth {
   static login(username, password) {
     const uClean = String(username || '').trim().toLowerCase();
     const pClean = String(password || '').trim();
-    const user = ADMIN_CREDENTIALS.find(u => {
+    const activeCreds = getActiveAdminCredentials();
+    const user = activeCreds.find(u => {
       const matchU = u.username.toLowerCase() === uClean;
       // Accept configured password OR known defaults (password123, richvine2025)
       const matchP = u.password === pClean || 

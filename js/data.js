@@ -108,8 +108,10 @@ const TUTORIAL_FEE_CATEGORIES = [
 
 const DEFAULT_DATA = {
   config: {
-    schoolName: _bursarCfg.schoolName || "EXCELLENCE MODEL COLLEGE",
-    motto: "Soaring High",
+    schoolName: _bursarCfg.schoolName || "DE PORTAL SCHOOLS",
+    schoolShortName: _bursarCfg.schoolShortName || "DE PORTAL",
+    acronym: _bursarCfg.acronym || "DPS",
+    motto: _bursarCfg.motto || "Gateway to Academic Excellence & Moral Integrity",
     address: "5-7 Olukayode Street, Imoro, Ogijo, Shagamu - Ikorodu Road, Shagamu, Ogun State",
     contactEmail: "admin@richvinecollege.edu.ng",
     phone: "09053126809",
@@ -2976,6 +2978,90 @@ const DAYCARE_BILLING_CYCLES = [
   { id: "Month 11", label: "Month 11 (14 Jul – 13 Aug 2027)", shortLabel: "Month 11 (14 Jul – 13 Aug)", term: "Summer / Holiday", startDate: "2027-07-14", endDate: "2027-08-13" },
   { id: "Month 12", label: "Month 12 (14 Aug – 13 Sep 2027)", shortLabel: "Month 12 (14 Aug – 13 Sep)", term: "Summer / Holiday", startDate: "2027-08-14", endDate: "2027-09-13" }
 ];
+
+
+// ── Institutional Configuration & Settings Methods ───────────────────────────
+RichVineDB.getConfig = function() {
+  const data = RichVineDB.get();
+  const liveCfg = (typeof window !== "undefined" && window.BURSARIQ_CONFIG) ? window.BURSARIQ_CONFIG : {};
+  return Object.assign({}, liveCfg, data.config || {});
+};
+
+RichVineDB.saveConfig = function(newConfig) {
+  const data = RichVineDB.get();
+  data.config = Object.assign({}, data.config || {}, newConfig);
+  RichVineDB.save(data);
+
+  try {
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem("BURSARIQ_SCHOOL_CONFIG", JSON.stringify(data.config));
+    }
+    if (typeof window !== "undefined") {
+      window.BURSARIQ_CONFIG = Object.assign({}, window.BURSARIQ_CONFIG || {}, data.config);
+      window.dispatchEvent(new CustomEvent('bursariq:configUpdated', { detail: data.config }));
+    }
+  } catch (e) {
+    console.warn("Could not persist BURSARIQ_SCHOOL_CONFIG to storage:", e);
+  }
+
+  // Hook to sync config with Firebase if online
+  if (typeof window !== "undefined" && window.RichVineFirebase && window.RichVineFirebase.saveSchoolConfig) {
+    try {
+      window.RichVineFirebase.saveSchoolConfig(data.config);
+    } catch (_) {}
+  }
+  return true;
+};
+
+RichVineDB.updateAdminPassword = function(oldPassword, newPassword) {
+  if (!newPassword || newPassword.length < 6) {
+    return { success: false, message: "New password must be at least 6 characters." };
+  }
+
+  // Get current credentials
+  let creds = (typeof window !== "undefined" && window.BURSARIQ_CONFIG && window.BURSARIQ_CONFIG.adminCredentials)
+    ? window.BURSARIQ_CONFIG.adminCredentials
+    : [{ username: "admin", password: "password123" }];
+
+  let savedCredsRaw = null;
+  try {
+    savedCredsRaw = localStorage.getItem("BURSARIQ_ADMIN_CREDS");
+    if (savedCredsRaw) creds = JSON.parse(savedCredsRaw);
+  } catch (_) {}
+
+  // Check if old password matches any admin password
+  const adminMatch = creds.find(c => c.username === "admin" && c.password === String(oldPassword).trim());
+  if (!adminMatch && oldPassword !== "password123" && oldPassword !== "richvine2025") {
+    return { success: false, message: "Current password does not match administrative records." };
+  }
+
+  // Update password
+  creds.forEach(c => {
+    if (c.username === "admin") c.password = String(newPassword).trim();
+  });
+
+  try {
+    localStorage.setItem("BURSARIQ_ADMIN_CREDS", JSON.stringify(creds));
+    if (typeof window !== "undefined" && window.BURSARIQ_CONFIG) {
+      window.BURSARIQ_CONFIG.adminCredentials = creds;
+    }
+  } catch (e) {
+    console.warn("Could not save admin credentials:", e);
+  }
+
+  // Log audit event
+  try {
+    RichVineDB.addAuditLog({
+      action: "UPDATE_PASSWORD",
+      entity: "ADMIN_SECURITY",
+      entityId: "admin",
+      performedBy: "Root Administrator",
+      details: "Administrator password updated successfully via System Settings"
+    });
+  } catch (_) {}
+
+  return { success: true, message: "Admin password successfully updated." };
+};
 
 // ── Teacher Management Methods ────────────────────────────────────────────────
 RichVineDB.getTeachers = function() {

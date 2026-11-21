@@ -471,20 +471,58 @@ a, button, input, select, textarea, label, [role="button"] {
   }
 }
 
-/* ── 8. Sidebar scroll containment for desktop ── */
-@media (min-width: 769px) {
-  #sidebar {
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-y: contain;
-  }
+/* ── 8. Universal Sidebar & Menu Scrolling for All Devices ── */
+#sidebar {
+  height: 100vh !important;
+  height: 100dvh !important;
+  max-height: 100vh !important;
+  max-height: 100dvh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
 
-  /* Custom scrollbar for dark sidebar */
-  #sidebar::-webkit-scrollbar { width: 4px; }
-  #sidebar::-webkit-scrollbar-track { background: transparent; }
-  #sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
-  #sidebar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
+#sidebar .sidebar-brand {
+  flex-shrink: 0 !important;
+}
+
+#sidebar nav,
+.sidebar nav,
+nav.sidebar-nav {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-y: contain !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(255, 255, 255, 0.25) rgba(0, 0, 0, 0.2) !important;
+}
+
+#sidebar nav::-webkit-scrollbar,
+nav::-webkit-scrollbar {
+  width: 6px !important;
+}
+
+#sidebar nav::-webkit-scrollbar-track,
+nav::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.25) !important;
+}
+
+#sidebar nav::-webkit-scrollbar-thumb,
+nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25) !important;
+  border-radius: 4px !important;
+}
+
+#sidebar nav::-webkit-scrollbar-thumb:hover,
+nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(56, 189, 248, 0.6) !important;
+}
+
+#sidebar .sidebar-footer {
+  flex-shrink: 0 !important;
 }
 
 /* ── 9. Bottom navigation safe area ── */

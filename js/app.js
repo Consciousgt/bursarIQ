@@ -186,6 +186,7 @@ const RichVineApp = (() => {
     else if (tab === "teachers") loadTeachersTab();
     else if (tab === "attendance") loadAttendanceTab();
     else if (tab === "exams-records") loadExamsRecordsTab();
+    else if (tab === "settings") loadSettingsTab();
 
     const sidebar = document.getElementById("sidebar");
     if (sidebar && window.innerWidth < 768) {
@@ -6594,6 +6595,144 @@ const RichVineApp = (() => {
 
   
 
+
+  // ── 15. INSTITUTIONAL SYSTEM SETTINGS CONTROLLER ──────────────────────────
+  let currentSettingsSubTab = "profile";
+
+  function switchSettingsSubTab(subTab) {
+    currentSettingsSubTab = subTab;
+    document.querySelectorAll(".settings-subpanel").forEach(p => p.classList.add("hidden"));
+    const target = document.getElementById("set-panel-" + subTab);
+    if (target) target.classList.remove("hidden");
+
+    const tabs = ["profile", "finance", "security", "database"];
+    tabs.forEach(t => {
+      const btn = document.getElementById("set-subtab-" + t + "-btn");
+      if (btn) btn.className = (t === subTab) ? "btn-primary" : "btn-secondary";
+    });
+  }
+
+  function loadSettingsTab() {
+    const cfg = RichVineDB.getConfig ? RichVineDB.getConfig() : {};
+    
+    // School Identity fields
+    const elName = document.getElementById("set-school-name");
+    const elShort = document.getElementById("set-school-short-name");
+    const elAcronym = document.getElementById("set-school-acronym");
+    const elMotto = document.getElementById("set-school-motto");
+    const elAddress = document.getElementById("set-school-address");
+    const elPhone = document.getElementById("set-school-phone");
+    const elAdminPhone = document.getElementById("set-school-admin-phone");
+    const elEmail = document.getElementById("set-school-email");
+    const elWeb = document.getElementById("set-school-website");
+
+    if (elName) elName.value = cfg.schoolName || "DE PORTAL SCHOOLS";
+    if (elShort) elShort.value = cfg.schoolShortName || "DE PORTAL";
+    if (elAcronym) elAcronym.value = cfg.acronym || "DPS";
+    if (elMotto) elMotto.value = cfg.motto || "Gateway to Academic Excellence & Moral Integrity";
+    if (elAddress) elAddress.value = cfg.address || "12 Education Boulevard, Victoria Island / Ikeja, Lagos State, Nigeria";
+    if (elPhone) elPhone.value = cfg.phone || "08012345678";
+    if (elAdminPhone) elAdminPhone.value = cfg.adminContact || cfg.phone || "08012345678";
+    if (elEmail) elEmail.value = cfg.contactEmail || "admin@deportalschools.edu.ng";
+    if (elWeb) elWeb.value = cfg.websiteUrl || "https://deportalschools.edu.ng";
+
+    // Calendar & Bank fields
+    const elSession = document.getElementById("set-current-session");
+    const elTerm = document.getElementById("set-current-term");
+    const elCurrency = document.getElementById("set-currency-symbol");
+    const elBank = document.getElementById("set-bank-name");
+    const elAccName = document.getElementById("set-account-name");
+    const elAccNum = document.getElementById("set-account-number");
+    const elTin = document.getElementById("set-tin-number");
+
+    if (elSession) elSession.value = cfg.currentSession || "2026/2027";
+    if (elTerm) elTerm.value = cfg.currentTerm || "1st Term";
+    if (elCurrency) elCurrency.value = cfg.currencySymbol || cfg.currency || "₦";
+
+    const bank = cfg.bankDetails || {};
+    if (elBank) elBank.value = bank.bankName || "Zenith Bank Plc";
+    if (elAccName) elAccName.value = bank.accountName || (cfg.schoolName + " - BURSARY");
+    if (elAccNum) elAccNum.value = bank.accountNumber || "1012345678";
+    if (elTin) elTin.value = bank.tinNumber || "TIN-9876543210";
+
+    switchSettingsSubTab(currentSettingsSubTab);
+  }
+
+  function saveSettingsForm() {
+    const schoolName = (document.getElementById("set-school-name")?.value || "").trim();
+    if (!schoolName) {
+      showAlert("School name is required", "error");
+      return;
+    }
+
+    const updatedConfig = {
+      schoolName: schoolName,
+      schoolShortName: (document.getElementById("set-school-short-name")?.value || "").trim() || schoolName,
+      acronym: (document.getElementById("set-school-acronym")?.value || "DPS").trim().toUpperCase(),
+      motto: (document.getElementById("set-school-motto")?.value || "").trim(),
+      address: (document.getElementById("set-school-address")?.value || "").trim(),
+      phone: (document.getElementById("set-school-phone")?.value || "").trim(),
+      adminContact: (document.getElementById("set-school-admin-phone")?.value || "").trim(),
+      contactEmail: (document.getElementById("set-school-email")?.value || "").trim(),
+      websiteUrl: (document.getElementById("set-school-website")?.value || "").trim(),
+      currentSession: (document.getElementById("set-current-session")?.value || "2026/2027").trim(),
+      currentTerm: (document.getElementById("set-current-term")?.value || "1st Term").trim(),
+      currencySymbol: (document.getElementById("set-currency-symbol")?.value || "₦").trim(),
+      bankDetails: {
+        bankName: (document.getElementById("set-bank-name")?.value || "").trim(),
+        accountName: (document.getElementById("set-account-name")?.value || "").trim(),
+        accountNumber: (document.getElementById("set-account-number")?.value || "").trim(),
+        tinNumber: (document.getElementById("set-tin-number")?.value || "").trim()
+      }
+    };
+
+    if (RichVineDB.saveConfig) {
+      RichVineDB.saveConfig(updatedConfig);
+    }
+
+    // Immediately update brand in DOM
+    document.querySelectorAll(".school-name-text").forEach(el => { el.textContent = updatedConfig.schoolName; });
+    document.querySelectorAll(".school-short-name-text").forEach(el => { el.textContent = updatedConfig.schoolShortName; });
+    document.querySelectorAll(".school-motto-text").forEach(el => { el.textContent = updatedConfig.motto; });
+    document.querySelectorAll(".school-acronym-text").forEach(el => { el.textContent = updatedConfig.acronym; });
+    document.querySelectorAll(".school-address-text").forEach(el => { el.textContent = updatedConfig.address; });
+    document.querySelectorAll(".school-phone-text").forEach(el => { el.textContent = updatedConfig.phone; });
+    document.querySelectorAll(".school-email-text").forEach(el => { el.textContent = updatedConfig.contactEmail; });
+    document.querySelectorAll(".school-session-text").forEach(el => { el.textContent = updatedConfig.currentSession; });
+    document.querySelectorAll(".school-term-text").forEach(el => { el.textContent = updatedConfig.currentTerm; });
+    
+    showToast("System settings successfully updated and live!", "success");
+  }
+
+  function changeAdminPasswordSubmit() {
+    const oldPass = (document.getElementById("set-old-password")?.value || "").trim();
+    const newPass = (document.getElementById("set-new-password")?.value || "").trim();
+    const confirmPass = (document.getElementById("set-confirm-password")?.value || "").trim();
+
+    if (!oldPass || !newPass) {
+      showAlert("Please enter both current and new password.", "error");
+      return;
+    }
+    if (newPass !== confirmPass) {
+      showAlert("New passwords do not match. Please re-enter.", "error");
+      return;
+    }
+    if (newPass.length < 6) {
+      showAlert("Password must be at least 6 characters long.", "error");
+      return;
+    }
+
+    const res = RichVineDB.updateAdminPassword ? RichVineDB.updateAdminPassword(oldPass, newPass) : { success: false, message: "Method not available" };
+    if (res.success) {
+      document.getElementById("set-old-password").value = "";
+      document.getElementById("set-new-password").value = "";
+      document.getElementById("set-confirm-password").value = "";
+      showToast("Administrator password updated successfully!", "success");
+    } else {
+      showAlert(res.message, "error");
+    }
+  }
+
   return {
     exportDatabaseBackup,
     importDatabaseBackup,
@@ -6738,6 +6877,10 @@ const RichVineApp = (() => {
     openTutorialProfile,
     openStakeholdersModal,
     calcSalaryNetPay,
+    switchSettingsSubTab,
+    loadSettingsTab,
+    saveSettingsForm,
+    changeAdminPasswordSubmit,
     loadTeachersTab,
     generateTeacherPassword,
     openAddTeacherModal,
