@@ -431,6 +431,23 @@ service cloud.firestore {
         (!('updatedAt' in data) || data.updatedAt == null || (data.updatedAt is string && data.updatedAt.size() <= 60) || (data.updatedAt is number && data.updatedAt > 0) || data.updatedAt is timestamp);
     }
 
+        function isValidWeeklyPerformance(perfId) {
+      let data = request.resource.data;
+      return hasAllFields(['studentId', 'className', 'subject']) &&
+        data.id == perfId &&
+        validStringLength('studentId', 1, 60) &&
+        validStringLength('className', 1, 50) &&
+        validStringLength('subject', 1, 80) &&
+        validOptionalString('studentName', 0, 150) &&
+        validOptionalString('regNo', 0, 50) &&
+        validOptionalString('notes', 0, 50) &&
+        validOptionalString('behaviour', 0, 50) &&
+        validOptionalString('attentiveness', 0, 50) &&
+        validOptionalString('teacherRemark', 0, 300) &&
+        validOptionalString('recordedBy', 0, 100) &&
+        (!('testScore' in data) || (data.testScore is number && data.testScore >= 0 && data.testScore <= 100));
+    }
+
     function isExamRecordUpdateValid(recordId) {
       return isValidExamRecord(recordId) &&
         request.resource.data.id == resource.data.id &&
@@ -558,11 +575,18 @@ service cloud.firestore {
       allow delete: if canWriteData();
     }
 
-    // 16. EXAMS & REPORT CARD RECORDS
+        // 16. EXAMS & REPORT CARD RECORDS
     match /examRecords/{recordId} {
       allow read: if canReadData();
       allow create: if canWriteData() && isValidExamRecord(recordId);
       allow update: if canWriteData() && isExamRecordUpdateValid(recordId);
+      allow delete: if canWriteData();
+    }
+
+    // 17. WEEKLY STUDENT PERFORMANCE (Subject Teacher Assessment)
+    match /weeklyPerformance/{perfId} {
+      allow read: if canReadData();
+      allow create, update: if canWriteData() && isValidWeeklyPerformance(perfId);
       allow delete: if canWriteData();
     }
 

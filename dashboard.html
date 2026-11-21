@@ -1044,8 +1044,8 @@
 <!-- ═══════════════ SIDEBAR ═══════════════ -->
 <aside id="sidebar">
   <div class="sidebar-brand">
-    <div class="brand-logo">RV</div>
-    <h2><span class="school-name-text">EXCELLENCE MODEL COLLEGE</span></h2>
+    <div class="brand-logo"><span class="school-acronym-text">DPS</span></div>
+    <h2><span class="school-name-text">DE PORTAL SCHOOLS</span></h2>
     <p>Admin Portal — 2026/2027</p>
   </div>
 
@@ -5085,16 +5085,34 @@
           <label style="font-size:12px;font-weight:700;color:var(--gray-700);display:block;margin-bottom:4px">Phone Number (Login Username) *</label>
           <input type="tel" id="tch-form-phone" class="form-control" required placeholder="e.g. 08012345671">
         </div>
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--gray-700);display:block;margin-bottom:4px">Staff Appointment Role *</label>
+          <select id="tch-form-role" class="form-control">
+            <option value="Class & Subject Teacher">Class & Subject Teacher (Both)</option>
+            <option value="Class Teacher">Class Teacher Only</option>
+            <option value="Subject Teacher">Subject Teacher Only</option>
+          </select>
+        </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
           <div>
-            <label style="font-size:12px;font-weight:700;color:var(--gray-700);display:block;margin-bottom:4px">Assigned Class Teacher *</label>
-            <select id="tch-form-class" class="form-control" required>
-              <option value="SSS 1">SSS 1</option>
-              <option value="SSS 2">SSS 2</option>
-              <option value="SSS 3">SSS 3</option>
-              <option value="JSS 1">JSS 1</option>
-              <option value="JSS 2">JSS 2</option>
-              <option value="JSS 3">JSS 3</option>
+            <label style="font-size:12px;font-weight:700;color:var(--gray-700);display:block;margin-bottom:4px">Assigned Class (Roll Call)</label>
+            <select id="tch-form-class" class="form-control">
+              <option value="">None (Subject Specialist)</option>
+              <option value="SSS 1 Science">SSS 1 Science</option>
+              <option value="SSS 1 Art">SSS 1 Art</option>
+              <option value="SSS 1 Commercial">SSS 1 Commercial</option>
+              <option value="SSS 2 Science">SSS 2 Science</option>
+              <option value="SSS 2 Art">SSS 2 Art</option>
+              <option value="SSS 2 Commercial">SSS 2 Commercial</option>
+              <option value="SSS 3 Science">SSS 3 Science</option>
+              <option value="SSS 3 Art">SSS 3 Art</option>
+              <option value="SSS 3 Commercial">SSS 3 Commercial</option>
+              <option value="JSS 1A">JSS 1A</option>
+              <option value="JSS 1B">JSS 1B</option>
+              <option value="JSS 2A">JSS 2A</option>
+              <option value="JSS 2B">JSS 2B</option>
+              <option value="JSS 3A">JSS 3A</option>
+              <option value="JSS 3B">JSS 3B</option>
               <option value="Primary 1">Primary 1</option>
               <option value="Primary 2">Primary 2</option>
               <option value="Primary 3">Primary 3</option>
@@ -5113,7 +5131,12 @@
         </div>
         <div>
           <label style="font-size:12px;font-weight:700;color:var(--gray-700);display:block;margin-bottom:4px">Teaching Subject(s)</label>
-          <input type="text" id="tch-form-subjects" class="form-control" placeholder="e.g. Mathematics, Further Maths">
+          <input type="text" id="tch-form-subjects" class="form-control" placeholder="e.g. Mathematics, Physics, Chemistry">
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--gray-700);display:block;margin-bottom:4px">Classes Offering These Subjects (Subject Arms)</label>
+          <input type="text" id="tch-form-assigned-classes" class="form-control" placeholder="e.g. SSS 1 Science, SSS 1 Art, SSS 2 Commercial">
+          <p style="font-size:11px;color:var(--gray-500);margin-top:2px">Comma-separated class arms where this teacher takes subjects.</p>
         </div>
         <div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">

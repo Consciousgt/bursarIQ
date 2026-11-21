@@ -112,10 +112,10 @@ const DEFAULT_DATA = {
     schoolShortName: _bursarCfg.schoolShortName || "DE PORTAL",
     acronym: _bursarCfg.acronym || "DPS",
     motto: _bursarCfg.motto || "Gateway to Academic Excellence & Moral Integrity",
-    address: "5-7 Olukayode Street, Imoro, Ogijo, Shagamu - Ikorodu Road, Shagamu, Ogun State",
-    contactEmail: "admin@richvinecollege.edu.ng",
-    phone: "09053126809",
-    adminContact: "09053126809",
+    address: _bursarCfg.address || "12 Education Boulevard, Victoria Island / Ikeja, Lagos State, Nigeria",
+    contactEmail: _bursarCfg.contactEmail || "admin@deportalschools.edu.ng",
+    phone: _bursarCfg.phone || "08012345678",
+    adminContact: _bursarCfg.adminContact || "08012345678",
     currentSession: "2026/2027",
     currentTerm: "1st Term",
     currency: "₦"
@@ -152,7 +152,188 @@ const DEFAULT_DATA = {
   ],
 
   // Fresh, empty collections
-  students: [],
+  students: [
+    {
+      id: "DPS-2026-001",
+      regNo: "DPS/2026/001",
+      name: "Adeleke Chukwuemeka",
+      class: "Primary 1",
+      section: "primary",
+      gender: "Male",
+      parentName: "Engr. & Mrs. Adeleke",
+      parentPhone: "08023456781",
+      address: "14 Palm Avenue, Lagos",
+      termFee: 55000,
+      pastArrears: 0,
+      status: "Active",
+      createdAt: 1718000000000
+    },
+    {
+      id: "DPS-2026-002",
+      regNo: "DPS/2026/002",
+      name: "Ibrahim Zainab Folashade",
+      class: "Primary 4",
+      section: "primary",
+      gender: "Female",
+      parentName: "Alhaji Ibrahim",
+      parentPhone: "08034567892",
+      address: "22 Victoria Island, Lagos",
+      termFee: 65000,
+      pastArrears: 0,
+      status: "Active",
+      createdAt: 1718000001000
+    },
+    {
+      id: "DPS-2026-003",
+      regNo: "DPS/2026/003",
+      name: "Okonkwo Somtochukwu",
+      class: "JSS 2B",
+      section: "junior_secondary",
+      gender: "Male",
+      parentName: "Chief Okonkwo",
+      parentPhone: "08056789014",
+      address: "8 Airport Road, Ikeja, Lagos",
+      termFee: 85000,
+      pastArrears: 0,
+      status: "Active",
+      createdAt: 1718000003000
+    },
+    {
+      id: "DPS-2026-004",
+      regNo: "DPS/2026/004",
+      name: "Bello Faruq Alabi",
+      class: "JSS 2B",
+      section: "junior_secondary",
+      gender: "Male",
+      parentName: "Mr. K. Bello",
+      parentPhone: "08061234567",
+      address: "5 Allen Avenue, Ikeja, Lagos",
+      termFee: 85000,
+      pastArrears: 0,
+      status: "Active",
+      createdAt: 1718000003500
+    },
+    {
+      id: "DPS-2026-005",
+      regNo: "DPS/2026/005",
+      name: "Balogun Aisha Temitope",
+      class: "SSS 1 Science",
+      section: "senior_secondary",
+      gender: "Female",
+      parentName: "Dr. & Mrs. Balogun",
+      parentPhone: "08078901236",
+      address: "18 Admiralty Way, Lekki, Lagos",
+      termFee: 105000,
+      pastArrears: 0,
+      status: "Active",
+      createdAt: 1718000005000
+    },
+    {
+      id: "DPS-2026-006",
+      regNo: "DPS/2026/006",
+      name: "Chukwuma David Nnamdi",
+      class: "SSS 1 Science",
+      section: "senior_secondary",
+      gender: "Male",
+      parentName: "Engr. Chukwuma",
+      parentPhone: "08090123458",
+      address: "24 Bode Thomas, Surulere, Lagos",
+      termFee: 105000,
+      pastArrears: 0,
+      status: "Active",
+      createdAt: 1718000005500
+    },
+    {
+      id: "DPS-2026-007",
+      regNo: "DPS/2026/007",
+      name: "Danjuma Maryam Hauwa",
+      class: "SSS 1 Science",
+      section: "senior_secondary",
+      gender: "Female",
+      parentName: "Alhaji Danjuma",
+      parentPhone: "08081234569",
+      address: "12 GRA, Ikeja, Lagos",
+      termFee: 105000,
+      pastArrears: 0,
+      status: "Active",
+      createdAt: 1718000006000
+    },
+    {
+      id: "DPS-2026-008",
+      regNo: "DPS/2026/008",
+      name: "Eze Princewill Obinna",
+      class: "SSS 1 Science",
+      section: "senior_secondary",
+      gender: "Male",
+      parentName: "Mr. & Mrs. Eze",
+      parentPhone: "08039876543",
+      address: "7 Maryland Crescent, Lagos",
+      termFee: 105000,
+      pastArrears: 0,
+      status: "Active",
+      createdAt: 1718000006500
+    },
+    {
+      id: "DPS-2026-009",
+      regNo: "DPS/2026/009",
+      name: "Fashola Daniel Ayomide",
+      class: "SSS 1 Art",
+      section: "senior_secondary",
+      gender: "Male",
+      parentName: "Barrister Fashola",
+      parentPhone: "08021112233",
+      address: "15 Yaba College Road, Lagos",
+      termFee: 100000,
+      pastArrears: 0,
+      status: "Active",
+      createdAt: 1718000007000
+    },
+    {
+      id: "DPS-2026-010",
+      regNo: "DPS/2026/010",
+      name: "Garba Amina Sani",
+      class: "SSS 1 Art",
+      section: "senior_secondary",
+      gender: "Female",
+      parentName: "Malam Garba",
+      parentPhone: "08033334455",
+      address: "9 Ikoyi Crescent, Lagos",
+      termFee: 100000,
+      pastArrears: 0,
+      status: "Active",
+      createdAt: 1718000007500
+    },
+    {
+      id: "DPS-2026-011",
+      regNo: "DPS/2026/011",
+      name: "Williams Kehinde Michael",
+      class: "SSS 2 Commercial",
+      section: "senior_secondary",
+      gender: "Male",
+      parentName: "Pastor Williams",
+      parentPhone: "08089012347",
+      address: "41 Ikorodu Road, Maryland, Lagos",
+      termFee: 110000,
+      pastArrears: 0,
+      status: "Active",
+      createdAt: 1718000008000
+    },
+    {
+      id: "DPS-2026-012",
+      regNo: "DPS/2026/012",
+      name: "Yusuf Fatima Zahra",
+      class: "SSS 2 Commercial",
+      section: "senior_secondary",
+      gender: "Female",
+      parentName: "Alhaji Yusuf",
+      parentPhone: "08077778899",
+      address: "3 Opebi Road, Ikeja, Lagos",
+      termFee: 110000,
+      pastArrears: 0,
+      status: "Active",
+      createdAt: 1718000008500
+    }
+  ],
   payments: [],
   expenses: [],
   stocks: [],
@@ -162,7 +343,45 @@ const DEFAULT_DATA = {
   staff: [],
   salaries: [],
   staffLoans: [],
-    teachers: [
+    weeklyPerformance: [
+    {
+      id: "WKP-DPS-2026-005-Math-W1",
+      studentId: "DPS-2026-005",
+      studentName: "Balogun Aisha Temitope",
+      regNo: "DPS/2026/005",
+      className: "SSS 1 Science",
+      subject: "Mathematics",
+      week: "1",
+      term: "1st Term",
+      session: "2026/2027",
+      notes: "Submitted",
+      behaviour: "Excellent",
+      attentiveness: "High",
+      testScore: 18,
+      testMax: 20,
+      teacherRemark: "Very sharp and participatory in quadratic equations.",
+      recordedBy: "Mr. Emmanuel Adebayo"
+    },
+    {
+      id: "WKP-DPS-2026-006-Math-W1",
+      studentId: "DPS-2026-006",
+      studentName: "Chukwuma David Nnamdi",
+      regNo: "DPS/2026/006",
+      className: "SSS 1 Science",
+      subject: "Mathematics",
+      week: "1",
+      term: "1st Term",
+      session: "2026/2027",
+      notes: "Submitted",
+      behaviour: "Good",
+      attentiveness: "High",
+      testScore: 16,
+      testMax: 20,
+      teacherRemark: "Neat notes and solved practice drills correctly.",
+      recordedBy: "Mr. Emmanuel Adebayo"
+    }
+  ],
+  teachers: [
     {
       id: "TCH-001",
       staffId: "STF/003",
@@ -171,7 +390,7 @@ const DEFAULT_DATA = {
       password: "password123",
       assignedClass: "SSS 1 Science",
       assignedClasses: ["SSS 1 Science", "SSS 1 Art", "SSS 1 Commercial"],
-      role: "Class Teacher",
+      role: "Class & Subject Teacher",
       subjects: ["Mathematics", "Physics"],
       status: "Active",
       createdAt: 1729000000000
@@ -184,7 +403,7 @@ const DEFAULT_DATA = {
       password: "password123",
       assignedClass: "JSS 2B",
       assignedClasses: ["JSS 2B", "JSS 2A"],
-      role: "Class Teacher",
+      role: "Class & Subject Teacher",
       subjects: ["English Language", "Literature in English"],
       status: "Active",
       createdAt: 1729000001000
@@ -197,10 +416,23 @@ const DEFAULT_DATA = {
       password: "password123",
       assignedClass: "SSS 2 Commercial",
       assignedClasses: ["SSS 2 Commercial", "SSS 2 Art"],
-      role: "Class Teacher",
+      role: "Class & Subject Teacher",
       subjects: ["Economics", "Commerce"],
       status: "Active",
       createdAt: 1729000002000
+    },
+    {
+      id: "TCH-004",
+      staffId: "STF/006",
+      name: "Dr. (Mrs) Ngozi Eze",
+      phone: "08045678901",
+      password: "password123",
+      assignedClass: null,
+      assignedClasses: ["SSS 1 Science", "SSS 2 Science", "SSS 3 Science"],
+      role: "Subject Teacher",
+      subjects: ["Biology", "Chemistry"],
+      status: "Active",
+      createdAt: 1729000003000
     }
   ],
     attendance: [
@@ -467,6 +699,8 @@ class RichVineDB {
     if (!data.teachers || data.teachers.length === 0) data.teachers = JSON.parse(JSON.stringify(DEFAULT_DATA.teachers || []));
     if (!data.attendance) data.attendance = JSON.parse(JSON.stringify(DEFAULT_DATA.attendance || []));
     if (!data.examRecords) data.examRecords = JSON.parse(JSON.stringify(DEFAULT_DATA.examRecords || []));
+    if (!data.weeklyPerformance) data.weeklyPerformance = JSON.parse(JSON.stringify(DEFAULT_DATA.weeklyPerformance || []));
+    if (!data.students || data.students.length === 0) data.students = JSON.parse(JSON.stringify(DEFAULT_DATA.students || []));
       if (!data.tutorialStudents) data.tutorialStudents = [];
       if (!data.tutorialPayments) data.tutorialPayments = [];
 
@@ -3166,6 +3400,106 @@ RichVineDB.getStudentAttendanceSummary = function(studentId, days) {
     else if (rec.status === 'Late') late++;
   });
   return { present, absent, late, total, rate: total ? Math.round((present / total) * 100) : 0 };
+};
+
+
+// ── Weekly Student Performance & Subject Methods ────────────────────────────
+RichVineDB.getWeeklyPerformance = function(filters) {
+  const data = RichVineDB.get();
+  let list = data.weeklyPerformance || [];
+  if (!filters) return list;
+  if (filters.className) {
+    list = list.filter(r => (r.className || '').toLowerCase().trim() === filters.className.toLowerCase().trim());
+  }
+  if (filters.subject) {
+    list = list.filter(r => (r.subject || '').toLowerCase().trim() === filters.subject.toLowerCase().trim());
+  }
+  if (filters.week !== undefined && filters.week !== null && filters.week !== '') {
+    list = list.filter(r => String(r.week) === String(filters.week));
+  }
+  if (filters.term) {
+    list = list.filter(r => (r.term || '').toLowerCase().trim() === filters.term.toLowerCase().trim());
+  }
+  if (filters.session) {
+    list = list.filter(r => (r.session || '').toLowerCase().trim() === filters.session.toLowerCase().trim());
+  }
+  if (filters.studentId) {
+    list = list.filter(r => r.studentId === filters.studentId);
+  }
+  return list;
+};
+
+RichVineDB.saveWeeklyPerformance = function(record) {
+  const data = RichVineDB.get();
+  if (!data.weeklyPerformance) data.weeklyPerformance = [];
+
+  const studentId = record.studentId;
+  const subject = record.subject;
+  const week = String(record.week || '1');
+  const term = record.term || '1st Term';
+  const session = record.session || '2026/2027';
+
+  const idx = data.weeklyPerformance.findIndex(r => 
+    r.studentId === studentId &&
+    (r.subject || '').toLowerCase().trim() === (subject || '').toLowerCase().trim() &&
+    String(r.week) === week &&
+    (r.term || '1st Term').toLowerCase().trim() === term.toLowerCase().trim() &&
+    (r.session || '2026/2027') === session
+  );
+
+  const now = new Date().toISOString();
+  if (idx !== -1) {
+    data.weeklyPerformance[idx] = { ...data.weeklyPerformance[idx], ...record, updatedAt: now };
+  } else {
+    const id = record.id || ('WKP-' + Date.now() + '-' + Math.floor(Math.random() * 10000));
+    data.weeklyPerformance.push({ ...record, id, createdAt: now, updatedAt: now });
+  }
+
+  RichVineDB.save(data);
+
+  if (typeof window !== "undefined" && window.RichVineFirebase && window.RichVineFirebase.saveWeeklyPerformance) {
+    window.RichVineFirebase.saveWeeklyPerformance(record);
+  }
+  return true;
+};
+
+RichVineDB.getAllSubjects = function() {
+  return [
+    "Mathematics",
+    "English Language",
+    "Biology",
+    "Physics",
+    "Chemistry",
+    "Economics",
+    "Government",
+    "Commerce",
+    "Literature in English",
+    "Civic Education",
+    "Agricultural Science",
+    "Further Mathematics",
+    "Basic Science",
+    "Basic Technology",
+    "Social Studies",
+    "Business Studies"
+  ];
+};
+
+RichVineDB.getClassesForTeacher = function(teacher) {
+  if (!teacher) return [];
+  const classesSet = new Set();
+  if (teacher.assignedClass && teacher.assignedClass !== 'None' && teacher.assignedClass !== 'Unassigned') {
+    classesSet.add(teacher.assignedClass);
+  }
+  if (Array.isArray(teacher.assignedClasses)) {
+    teacher.assignedClasses.forEach(c => classesSet.add(c));
+  }
+  // If teacher has subjects but no classes assigned, allow all school classes
+  if (classesSet.size === 0 && teacher.subjects && teacher.subjects.length > 0) {
+    if (typeof ALL_CLASSES !== "undefined") {
+      ALL_CLASSES.forEach(c => classesSet.add(c));
+    }
+  }
+  return Array.from(classesSet);
 };
 
 // ── Exam Record Methods ────────────────────────────────────────────────────────

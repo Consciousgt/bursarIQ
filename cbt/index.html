@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="theme-color" content="#0080c8">
-  <title><span class="school-name-text">EXCELLENCE MODEL COLLEGE</span> — Student CBT Examination Portal</title>
+  <title>Student CBT Examination Portal — De Portal Schools | Powered by BursarIQ</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -329,7 +329,7 @@
             <span>Attempt Already Completed</span>
           </div>
           <p class="text-xs text-slate-600">
-            You have already written this General Mathematics test. Under <span class="school-name-text">EXCELLENCE MODEL COLLEGE</span> CBT regulations, multiple attempts are strictly disallowed.
+            You have already written this General Mathematics test. Under <span class="school-name-text">DE PORTAL SCHOOLS</span> CBT regulations, multiple attempts are strictly disallowed.
           </p>
           <div class="bg-white p-3 rounded-lg border border-emerald-100 flex items-center justify-between">
             <div>
@@ -630,7 +630,7 @@
           <i class="fas fa-award"></i>
         </div>
         <h2 class="text-xl sm:text-2xl font-black">Examination Completed!</h2>
-        <p class="text-xs text-sky-100 mt-0.5">Your official assessment score has been recorded in <span class="school-name-text">EXCELLENCE MODEL COLLEGE</span> records.</p>
+        <p class="text-xs text-sky-100 mt-0.5">Your official assessment score has been recorded in <span class="school-name-text">DE PORTAL SCHOOLS</span> records.</p>
       </div>
 
       <div class="p-5 sm:p-8 space-y-6">
@@ -754,10 +754,10 @@
     
     <!-- Slip Header -->
     <div class="text-center border-b-2 border-slate-900 pb-4 mb-4">
-      <h1 class="text-2xl font-black tracking-tight text-slate-900"><span class="school-name-text">EXCELLENCE MODEL COLLEGE</span></h1>
-      <p class="text-xs font-bold uppercase tracking-widest text-slate-600">Motto: Soaring High</p>
-      <p class="text-xs text-slate-600 mt-0.5">5-7 Olukayode Street, Imoro, Ogijo, Shagamu - Ikorodu Road, Shagamu, Ogun State</p>
-      <p class="text-xs text-slate-600">Admin Contact: 09053126809 | Email: admissions@richvinecollege.edu.ng</p>
+      <h1 class="text-2xl font-black tracking-tight text-slate-900"><span class="school-name-text">DE PORTAL SCHOOLS</span></h1>
+      <p class="text-xs font-bold uppercase tracking-widest text-slate-600">Motto: <span class="school-motto-text">Gateway to Academic Excellence & Moral Integrity</span></p>
+      <p class="text-xs text-slate-600 mt-0.5"><span class="school-address-text">12 Education Boulevard, Victoria Island / Ikeja, Lagos State, Nigeria</span></p>
+      <p class="text-xs text-slate-600">Admin Contact: <span class="school-phone-text">08012345678</span> | Email: <span class="school-email-text">admin@deportalschools.edu.ng</span></p>
       <div class="mt-2 text-xs font-bold uppercase bg-slate-100 py-1 border border-slate-300">
         OFFICIAL COMPUTER-BASED TEST (CBT) EXAMINATION RESULT SLIP
       </div>
@@ -831,7 +831,7 @@
     </div>
 
     <div class="mt-8 text-center text-[10px] text-slate-400 border-t border-slate-200 pt-2">
-      Powered by BursarIQ Assessment Engine &bull; Every naira accounted for. &bull; Generated automatically by <span class="school-name-text">EXCELLENCE MODEL COLLEGE</span> CBT System • Verification Hash: <span id="slip-hash">RVC-VERIFIED</span> • Valid without alterations.
+      Powered by BursarIQ Assessment Engine &bull; Every naira accounted for. &bull; Generated automatically by <span class="school-name-text">DE PORTAL SCHOOLS</span> CBT System • Verification Hash: <span id="slip-hash">DPS-VERIFIED</span> • Valid without alterations.
     </div>
 
   </div>
@@ -847,31 +847,30 @@
     (function () {
       'use strict';
 
-      // ── KaTeX Mathematical Formula Renderer ───────────────────────────────
+      // ── KaTeX Mathematical & Scientific Formula Renderer ──────────────────
       function renderLatex(container) {
         if (!container) return;
         var options = {
           delimiters: [
             { left: '$$', right: '$$', display: true },
-            { left: '$', right: '$', display: false }
+            { left: '$', right: '$', display: false },
+            { left: '\\[', right: '\\]', display: true },
+            { left: '\\(', right: '\\)', display: false }
           ],
           throwOnError: false
         };
-        if (typeof renderMathInElement === 'function') {
-          try {
-            renderMathInElement(container, options);
-          } catch (e) {
-            console.warn('KaTeX render warning:', e);
-          }
-        } else {
-          setTimeout(function () {
-            if (typeof renderMathInElement === 'function') {
-              try {
-                renderMathInElement(container, options);
-              } catch (_) {}
+        function tryRender(retries) {
+          if (typeof renderMathInElement === 'function') {
+            try {
+              renderMathInElement(container, options);
+            } catch (e) {
+              console.warn('KaTeX render warning:', e);
             }
-          }, 400);
+          } else if (retries > 0) {
+            setTimeout(function () { tryRender(retries - 1); }, 300);
+          }
         }
+        tryRender(5);
       }
 
       // One-time purge of practice attempts

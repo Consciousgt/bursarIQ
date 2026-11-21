@@ -158,7 +158,7 @@ window.RichVineFirebase = {
     }
 
     // 2. Process pending offline uploads across all collections
-    const collections = ["students", "payments", "expenses", "stocks", "stockSales", "stockRestocks", "cbtSubmissions", "staff", "salaries", "staffLoans", "teachers", "attendance", "examRecords"];
+    const collections = ["students", "payments", "expenses", "stocks", "stockSales", "stockRestocks", "cbtSubmissions", "staff", "salaries", "staffLoans", "teachers", "attendance", "examRecords", "weeklyPerformance"];
     for (const colName of collections) {
       const list = Array.isArray(localDb[colName]) ? localDb[colName] : [];
       for (const item of list) {
@@ -220,7 +220,7 @@ window.RichVineFirebase = {
     this._setSyncStatus("syncing", "Syncing Cloud...");
 
     try {
-      const collections = ["students", "payments", "expenses", "stocks", "stockSales", "stockRestocks", "cbtSubmissions", "staff", "salaries"];
+      const collections = ["students", "payments", "expenses", "stocks", "stockSales", "stockRestocks", "cbtSubmissions", "staff", "salaries", "teachers", "attendance", "examRecords", "weeklyPerformance"];
       const localDb = window.RichVineDB ? window.RichVineDB.get() : {};
       let changed = false;
 
@@ -667,6 +667,29 @@ window.RichVineFirebase = {
       this._setSyncStatus("synced", "Cloud Synced");
     } catch (e) {
       console.warn("[Firebase] Error deleting attendance from cloud:", e.message);
+    }
+  },
+
+    async saveWeeklyPerformance(record) {
+    if (!db || !record?.id) return;
+    try {
+      const clean = this._sanitize(record);
+      await setDoc(doc(db, "weeklyPerformance", record.id), clean, { merge: true });
+      this._setSyncStatus("synced", "Cloud Synced");
+      console.log("[Firebase] Weekly performance record synced to cloud:", record.id);
+    } catch (e) {
+      console.warn("[Firebase] Error saving weekly performance to cloud:", e.message);
+    }
+  },
+
+  async deleteWeeklyPerformance(id) {
+    if (!db || !id) return;
+    try {
+      await this.recordCloudDeletion("weeklyPerformance", id);
+      await deleteDoc(doc(db, "weeklyPerformance", id));
+      this._setSyncStatus("synced", "Cloud Synced");
+    } catch (e) {
+      console.warn("[Firebase] Error deleting weekly performance from cloud:", e.message);
     }
   },
 

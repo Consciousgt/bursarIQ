@@ -6006,9 +6006,11 @@ const RichVineApp = (() => {
     const idInput = document.getElementById("tch-form-id");
     const nameInput = document.getElementById("tch-form-name");
     const phoneInput = document.getElementById("tch-form-phone");
+    const roleSelect = document.getElementById("tch-form-role");
     const classSelect = document.getElementById("tch-form-class");
     const statusSelect = document.getElementById("tch-form-status");
     const subjectsInput = document.getElementById("tch-form-subjects");
+    const assignedClassesInput = document.getElementById("tch-form-assigned-classes");
     const pwdInput = document.getElementById("tch-form-password");
 
     if (teacherId) {
@@ -6018,18 +6020,22 @@ const RichVineApp = (() => {
       if (idInput) idInput.value = t.id;
       if (nameInput) nameInput.value = t.name || "";
       if (phoneInput) phoneInput.value = t.phone || "";
-      if (classSelect) classSelect.value = t.assignedClass || "SSS 1";
+      if (roleSelect) roleSelect.value = t.role || "Class & Subject Teacher";
+      if (classSelect) classSelect.value = t.assignedClass || "";
       if (statusSelect) statusSelect.value = t.status || "active";
       if (subjectsInput) subjectsInput.value = (t.subjects || []).join(", ");
+      if (assignedClassesInput) assignedClassesInput.value = (t.assignedClasses || []).join(", ");
       if (pwdInput) pwdInput.value = t.password || "";
     } else {
       if (modalTitle) modalTitle.innerHTML = '<i class="fas fa-user-plus" style="color:#f59e0b"></i> Generate Teacher Login';
       if (idInput) idInput.value = "";
       if (nameInput) nameInput.value = "";
       if (phoneInput) phoneInput.value = "";
-      if (classSelect) classSelect.value = "SSS 1";
+      if (roleSelect) roleSelect.value = "Class & Subject Teacher";
+      if (classSelect) classSelect.value = "SSS 1 Science";
       if (statusSelect) statusSelect.value = "active";
       if (subjectsInput) subjectsInput.value = "";
+      if (assignedClassesInput) assignedClassesInput.value = "";
       generateTeacherPassword();
     }
     openModal("modal-add-teacher");
@@ -6039,9 +6045,11 @@ const RichVineApp = (() => {
     const id = document.getElementById("tch-form-id")?.value;
     const name = document.getElementById("tch-form-name")?.value.trim();
     const phone = document.getElementById("tch-form-phone")?.value.trim();
+    const role = document.getElementById("tch-form-role")?.value || "Class & Subject Teacher";
     const assignedClass = document.getElementById("tch-form-class")?.value;
     const status = document.getElementById("tch-form-status")?.value || "active";
     const subjectsRaw = document.getElementById("tch-form-subjects")?.value || "";
+    const assignedClassesRaw = document.getElementById("tch-form-assigned-classes")?.value || "";
     const password = document.getElementById("tch-form-password")?.value.trim();
 
     if (!name || !phone || !password) {
@@ -6050,12 +6058,17 @@ const RichVineApp = (() => {
     }
 
     const subjects = subjectsRaw.split(",").map(s => s.trim()).filter(Boolean);
+    let assignedClasses = assignedClassesRaw.split(",").map(s => s.trim()).filter(Boolean);
+    if (assignedClass && !assignedClasses.includes(assignedClass)) {
+      assignedClasses.unshift(assignedClass);
+    }
 
     const payload = {
       name,
       phone,
-      assignedClass,
-      assignedClasses: [assignedClass],
+      role,
+      assignedClass: assignedClass || null,
+      assignedClasses: assignedClasses.length ? assignedClasses : (assignedClass ? [assignedClass] : []),
       subjects,
       password,
       status
@@ -6372,6 +6385,10 @@ const RichVineApp = (() => {
       </tr>
     `).join("");
 
+    const cfg = (RichVineDB.getConfig ? RichVineDB.getConfig() : {}) || {};
+    const reportSchoolName = cfg.schoolName || (window.BURSARIQ_CONFIG && window.BURSARIQ_CONFIG.schoolName) || "DE PORTAL SCHOOLS";
+    const reportMotto = cfg.motto || (window.BURSARIQ_CONFIG && window.BURSARIQ_CONFIG.motto) || "Gateway to Academic Excellence & Moral Integrity";
+
     container.innerHTML = `
       <div id="printable-report-sheet">
         <!-- School Header -->
@@ -6381,8 +6398,8 @@ const RichVineApp = (() => {
               <i class="fas fa-graduation-cap"></i>
             </div>
             <div>
-              <h2 style="font-size:20px;font-weight:900;color:#0f172a;letter-spacing:0.5px;margin:0">EXCELLENCE MODEL COLLEGE</h2>
-              <p style="font-size:11px;color:#64748b;margin:2px 0 0;font-weight:600">Government Approved &bull; WAEC, NECO &amp; JAMB CBT Center</p>
+              <h2 style="font-size:20px;font-weight:900;color:#0f172a;letter-spacing:0.5px;margin:0" class="school-name-text">${reportSchoolName}</h2>
+              <p style="font-size:11px;color:#64748b;margin:2px 0 0;font-weight:600" class="school-motto-text">${reportMotto}</p>
               <p style="font-size:10px;color:#0284c7;margin:2px 0 0;font-weight:700">Official Continuous Assessment &amp; Terminal Examination Report</p>
             </div>
           </div>
