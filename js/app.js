@@ -324,7 +324,7 @@ const RichVineApp = (() => {
     let students = RichVineDB.getStudents(filter);
     if (searchInput) {
       students = students.filter(s =>
-        `${s.firstName} ${s.lastName} ${s.regNo} ${s.currentClass}`.toLowerCase().includes(searchInput)
+        `${s.firstName || ''} ${s.lastName || ''} ${s.name || ''} ${s.fullName || ''} ${s.regNo || ''} ${s.currentClass || ''}`.toLowerCase().includes(searchInput)
       );
     }
 
@@ -335,7 +335,7 @@ const RichVineApp = (() => {
       const isFullyPaid = bal.totalOutstanding === 0;
       return `<tr>
         <td><img src="${s.avatar || 'https://via.placeholder.com/38'}" class="student-avatar-sm"> ${s.regNo}</td>
-        <td><b>${s.firstName} ${s.lastName}</b></td>
+        <td><b>${s.fullName || s.name || `${s.firstName || ''} ${s.lastName || ''}`.trim() || 'Learner'}</b></td>
         <td><span class="class-badge" style="background:#e0f2fe;color:#0369a1;font-weight:600;padding:2px 8px;border-radius:12px;font-size:11px">${s.currentClass}</span></td>
         <td>${(window.getSectionByClass?.(s.currentClass)?.name) || "—"}</td>
         <td style="font-weight:600">₦${formatAmount(s.termFee || 0, true)}</td>
@@ -445,7 +445,7 @@ const RichVineApp = (() => {
       const bal = RichVineDB.getStudentBalance(s.id);
       return `<tr>
         <td>${s.regNo}</td>
-        <td><b>${s.firstName} ${s.lastName}</b></td>
+        <td><b>${s.fullName || s.name || `${s.firstName || ''} ${s.lastName || ''}`.trim() || 'Learner'}</b></td>
         <td>₦${formatAmount(s.termFee || 0, true)}</td>
         <td style="color:green;font-weight:600">₦${formatAmount(bal.totalPaidAll, true)}</td>
         <td style="${bal.arrearsBalance > 0 ? 'color:#b45309;font-weight:700' : 'color:green'}">
@@ -1929,7 +1929,7 @@ const RichVineApp = (() => {
     const section  = window.getSectionByClass?.(student.currentClass);
     const bal      = RichVineDB.getStudentBalance(studentId);
 
-    _setText("profile-name",    student.firstName + " " + student.lastName);
+    _setText("profile-name",    student.fullName || student.name || ((student.firstName || "") + " " + (student.lastName || "")).trim() || "Learner");
     _setText("profile-reg",     student.regNo);
     _setText("profile-class",   student.currentClass);
     _setText("profile-section", section?.name || "—");

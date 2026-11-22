@@ -21,10 +21,15 @@ const SCHOOL_SECTIONS = {
     icon: "fas fa-child",
     color: "emerald",
     classes: [
-      "Day Care", "Creche", "Kindergarten",
-      "Nursery 1", "Nursery 2",
-      "Primary 1", "Primary 2", "Primary 3",
-      "Primary 4", "Primary 5", "Primary 6"
+      "Creche / Preparatory I",
+      "Preparatory II",
+      "Nursery I",
+      "Nursery II",
+      "Primary 1",
+      "Primary 2",
+      "Primary 3",
+      "Primary 4",
+      "Primary 5"
     ]
   },
   junior: {
@@ -33,9 +38,9 @@ const SCHOOL_SECTIONS = {
     icon: "fas fa-school",
     color: "sky",
     classes: [
-      "JSS 1A", "JSS 1B",
-      "JSS 2A", "JSS 2B",
-      "JSS 3A", "JSS 3B"
+      "JSS 1",
+      "JSS 2",
+      "JSS 3"
     ]
   },
   senior: {
@@ -44,8 +49,11 @@ const SCHOOL_SECTIONS = {
     icon: "fas fa-graduation-cap",
     color: "purple",
     classes: [
+      "SS 1 (Art, Commercial, Science)",
       "SSS 1 Science", "SSS 1 Art", "SSS 1 Commercial",
+      "SS 2 (Art, Commercial, Science)",
       "SSS 2 Science", "SSS 2 Art", "SSS 2 Commercial",
+      "SS 3 (Art, Commercial, Science)",
       "SSS 3 Science", "SSS 3 Art", "SSS 3 Commercial"
     ]
   }
@@ -88,8 +96,8 @@ function isClassMatch(studentClass, targetClass) {
 
   // Senior Secondary Grade Level matching
   // (e.g. Class Teacher manages SS 1 Art, Commercial, Science as one grade)
-  const isTargetSS1 = tc.includes("ss1") || tc.includes("sss1");
-  const isStudentSS1 = sc.includes("ss1") || sc.includes("sss1");
+  const isTargetSS1 = (tc.includes("sss1") || tc.includes("ss1")) && !tc.includes("jss") && !tc.includes("js");
+  const isStudentSS1 = (sc.includes("sss1") || sc.includes("ss1")) && !sc.includes("jss") && !sc.includes("js");
   if (isTargetSS1 && isStudentSS1) {
     if (tcRaw.includes("science") && !tcRaw.includes("art") && !scRaw.includes("science")) return false;
     if (tcRaw.includes("art") && !tcRaw.includes("commercial") && !scRaw.includes("art")) return false;
@@ -97,8 +105,8 @@ function isClassMatch(studentClass, targetClass) {
     return true;
   }
 
-  const isTargetSS2 = tc.includes("ss2") || tc.includes("sss2");
-  const isStudentSS2 = sc.includes("ss2") || sc.includes("sss2");
+  const isTargetSS2 = (tc.includes("sss2") || tc.includes("ss2")) && !tc.includes("jss") && !tc.includes("js");
+  const isStudentSS2 = (sc.includes("sss2") || sc.includes("ss2")) && !sc.includes("jss") && !sc.includes("js");
   if (isTargetSS2 && isStudentSS2) {
     if (tcRaw.includes("science") && !tcRaw.includes("art") && !scRaw.includes("science")) return false;
     if (tcRaw.includes("art") && !tcRaw.includes("commercial") && !scRaw.includes("art")) return false;
@@ -106,8 +114,8 @@ function isClassMatch(studentClass, targetClass) {
     return true;
   }
 
-  const isTargetSS3 = tc.includes("ss3") || tc.includes("sss3");
-  const isStudentSS3 = sc.includes("ss3") || sc.includes("sss3");
+  const isTargetSS3 = (tc.includes("sss3") || tc.includes("ss3")) && !tc.includes("jss") && !tc.includes("js");
+  const isStudentSS3 = (sc.includes("sss3") || sc.includes("ss3")) && !sc.includes("jss") && !sc.includes("js");
   if (isTargetSS3 && isStudentSS3) {
     if (tcRaw.includes("science") && !tcRaw.includes("art") && !scRaw.includes("science")) return false;
     if (tcRaw.includes("art") && !tcRaw.includes("commercial") && !scRaw.includes("art")) return false;
@@ -385,12 +393,51 @@ class RichVineDB {
       if (!data.tutorialStudents) data.tutorialStudents = [];
       if (!data.tutorialPayments) data.tutorialPayments = [];
 
+
       // Auto-purge any legacy test student profiles (RVC-2026-001 through 006)
       const testStudentIds = new Set(["RVC-2026-001", "RVC-2026-002", "RVC-2026-003", "RVC-2026-004", "RVC-2026-005", "RVC-2026-006", "DPS-2026-001", "DPS-2026-002", "DPS-2026-003", "DPS-2026-004", "DPS-2026-005", "DPS-2026-006", "DPS-2026-007", "DPS-2026-008", "DPS-2026-009", "DPS-2026-010", "DPS-2026-011", "DPS-2026-012"]);
       let needsSave = false;
       if (Array.isArray(data.students) && data.students.some(s => testStudentIds.has(s.id))) {
         data.students = data.students.filter(s => !testStudentIds.has(s.id));
         needsSave = true;
+      }
+
+      // Ensure official DPS 2026/2027 student register is loaded & synchronized
+      const officialList = (typeof window !== "undefined" && window.DPS_STUDENTS && window.DPS_STUDENTS.length > 0)
+        ? window.DPS_STUDENTS
+        : (typeof DPS_STUDENTS_LIST !== "undefined" && DPS_STUDENTS_LIST.length > 0 ? DPS_STUDENTS_LIST : []);
+
+      if (officialList.length > 0) {
+        if (!Array.isArray(data.students) || data.students.length === 0) {
+          data.students = JSON.parse(JSON.stringify(officialList));
+          needsSave = true;
+        } else {
+          // Update any student records with canonical names and classes from official register
+          let rosterUpdated = false;
+          const officialMap = new Map();
+          officialList.forEach(st => {
+            if (st.id) officialMap.set(st.id, st);
+            if (st.regNo) officialMap.set(st.regNo.toLowerCase(), st);
+          });
+
+          data.students.forEach(s => {
+            const match = officialMap.get(s.id) || (s.regNo ? officialMap.get(s.regNo.toLowerCase()) : null);
+            if (match) {
+              if (!s.firstName || !s.lastName || s.firstName === s.lastName || !s.name || !s.fullName || (s.currentClass && s.currentClass.includes("Art, Commercial, Science"))) {
+                s.firstName = match.firstName;
+                s.lastName = match.lastName;
+                s.name = match.name;
+                s.fullName = match.fullName;
+                s.currentClass = match.currentClass;
+                s.class = match.class;
+                s.section = match.section;
+                if (!s.gender || s.gender === "Other") s.gender = match.gender;
+                rosterUpdated = true;
+              }
+            }
+          });
+          if (rosterUpdated) needsSave = true;
+        }
       }
 
       // Auto-migrate legacy "Catering" expense category to "Entertainment"
@@ -846,8 +893,13 @@ class RichVineDB {
     const db = this.get();
     let students = [...db.students];
     if (filter.class && filter.class !== "All") {
-      students = students.filter(s => s.currentClass === filter.class);
-    }
+        students = students.filter(s => {
+          const sc = s.currentClass || s.class || "";
+          if (sc === filter.class) return true;
+          if (typeof isClassMatch === "function") return isClassMatch(sc, filter.class);
+          return false;
+        });
+      }
     if (filter.section && filter.section !== "All") {
       students = students.filter(s => s.section === filter.section);
     }

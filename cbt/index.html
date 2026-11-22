@@ -1258,7 +1258,7 @@
         screenResult.classList.add('hidden');
         screenExam.classList.remove('hidden');
 
-        examStudentName.textContent = state.student.firstName + ' ' + state.student.lastName;
+        examStudentName.textContent = state.student.fullName || state.student.name || ((state.student.firstName || '') + ' ' + (state.student.lastName || '')).trim() || 'Candidate';
         examStudentClass.textContent = state.student.currentClass;
         examStudentId.textContent = state.student.regNo || state.student.id;
 
