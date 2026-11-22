@@ -369,6 +369,39 @@ window.RichVineFirebase = {
     return this.syncWithCloud(true);
   },
 
+  async syncAllStudents(studentsList) {
+    try {
+      const list = studentsList || (window.RichVineDB ? window.RichVineDB.getStudents() : []);
+      if (!list || !list.length) return { success: true, count: 0 };
+      
+      console.log(`[Firebase] Beginning batch upload of ${list.length} learners to Cloud Firestore...`);
+      const CHUNK_SIZE = 200;
+      let uploaded = 0;
+      
+      for (let i = 0; i < list.length; i += CHUNK_SIZE) {
+        const chunk = list.slice(i, i + CHUNK_SIZE);
+        const batch = writeBatch(db);
+        chunk.forEach(st => {
+          if (!st || !st.id) return;
+          const clean = this._sanitize(st);
+          clean.updatedAt = new Date().toISOString();
+          delete clean._pendingUpload;
+          batch.set(doc(db, "students", st.id), clean, { merge: true });
+        });
+        await batch.commit();
+        uploaded += chunk.length;
+        console.log(`[Firebase] Synced batch ${uploaded} / ${list.length} students to Cloud ✓`);
+      }
+      
+      this._setSyncStatus("synced", `Cloud Synced (${uploaded} Learners)`);
+      return { success: true, count: uploaded };
+    } catch (e) {
+      console.warn("[Firebase] syncAllStudents error:", e.message);
+      this._setSyncStatus("error", "Sync Pending");
+      return { success: false, error: e.message };
+    }
+  },
+
   // ── Students ────────────────────────────────────────────────────────────
   async saveStudent(student) {
     try {

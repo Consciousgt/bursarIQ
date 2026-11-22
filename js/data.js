@@ -1,3 +1,7 @@
+const DPS_STUDENTS_LIST = (typeof window !== "undefined" && window.DPS_STUDENTS && window.DPS_STUDENTS.length > 0)
+  ? window.DPS_STUDENTS
+  : (typeof require !== "undefined" ? (function() { try { return require("./dps-students.js"); } catch(e) { return []; } })() : []);
+
 /**
  * De Portal Schools — Complete Data Schema v6
  * 2026/2027 Academic Session
@@ -242,7 +246,7 @@ const DEFAULT_DATA = {
   ],
 
   // 100% Clean Slate: Zero dummy students, zero dummy payments, zero dummy expenses
-  students: [],
+  students: (typeof DPS_STUDENTS_LIST !== "undefined" && DPS_STUDENTS_LIST.length > 0) ? DPS_STUDENTS_LIST : [],
   payments: [],
   expenses: [],
   stocks: [],

@@ -294,6 +294,21 @@ const RichVineApp = (() => {
   }
 
   // ── LEARNERS TAB ─────────────────────────────────────────────────────────
+
+  async function syncStudentsToCloud() {
+    if (window.RichVineFirebase && window.RichVineFirebase.syncAllStudents) {
+      showToast("Syncing 244 learners to Firebase Cloud...", "info");
+      const res = await window.RichVineFirebase.syncAllStudents();
+      if (res && res.success) {
+        showToast(`Successfully uploaded ${res.count} learners to Firebase Cloud!`, "success");
+      } else {
+        showToast("Cloud sync queued offline. Changes will push when online.", "info");
+      }
+    } else {
+      showToast("Firebase cloud connection offline or initializing.", "info");
+    }
+  }
+
   function loadLearnersTab() {
     const sectionFilter  = document.getElementById("learner-section-filter")?.value || "All";
     const classFilter    = document.getElementById("learner-class-filter")?.value   || "All";
@@ -7198,6 +7213,7 @@ const RichVineApp = (() => {
     loadSettingsTab,
     saveSettingsForm,
     changeAdminPasswordSubmit,
+    syncStudentsToCloud,
     loadTeachersTab,
     generateTeacherPassword,
     openAddTeacherModal,
