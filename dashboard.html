@@ -1,6 +1,7 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="school.config.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
   <meta name="mobile-web-app-capable" content="yes">
@@ -443,7 +444,13 @@
         flex-shrink: 0;
       }
 
-      #live-clock-badge { display: none !important; }
+      #live-clock-badge {
+        display: inline-flex !important;
+        padding: 3px 8px !important;
+        font-size: 10px !important;
+        border-radius: 12px !important;
+        flex-shrink: 0;
+      }
       .session-badge { display: none !important; }
 
       .btn-logout {
@@ -1219,7 +1226,7 @@
   <section id="view-dashboard" class="tab-section">
     <div class="dash-welcome-row">
       <h2 style="font-size:20px;font-weight:800;margin-bottom:4px">System Dashboard &amp; Outstanding Tracker ðŸ‘‹</h2>
-      <p class="dash-welcome-sub">Live school bursary &amp; operations portal Â· 2026/2027</p>
+      <p class="dash-welcome-sub">Live school bursary &amp; operations portal &bull; 2026/2027 &bull; <span id="dash-welcome-clock" style="font-weight:700;color:var(--sky)">--:--:--</span></p>
     </div>
 
     <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• INSTITUTIONAL PORTAL GATEWAY CARDS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->

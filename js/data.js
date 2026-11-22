@@ -54,10 +54,26 @@ const ALL_CLASSES = [
 ];
 
 function getSectionByClass(className) {
-  for (const [key, sec] of Object.entries(SCHOOL_SECTIONS)) {
-    if (sec.classes.includes(className)) return sec;
+  if (!className) return SCHOOL_SECTIONS.primary;
+  const clean = String(className).toLowerCase().trim();
+  // Check junior classes
+  if (clean.includes("jss") || clean.includes("junior") || clean.includes("bece") || clean.startsWith("j.s") || clean.startsWith("js ")) {
+    return SCHOOL_SECTIONS.junior;
   }
-  return null;
+  // Check senior classes
+  if (clean.includes("sss") || clean.includes("senior") || clean.includes("waec") || clean.includes("neco") || clean.startsWith("s.s") || clean.startsWith("ss ") || clean.startsWith("ss1") || clean.startsWith("ss2") || clean.startsWith("ss3")) {
+    return SCHOOL_SECTIONS.senior;
+  }
+  // Check primary and early years
+  if (clean.includes("primary") || clean.includes("pry") || clean.includes("nursery") || clean.includes("nur") || clean.includes("creche") || clean.includes("day care") || clean.includes("kindergarten") || clean.includes("kg") || clean.includes("basic")) {
+    return SCHOOL_SECTIONS.primary;
+  }
+  for (const [key, sec] of Object.entries(SCHOOL_SECTIONS)) {
+    if (sec.classes.some(c => c.toLowerCase() === clean || clean.startsWith(c.toLowerCase()))) {
+      return sec;
+    }
+  }
+  return SCHOOL_SECTIONS.primary;
 }
 
 // ─── Expense Accounts ───────────────────────────────────────────────────
@@ -161,7 +177,60 @@ const DEFAULT_DATA = {
   salaries: [],
   staffLoans: [],
   weeklyPerformance: [],
-  teachers: [],
+    teachers: [
+    {
+      id: "TCH-001",
+      staffId: "STF/003",
+      name: "Mr. Emmanuel Adebayo",
+      phone: "08012345678",
+      password: "password123",
+      assignedClass: "SSS 1 Science",
+      assignedClasses: ["SSS 1 Science", "SSS 1 Art", "SSS 1 Commercial"],
+      role: "Class Teacher",
+      subjects: ["Mathematics", "Physics"],
+      status: "Active",
+      createdAt: 1729000000000
+    },
+    {
+      id: "TCH-002",
+      staffId: "STF/004",
+      name: "Mrs. Funmilayo Adeleke",
+      phone: "08023456789",
+      password: "password123",
+      assignedClass: "JSS 2B",
+      assignedClasses: ["JSS 2B", "JSS 2A"],
+      role: "Class Teacher",
+      subjects: ["English Language", "Literature in English"],
+      status: "Active",
+      createdAt: 1729000001000
+    },
+    {
+      id: "TCH-003",
+      staffId: "STF/005",
+      name: "Mr. Chukwudi Okafor",
+      phone: "08034567890",
+      password: "password123",
+      assignedClass: "SSS 2 Commercial",
+      assignedClasses: ["SSS 2 Commercial", "SSS 2 Art"],
+      role: "Class Teacher",
+      subjects: ["Economics", "Commerce"],
+      status: "Active",
+      createdAt: 1729000002000
+    },
+    {
+      id: "TCH-004",
+      staffId: "STF/006",
+      name: "Dr. (Mrs) Ngozi Eze",
+      phone: "08045678901",
+      password: "password123",
+      assignedClass: "Unassigned",
+      assignedClasses: ["SSS 1 Science", "SSS 2 Science", "SSS 3 Science"],
+      role: "Subject Teacher",
+      subjects: ["Biology", "Chemistry"],
+      status: "Active",
+      createdAt: 1729000003000
+    }
+  ],
   attendance: [],
   examRecords: [],
   tutorialStudents: [],
@@ -215,7 +284,7 @@ class RichVineDB {
       if (!data.staff) data.staff = [];
       if (!data.salaries) data.salaries = [];
       if (!data.staffLoans) data.staffLoans = [];
-    if (!data.teachers) data.teachers = [];
+    if (!data.teachers || data.teachers.length === 0) { data.teachers = JSON.parse(JSON.stringify(DEFAULT_DATA.teachers || [])); needsSave = true; }
     if (!data.attendance) data.attendance = [];
     if (!data.examRecords) data.examRecords = [];
     if (!data.weeklyPerformance) data.weeklyPerformance = [];
@@ -2779,7 +2848,7 @@ class RichVineDB {
     clean.staff = [];
     clean.salaries = [];
     clean.staffLoans = [];
-    clean.teachers = [];
+    clean.teachers = JSON.parse(JSON.stringify(DEFAULT_DATA.teachers || []));
     clean.attendance = [];
     clean.examRecords = [];
     clean.weeklyPerformance = [];

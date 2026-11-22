@@ -74,6 +74,15 @@
   };
 
   // Merge default config with any admin-saved overrides
+  // Sanitize legacy cache
+  if (savedConfig.schoolName && /richvine/i.test(savedConfig.schoolName)) {
+    savedConfig.schoolName = "DE PORTAL SCHOOLS";
+    savedConfig.schoolShortName = "DE PORTAL";
+    savedConfig.acronym = "DPS";
+  }
+  if (savedConfig.address && /lagos/i.test(savedConfig.address)) {
+    savedConfig.address = "5-7 Olukayode Street, Imoro, Ogijo, Ogun State, Nigeria";
+  }
   const config = Object.assign({}, defaultConfig, savedConfig);
   if (savedConfig.bankDetails) {
     config.bankDetails = Object.assign({}, defaultConfig.bankDetails, savedConfig.bankDetails);

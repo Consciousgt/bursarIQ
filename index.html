@@ -1,13 +1,25 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
 <head>
   <script src="school.config.js"></script>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>DE PORTAL SCHOOLS â€” Gateway to Academic Excellence & Moral Integrity | Powered by BursarIQ</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%200%20100%20100%22><text y=%22.9em%22 font-size=%2290%22>ðŸ›ï¸</text></svg>">
-  
-  <!-- Tailwind CSS CDN -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="De Portal Schools">
+  <meta name="theme-color" content="#0284c7">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="description" content="De Portal Schools, Ogijo, Ogun State. Premier co-educational school offering British-Nigerian curriculum from Creche to Senior Secondary College.">
+
+  <title>De Portal Schools &mdash; Gateway to Academic Excellence &amp; Moral Integrity | Ogijo, Ogun State</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
+
+  <!-- Tailwind CSS & Font Awesome -->
+  <link rel="preconnect" href="https://cdn.tailwindcss.com">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -15,290 +27,645 @@
         extend: {
           colors: {
             sky: {
-              50: '#f0f9ff', 100: '#e0f2fe', 200: '#bae6fd', 300: '#7dd3fc', 400: '#38bdf8',
-              500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1', 800: '#075985', 900: '#0c4a6e'
-            },
-            emerald: {
-              50: '#ecfdf5', 100: '#d1fae5', 500: '#10b981', 600: '#059669', 700: '#047857'
+              50: '#f0f9ff', 100: '#e0f2fe', 200: '#bae6fd', 300: '#7dd3fc',
+              400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1',
+              800: '#075985', 900: '#0c4a6e', 950: '#082f49',
             }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
           }
         }
       }
     }
   </script>
-  
-  <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  
-  <!-- Custom Styles -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/custom.css">
-  <style>
-    html { scroll-behavior: smooth; }
-    .portal-card {
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .portal-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 20px 30px -10px rgba(2, 132, 199, 0.25);
-    }
 
-    /* Mobile-first index polish */
-    html { overflow-x: hidden; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
-    body { overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+  <style>
+    /* iOS & Android native app feel */
     * { -webkit-tap-highlight-color: transparent; }
-    input, select, button, a { touch-action: manipulation; }
+    html, body {
+      font-family: 'Inter', system-ui, sans-serif;
+      overflow-x: hidden;
+      touch-action: manipulation;
+    }
     @media (hover: none) and (pointer: coarse) {
       input, select, textarea { font-size: 16px !important; }
     }
-    /* Portal cards on mobile: full width */
-    @media (max-width: 480px) {
-      .portal-card { transform: none !important; }
+    .pb-safe { padding-bottom: calc(74px + env(safe-area-inset-bottom, 12px)); }
+    .bottom-app-bar {
+      padding-bottom: max(10px, env(safe-area-inset-bottom));
+    }
+    .glass-nav {
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
     }
   </style>
-  <!-- PWA Manifest & Service Worker -->
+
   <link rel="manifest" href="manifest.json">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="BursarIQ">
-  <meta name="theme-color" content="#0284c7">
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased selection:bg-sky-500 selection:text-white min-h-screen flex flex-col justify-between">
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-sky-500 selection:text-white pb-safe lg:pb-0">
 
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• TOP GLOBAL ANNOUNCEMENT BAR â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-  <div id="bursariq-top-banner" class="bg-gradient-to-r from-slate-950 via-[#0b2b48] to-slate-950 text-white text-xs py-2 px-4 border-b border-sky-950/60 shadow-inner">
-    <div class="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-2">
-      <div class="flex items-center space-x-2">
-        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase tracking-wider">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5 animate-pulse"></span> Certified System
+  <!-- ═══════════════════════════════════════════════════════════════
+       1. TOP INSTITUTIONAL UTILITY BAR (Live Clock & Quick Contact)
+       ═══════════════════════════════════════════════════════════════ -->
+  <aside aria-label="Campus Information" class="bg-slate-900 text-slate-300 text-xs py-2 px-4 border-b border-slate-800 hidden sm:block">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-5">
+        <span class="flex items-center gap-1.5 text-slate-300 font-medium">
+          <i class="fas fa-map-marker-alt text-sky-400"></i>
+          <span>5-7 Olukayode St, Imoro, Ogijo, Ogun State</span>
         </span>
-        <span class="font-medium text-slate-200 text-[11px] sm:text-xs">
-          Powered by <strong class="text-white font-bold">BursarIQ</strong> &bull; <span class="italic text-emerald-300">"Every naira accounted for."</span>
+        <span class="text-slate-700">&bull;</span>
+        <a href="tel:08012345678" class="flex items-center gap-1.5 hover:text-white transition">
+          <i class="fas fa-phone-alt text-emerald-400"></i>
+          <span>08012345678</span>
+        </a>
+        <span class="text-slate-700">&bull;</span>
+        <span class="text-sky-300 font-semibold flex items-center gap-1.5">
+          <i class="fas fa-graduation-cap text-sky-400"></i>
+          <span>2026/2027 Academic Session</span>
         </span>
       </div>
-      <div class="flex items-center space-x-3 text-[11px] text-slate-300">
-        <span class="hidden md:inline"><i class="fas fa-shield-halved text-emerald-400 mr-1"></i> 256-Bit Financial Encryption</span>
-        <span class="hidden sm:inline text-slate-600">&bull;</span>
-        <span><i class="far fa-calendar-check text-sky-400 mr-1"></i> Session: <strong class="text-white school-session-text">2026/2027</strong> (<span class="school-term-text">1st Term</span>)</span>
+
+      <!-- Live Clock & Staff Modal Trigger -->
+      <div class="flex items-center space-x-4">
+        <div class="flex items-center gap-1.5 text-sky-300 bg-slate-800/80 px-2.5 py-0.5 rounded border border-slate-700 font-mono text-[11px]">
+          <i class="far fa-clock text-sky-400"></i>
+          <span id="top-clock-time">--:--:--</span>
+        </div>
+        <button 
+          type="button"
+          onclick="openStaffGatewayModal()"
+          class="text-xs font-semibold text-slate-300 hover:text-white flex items-center gap-1 bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded-lg border border-slate-700 transition cursor-pointer"
+        >
+          <i class="fas fa-lock text-amber-400"></i>
+          <span>Staff Access</span>
+        </button>
       </div>
     </div>
-  </div>
+  </aside>
 
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• SECONDARY CAMPUS CONTACT BAR â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-  <div class="bg-gradient-to-r from-sky-900 via-sky-800 to-slate-900 text-white text-xs py-1.5 px-4 shadow-sm border-b border-sky-800/50">
-    <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2">
-      <div class="flex items-center space-x-2">
-        <i class="fas fa-map-marker-alt text-sky-400 text-xs"></i>
-        <span class="text-sky-100 school-address-text text-[11px] truncate max-w-xs sm:max-w-md">Campus Location</span>
-      </div>
-      <div class="flex items-center space-x-4 text-sky-200 text-[11px]">
-        <span><i class="fas fa-phone-alt mr-1 text-emerald-400"></i> <span class="school-phone-text">08012345678</span></span>
-        <span class="hidden sm:inline"><i class="fas fa-envelope mr-1 text-sky-400"></i> <span class="school-email-text">admin@excellencemodel.edu.ng</span></span>
-      </div>
-    </div>
-  </div>
-
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• MAIN HEADER & NAVIGATION â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-  <header class="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+  <!-- ═══════════════════════════════════════════════════════════════
+       2. PRIMARY BRAND HEADER & NAVIGATION
+       ═══════════════════════════════════════════════════════════════ -->
+  <header class="glass-nav sticky top-0 z-40 border-b border-slate-200/80 shadow-sm transition-all duration-300">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
       
-      <!-- Brand Logo & School Identity -->
+      <!-- School Identity & Official Crest -->
       <a href="index.html" class="flex items-center space-x-3 group">
-        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-700 to-indigo-800 flex items-center justify-center text-white shadow-md shadow-sky-500/20 group-hover:scale-105 transition-transform duration-300">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-700 via-sky-600 to-indigo-800 flex items-center justify-center text-white shadow-md shadow-sky-600/30 group-hover:scale-105 transition-transform duration-300">
           <i class="fas fa-graduation-cap text-2xl text-sky-200"></i>
         </div>
         <div>
           <div class="text-lg sm:text-xl font-black text-slate-900 tracking-tight leading-tight school-name-text">
             DE PORTAL SCHOOLS
           </div>
-          <div class="text-[11px] tracking-wider font-semibold text-slate-500 uppercase -mt-0.5 school-motto-text">
-            Knowledge, Character & Leadership
+          <div class="text-[10px] sm:text-[11px] font-bold text-sky-700 uppercase tracking-wider school-motto-text">
+            Gateway to Academic Excellence &amp; Moral Integrity
           </div>
         </div>
       </a>
 
       <!-- Desktop Navigation Menu -->
-      <nav class="hidden xl:flex items-center space-x-6 text-xs font-semibold text-slate-600">
-        <a href="#about" class="hover:text-sky-600 transition flex items-center gap-1">
-          <i class="fas fa-school text-sky-500"></i> About
+      <nav class="hidden lg:flex items-center space-x-7 text-xs font-bold text-slate-600">
+        <a href="#about" class="hover:text-sky-600 transition flex items-center gap-1.5 py-2">
+          <span>About DPS</span>
         </a>
-        <a href="#accounting" class="hover:text-sky-600 transition flex items-center gap-1 font-bold text-sky-700">
-          <i class="fas fa-coins text-amber-500"></i> Bursary & Accounting
+        <a href="#academics" class="hover:text-sky-600 transition flex items-center gap-1.5 py-2">
+          <span>Academics</span>
         </a>
-        <a href="#cbt" class="hover:text-sky-600 transition flex items-center gap-1">
-          <i class="fas fa-laptop-code text-indigo-500"></i> JAMB CBT
+        <a href="#facilities" class="hover:text-sky-600 transition flex items-center gap-1.5 py-2">
+          <span>Facilities</span>
         </a>
-        <a href="#attendance" class="hover:text-sky-600 transition flex items-center gap-1">
-          <i class="fas fa-clipboard-check text-emerald-500"></i> Attendance
+        <a href="#clearance" class="hover:text-sky-600 text-sky-700 font-extrabold transition flex items-center gap-1.5 py-2">
+          <i class="fas fa-id-card text-sky-500"></i>
+          <span>Parent Clearance</span>
         </a>
-        <a href="#exams" class="hover:text-sky-600 transition flex items-center gap-1">
-          <i class="fas fa-file-signature text-purple-500"></i> Broadsheets
+        <a href="#admissions" class="hover:text-sky-600 transition flex items-center gap-1.5 py-2">
+          <span>Admissions</span>
         </a>
-        <a href="#clearance-checker" class="hover:text-sky-600 transition flex items-center gap-1 font-bold text-emerald-600">
-          <i class="fas fa-id-card"></i> Fee Clearance
+        <a href="#contact" class="hover:text-sky-600 transition flex items-center gap-1.5 py-2">
+          <span>Contact</span>
         </a>
-        <a href="#contact" class="hover:text-sky-600 transition">Contact</a>
       </nav>
 
-      <!-- School Contact & Admission CTA -->
-      <div class="flex items-center space-x-2 sm:space-x-3">
-        <a href="#contact" class="inline-flex items-center justify-center px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-700 hover:to-sky-800 shadow-md shadow-sky-600/30 hover:shadow-lg transition">
-          <i class="fas fa-envelope mr-1.5 text-sky-200"></i>
-          <span>Inquire &amp; Contact</span>
+      <!-- Action Buttons (Desktop) -->
+      <div class="hidden lg:flex items-center space-x-3">
+        <button 
+          type="button"
+          onclick="openStaffGatewayModal()"
+          class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 transition flex items-center gap-1.5 cursor-pointer"
+        >
+          <i class="fas fa-shield-alt text-amber-500"></i>
+          <span>Staff Gateway</span>
+        </button>
+        <a 
+          href="#admissions" 
+          class="px-4 py-2.5 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-700 hover:to-sky-800 shadow-md shadow-sky-600/25 transition flex items-center gap-1.5"
+        >
+          <i class="fas fa-paper-plane text-sky-200"></i>
+          <span>Enroll 2026/2027</span>
+        </a>
+      </div>
+
+      <!-- Mobile Hamburger Button -->
+      <div class="flex items-center space-x-2 lg:hidden">
+        <button 
+          type="button" 
+          id="mobileMenuBtn" 
+          onclick="toggleMobileDrawer()" 
+          class="p-2.5 rounded-xl text-slate-700 hover:bg-slate-100 border border-slate-200 transition focus:outline-none"
+          aria-label="Toggle navigation menu"
+        >
+          <i class="fas fa-bars text-lg" id="menuIcon"></i>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Mobile Drawer Menu (Slide-out / Expand) -->
+    <div id="mobileDrawer" class="hidden lg:hidden border-t border-slate-200 bg-white/98 px-5 py-4 space-y-3 shadow-xl">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 text-xs text-slate-500">
+        <span class="flex items-center gap-1.5">
+          <i class="fas fa-map-marker-alt text-sky-500"></i> Ogijo, Ogun State
+        </span>
+        <span class="font-mono text-sky-600 font-bold" id="drawer-clock-time">--:--:--</span>
+      </div>
+      <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
+        <a href="#about" onclick="toggleMobileDrawer()" class="p-2.5 rounded-xl bg-slate-50 hover:bg-sky-50 text-slate-700 hover:text-sky-700 transition flex items-center gap-2">
+          <i class="fas fa-school text-sky-500"></i> About DPS
+        </a>
+        <a href="#academics" onclick="toggleMobileDrawer()" class="p-2.5 rounded-xl bg-slate-50 hover:bg-sky-50 text-slate-700 hover:text-sky-700 transition flex items-center gap-2">
+          <i class="fas fa-graduation-cap text-indigo-500"></i> Academics
+        </a>
+        <a href="#facilities" onclick="toggleMobileDrawer()" class="p-2.5 rounded-xl bg-slate-50 hover:bg-sky-50 text-slate-700 hover:text-sky-700 transition flex items-center gap-2">
+          <i class="fas fa-flask text-emerald-500"></i> Facilities
+        </a>
+        <a href="#clearance" onclick="toggleMobileDrawer()" class="p-2.5 rounded-xl bg-slate-50 hover:bg-sky-50 text-slate-700 hover:text-sky-700 transition flex items-center gap-2">
+          <i class="fas fa-id-card text-purple-500"></i> Clearance
+        </a>
+        <a href="#admissions" onclick="toggleMobileDrawer()" class="p-2.5 rounded-xl bg-slate-50 hover:bg-sky-50 text-slate-700 hover:text-sky-700 transition flex items-center gap-2">
+          <i class="fas fa-user-plus text-amber-500"></i> Admissions
+        </a>
+        <a href="#contact" onclick="toggleMobileDrawer()" class="p-2.5 rounded-xl bg-slate-50 hover:bg-sky-50 text-slate-700 hover:text-sky-700 transition flex items-center gap-2">
+          <i class="fas fa-envelope text-rose-500"></i> Contact
+        </a>
+      </div>
+      <div class="pt-2 flex gap-2">
+        <button 
+          type="button" 
+          onclick="toggleMobileDrawer(); openStaffGatewayModal();"
+          class="flex-1 py-2.5 rounded-xl text-xs font-bold text-slate-800 bg-slate-100 border border-slate-300 text-center flex items-center justify-center gap-1.5"
+        >
+          <i class="fas fa-lock text-amber-500"></i> Staff Gateway
+        </button>
+        <a 
+          href="#admissions" 
+          onclick="toggleMobileDrawer()" 
+          class="flex-1 py-2.5 rounded-xl text-xs font-bold text-white bg-sky-600 text-center flex items-center justify-center gap-1.5 shadow-md shadow-sky-600/30"
+        >
+          <i class="fas fa-paper-plane text-sky-200"></i> Enroll Now
         </a>
       </div>
     </div>
   </header>
 
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• HERO SECTION & PORTALS LAUNCHPAD â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-  <section id="hero" class="relative min-h-[640px] flex items-center bg-slate-950 overflow-hidden">
-    <!-- Background Image with Overlay -->
+  <!-- ═══════════════════════════════════════════════════════════════
+       3. INSTITUTIONAL HERO SECTION
+       ═══════════════════════════════════════════════════════════════ -->
+  <section id="hero" class="relative min-h-[620px] lg:min-h-[680px] flex items-center bg-slate-950 overflow-hidden text-white">
+    <!-- Rich Campus Photographic Background with Gradient Overlay -->
     <div class="absolute inset-0 z-0">
       <img 
         src="https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?auto=format&fit=crop&w=1920&q=80" 
-        alt="School Academic Campus" 
-        class="w-full h-full object-cover object-center filter brightness-[0.25] scale-105"
+        alt="De Portal Schools Campus" 
+        class="w-full h-full object-cover object-center filter brightness-[0.25] scale-105 transition-transform duration-1000"
       >
-      <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/90 to-sky-950/80"></div>
+      <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-sky-950/75"></div>
       <div class="absolute inset-0 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:24px_24px] opacity-15"></div>
     </div>
 
-    <!-- Hero Content Container -->
-    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-white w-full">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 w-full">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
         
-        <!-- Left Column: Vision & Identity -->
+        <!-- Left: School Vision, Mission & Calls to Action -->
         <div class="lg:col-span-7 space-y-6">
-          <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-emerald-400/40 text-white text-xs font-semibold backdrop-blur-md shadow-lg">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-            <span>Welcome to <span class="school-name-text font-bold text-emerald-300">DE PORTAL SCHOOLS</span></span>
+          <div class="inline-flex items-center space-x-2.5 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-emerald-400/40 text-white text-xs font-semibold backdrop-blur-md shadow-lg">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Premier Co-Educational Citadel &bull; <strong class="text-emerald-300">Ogijo, Ogun State</strong></span>
           </div>
 
-          <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight">
-            Gateway to Academic Excellence & <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-sky-300 to-emerald-300">Moral Integrity</span>.
+          <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.12]">
+            Nurturing Academic Excellence, <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-sky-300 to-emerald-300">Moral Integrity</span> &amp; Global Leaders.
           </h1>
 
           <p class="text-slate-300 text-sm sm:text-base max-w-2xl font-normal leading-relaxed">
-            Welcome to the official institutional digital ecosystem of <strong>De Portal Schools</strong>. 
-            Empowering learners with cutting-edge academic curriculum, twice-daily attendance registers, 
-            JAMB-standard multi-subject CBT examinations, and precision zero-loss bursary accounting â€” secured and powered by BursarIQ.
+            Welcome to <strong>De Portal Schools</strong>. We provide an inspiring British-Nigerian curriculum from Creche and Primary through Junior and Senior Secondary College. Equipped with ultra-modern science laboratories, LaTeX-enabled JAMB CBT assessment systems, and twice-daily attendance monitoring in a serene, disciplined campus environment.
           </p>
 
-          <!-- Core Institutional Metrics -->
-          <div class="grid grid-cols-3 gap-4 pt-3 border-t border-slate-800 max-w-lg">
-            <div>
+          <!-- Core Institutional Pillar Badges -->
+          <div class="grid grid-cols-3 gap-3 sm:gap-4 pt-2 border-t border-slate-800/80 max-w-lg">
+            <div class="p-2 sm:p-3 rounded-xl bg-slate-900/60 border border-slate-800">
               <div class="text-xl sm:text-2xl font-black text-emerald-400">100%</div>
-              <div class="text-[11px] text-slate-400 font-medium">Bursary Reconciliation</div>
+              <div class="text-[10px] sm:text-xs text-slate-400 font-medium">WAEC &amp; BECE Success</div>
             </div>
-            <div>
-              <div class="text-xl sm:text-2xl font-black text-sky-400">8 Subjects</div>
-              <div class="text-[11px] text-slate-400 font-medium">Standard JAMB CBT</div>
+            <div class="p-2 sm:p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+              <div class="text-xl sm:text-2xl font-black text-sky-400">JAMB CBT</div>
+              <div class="text-[10px] sm:text-xs text-slate-400 font-medium">LaTeX Formula Lab</div>
             </div>
-            <div>
-              <div class="text-xl sm:text-2xl font-black text-amber-400">AM & PM</div>
-              <div class="text-[11px] text-slate-400 font-medium">Dual Daily Attendance</div>
+            <div class="p-2 sm:p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+              <div class="text-xl sm:text-2xl font-black text-amber-400">AM &amp; PM</div>
+              <div class="text-[10px] sm:text-xs text-slate-400 font-medium">Dual Daily Attendance</div>
             </div>
           </div>
 
           <!-- Action CTA Buttons -->
-          <div class="flex flex-wrap gap-3 pt-2">
-            <a href="#about" class="px-6 py-3 rounded-xl font-bold text-xs sm:text-sm text-slate-900 bg-sky-300 hover:bg-sky-200 shadow-lg shadow-sky-400/20 transition flex items-center gap-2"><i class="fas fa-info-circle text-sky-900"></i> Discover De Portal Schools</a>
-            <a href="#clearance-checker" class="px-6 py-3 rounded-xl font-semibold text-xs sm:text-sm text-white bg-slate-800/80 hover:bg-slate-700 border border-slate-700 transition flex items-center gap-2">
-              <i class="fas fa-search text-emerald-400"></i> Check Student Clearance
+          <div class="flex flex-wrap gap-3 pt-3">
+            <a 
+              href="#admissions" 
+              class="px-6 py-3.5 rounded-xl font-bold text-xs sm:text-sm text-slate-900 bg-sky-300 hover:bg-sky-200 shadow-lg shadow-sky-400/25 transition flex items-center gap-2"
+            >
+              <i class="fas fa-file-alt text-sky-900"></i>
+              <span>Admissions 2026/2027</span>
+            </a>
+            <a 
+              href="#clearance" 
+              class="px-6 py-3.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-slate-800/90 hover:bg-slate-700 border border-slate-700 transition flex items-center gap-2"
+            >
+              <i class="fas fa-search text-emerald-400"></i>
+              <span>Check Student Clearance</span>
+            </a>
+            <a 
+              href="#about" 
+              class="px-5 py-3.5 rounded-xl font-semibold text-xs sm:text-sm text-slate-300 hover:text-white transition flex items-center gap-2"
+            >
+              <span>Explore Campus</span>
+              <i class="fas fa-arrow-right text-xs"></i>
             </a>
           </div>
         </div>
 
-        <!-- Right Column: Institutional Excellence Showcase -->
-        <div class="lg:col-span-5" id="school-highlights">
-          <div class="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-6 sm:p-7 rounded-3xl shadow-2xl space-y-4">
+        <!-- Right: Institutional Highlights Card -->
+        <div class="lg:col-span-5">
+          <div class="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-6 sm:p-8 rounded-3xl shadow-2xl space-y-4">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
               <div>
-                <span class="text-[10px] font-extrabold text-sky-400 uppercase tracking-widest">Why Choose Us</span>
-                <h3 class="text-base sm:text-lg font-bold text-white">De Portal Schools Advantage</h3>
+                <span class="text-[10px] font-black text-sky-400 uppercase tracking-widest">Citadel of Excellence</span>
+                <h2 class="text-lg font-bold text-white">De Portal Schools Advantage</h2>
               </div>
-              <div class="w-8 h-8 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center text-sm font-bold">
+              <div class="w-10 h-10 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center text-lg font-bold">
                 <i class="fas fa-award"></i>
               </div>
             </div>
 
-            <!-- Feature 1: Complete Academic Journey -->
-            <div class="p-3.5 rounded-2xl bg-slate-800/80 border border-slate-700/80">
-              <div class="flex items-start space-x-3">
-                <div class="w-9 h-9 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center text-sm flex-shrink-0 mt-0.5">
-                  <i class="fas fa-graduation-cap"></i>
-                </div>
-                <div>
-                  <h4 class="text-xs sm:text-sm font-bold text-white">Creche to Senior College</h4>
-                  <p class="text-[11px] text-slate-400 mt-0.5">Day Care, Nursery, Primary, Junior &amp; Senior Secondary with science, arts, and commercial divisions.</p>
-                </div>
+            <!-- Advantage 1 -->
+            <div class="p-3.5 rounded-2xl bg-slate-800/70 border border-slate-700/60 flex items-start space-x-3.5">
+              <div class="w-10 h-10 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center text-base flex-shrink-0 mt-0.5">
+                <i class="fas fa-child"></i>
+              </div>
+              <div>
+                <h3 class="text-xs sm:text-sm font-bold text-white">From Creche to Senior College</h3>
+                <p class="text-[11px] text-slate-400 mt-0.5">Seamless, structured learning continuum: Early Years, Primary 1-6, Junior College &amp; Senior Secondary.</p>
               </div>
             </div>
 
-            <!-- Feature 2: High Academic Rigour & KaTeX CBT -->
-            <div class="p-3.5 rounded-2xl bg-slate-800/80 border border-slate-700/80">
-              <div class="flex items-start space-x-3">
-                <div class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm flex-shrink-0 mt-0.5">
-                  <i class="fas fa-laptop-code"></i>
-                </div>
-                <div>
-                  <h4 class="text-xs sm:text-sm font-bold text-white">Modern ICT &amp; Science Labs</h4>
-                  <p class="text-[11px] text-slate-400 mt-0.5">Equipped with state-of-the-art computer labs, science apparatus, and interactive learning tools.</p>
-                </div>
+            <!-- Advantage 2 -->
+            <div class="p-3.5 rounded-2xl bg-slate-800/70 border border-slate-700/60 flex items-start space-x-3.5">
+              <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-base flex-shrink-0 mt-0.5">
+                <i class="fas fa-atom"></i>
+              </div>
+              <div>
+                <h3 class="text-xs sm:text-sm font-bold text-white">Practical Science &amp; STEM Lab</h3>
+                <p class="text-[11px] text-slate-400 mt-0.5">Hands-on Physics, Chemistry, Biology &amp; Computer laboratory practicals adhering to WAEC &amp; Cambridge standards.</p>
               </div>
             </div>
 
-            <!-- Feature 3: Moral & Character Development -->
-            <div class="p-3.5 rounded-2xl bg-slate-800/80 border border-slate-700/80">
-              <div class="flex items-start space-x-3">
-                <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-sm flex-shrink-0 mt-0.5">
-                  <i class="fas fa-heart"></i>
-                </div>
-                <div>
-                  <h4 class="text-xs sm:text-sm font-bold text-white">Moral Integrity &amp; Discipline</h4>
-                  <p class="text-[11px] text-slate-400 mt-0.5">Nurturing sound moral grounding, leadership qualities, and personal accountability in every learner.</p>
-                </div>
+            <!-- Advantage 3 -->
+            <div class="p-3.5 rounded-2xl bg-slate-800/70 border border-slate-700/60 flex items-start space-x-3.5">
+              <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-base flex-shrink-0 mt-0.5">
+                <i class="fas fa-shield-heart"></i>
+              </div>
+              <div>
+                <h3 class="text-xs sm:text-sm font-bold text-white">Moral Discipline &amp; Character</h3>
+                <p class="text-[11px] text-slate-400 mt-0.5">Nurturing high moral integrity, respectful culture, leadership grooming, and personal accountability in every learner.</p>
               </div>
             </div>
 
-            <!-- Feature 4: Prime Campus in Ogijo -->
-            <div class="p-3.5 rounded-2xl bg-slate-800/80 border border-slate-700/80">
-              <div class="flex items-start space-x-3">
-                <div class="w-9 h-9 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-sm flex-shrink-0 mt-0.5">
-                  <i class="fas fa-map-marker-alt"></i>
-                </div>
-                <div>
-                  <h4 class="text-xs sm:text-sm font-bold text-white">Ogijo Campus Location</h4>
-                  <p class="text-[11px] text-slate-400 mt-0.5">5-7 Olukayode Street, Imoro, Ogijo, Ogun State. Safe, secured, and easily accessible learning environment.</p>
-                </div>
+            <!-- Advantage 4 -->
+            <div class="p-3.5 rounded-2xl bg-slate-800/70 border border-slate-700/60 flex items-start space-x-3.5">
+              <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-base flex-shrink-0 mt-0.5">
+                <i class="fas fa-map-marked-alt"></i>
+              </div>
+              <div>
+                <h3 class="text-xs sm:text-sm font-bold text-white">Ogijo Campus Location</h3>
+                <p class="text-[11px] text-slate-400 mt-0.5">5-7 Olukayode Street, Imoro, Ogijo. Safe, gated, and easily accessible along the Sagamu-Ikorodu corridor.</p>
               </div>
             </div>
 
           </div>
         </div>
+
       </div>
     </div>
   </section>
 
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• INTERACTIVE FEE CLEARANCE & BALANCE CHECKER â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-  <section id="clearance-checker" class="py-12 bg-gradient-to-b from-slate-900 to-sky-950 text-white border-y border-slate-800">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="bg-slate-900/80 border border-sky-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-md">
+  <!-- ═══════════════════════════════════════════════════════════════
+       4. ABOUT DE PORTAL SCHOOLS & LEADERSHIP WELCOME
+       ═══════════════════════════════════════════════════════════════ -->
+  <section id="about" class="py-16 sm:py-20 bg-white border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <!-- Visual Column -->
+        <div class="lg:col-span-5 relative">
+          <div class="rounded-3xl overflow-hidden shadow-2xl border-4 border-slate-100">
+            <img 
+              src="https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?auto=format&fit=crop&w=1000&q=80" 
+              alt="De Portal Schools Campus Complex" 
+              class="w-full h-80 sm:h-96 object-cover"
+            >
+          </div>
+          <!-- Floating Credential Card -->
+          <div class="absolute -bottom-6 -right-4 sm:right-6 bg-slate-900 text-white p-5 rounded-2xl shadow-xl border border-slate-700 max-w-xs">
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl font-bold">
+                <i class="fas fa-certificate"></i>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-slate-300">Govt. Approved &amp; Accredited</div>
+                <div class="text-sm font-extrabold text-white">WAEC &amp; BECE Examination Center</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Text Content -->
+        <div class="lg:col-span-7 space-y-6">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-widest text-sky-700 bg-sky-50 px-3 py-1 rounded-full border border-sky-200">
+              Welcome to De Portal Schools
+            </span>
+            <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-900 mt-3 leading-tight">
+              A Culture of Distinction, Diligence and Integrity
+            </h2>
+          </div>
+
+          <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
+            At <strong>De Portal Schools</strong>, we believe every child is endowed with boundless potential waiting to be ignited. Located in the serene town of Ogijo, Ogun State, our institution has stood as an oasis of rigorous academics, Christian moral values, and wholesome character formation.
+          </p>
+
+          <p class="text-slate-600 text-sm leading-relaxed">
+            From our Early Years foundation where curiosity is cultivated, through Junior Secondary where BECE candidates achieve distinctions, to our Senior Secondary College where students excel in Science, Arts, and Commercial tracks for WAEC and JAMB &mdash; our dedicated educators nurture every learner with individualized care.
+          </p>
+
+          <!-- Core Pillars Grid -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2">
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-center">
+              <i class="fas fa-brain text-sky-600 text-xl mb-1.5"></i>
+              <div class="font-bold text-xs text-slate-900">Academic Rigour</div>
+              <div class="text-[10px] text-slate-500 mt-0.5">Top examination records</div>
+            </div>
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-center">
+              <i class="fas fa-shield-alt text-emerald-600 text-xl mb-1.5"></i>
+              <div class="font-bold text-xs text-slate-900">Moral Grounding</div>
+              <div class="text-[10px] text-slate-500 mt-0.5">Godly values &amp; ethics</div>
+            </div>
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-center">
+              <i class="fas fa-laptop-code text-indigo-600 text-xl mb-1.5"></i>
+              <div class="font-bold text-xs text-slate-900">Digital Fluency</div>
+              <div class="text-[10px] text-slate-500 mt-0.5">JAMB CBT &amp; ICT center</div>
+            </div>
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-center">
+              <i class="fas fa-users text-amber-600 text-xl mb-1.5"></i>
+              <div class="font-bold text-xs text-slate-900">Leadership</div>
+              <div class="text-[10px] text-slate-500 mt-0.5">Global visionaries</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       5. ACADEMIC DIVISIONS & CURRICULUM
+       ═══════════════════════════════════════════════════════════════ -->
+  <section id="academics" class="py-16 sm:py-20 bg-slate-50 border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-14">
+        <span class="text-xs font-bold uppercase tracking-widest text-sky-700 bg-sky-100 px-3 py-1 rounded-full border border-sky-200">
+          Academic Architecture
+        </span>
+        <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-900 mt-3">
+          Comprehensive British-Nigerian Curriculum
+        </h2>
+        <p class="text-slate-600 text-sm mt-2">
+          Tailored learning pathways from early childhood development to university preparatory senior secondary divisions.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         
-        <div class="text-center max-w-2xl mx-auto mb-6">
-          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 uppercase tracking-widest">
-            <i class="fas fa-id-card mr-1.5"></i> Parent &amp; Student Self-Service
+        <!-- Cohort 1: Early Years & Primary -->
+        <div class="bg-white rounded-3xl p-7 border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
+          <div>
+            <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl mb-5">
+              <i class="fas fa-child"></i>
+            </div>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100/70 px-2.5 py-0.5 rounded-full">
+              Foundation Stage
+            </span>
+            <h3 class="text-xl font-extrabold text-slate-900 mt-2">Early Years &amp; Primary School</h3>
+            <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+              Day Care, Creche, Nursery 1 &amp; 2, and Primary 1 through 6. Cultivating literacy, numeracy, scientific curiosity, phonetics, and social dexterity in a joyful, secure atmosphere.
+            </p>
+            <ul class="mt-4 space-y-2 text-xs text-slate-600 border-t border-slate-100 pt-3">
+              <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-500"></i> Phonics &amp; Diction Mastery</li>
+              <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-500"></i> Mathematics &amp; Quantitative Logic</li>
+              <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-500"></i> Hands-on Discovery &amp; Arts</li>
+            </ul>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-100">
+            <span class="text-[11px] font-semibold text-slate-500">Ages: 6 months &ndash; 11 years</span>
+          </div>
+        </div>
+
+        <!-- Cohort 2: Junior Secondary College -->
+        <div class="bg-white rounded-3xl p-7 border-2 border-sky-500 shadow-lg relative flex flex-col justify-between">
+          <div class="absolute -top-3.5 right-6 bg-sky-600 text-white text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-md">
+            BECE Center
+          </div>
+          <div>
+            <div class="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center text-2xl mb-5">
+              <i class="fas fa-school"></i>
+            </div>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-sky-700 bg-sky-100 px-2.5 py-0.5 rounded-full">
+              Middle School
+            </span>
+            <h3 class="text-xl font-extrabold text-slate-900 mt-2">Junior College (JSS 1 &ndash; 3)</h3>
+            <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+              JSS 1A/B, JSS 2A/B, and JSS 3A/B. Building academic stamina, critical thinking, Basic Technology, and intensive coaching for the Basic Education Certificate Examination (BECE).
+            </p>
+            <ul class="mt-4 space-y-2 text-xs text-slate-600 border-t border-slate-100 pt-3">
+              <li class="flex items-center gap-2"><i class="fas fa-check text-sky-500"></i> Basic Science &amp; Technology Practical</li>
+              <li class="flex items-center gap-2"><i class="fas fa-check text-sky-500"></i> Business Studies &amp; ICT</li>
+              <li class="flex items-center gap-2"><i class="fas fa-check text-sky-500"></i> BECE Extension Intensive Tutorials</li>
+            </ul>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-100">
+            <span class="text-[11px] font-semibold text-slate-500">Examinations: BECE &amp; State Checkpoint</span>
+          </div>
+        </div>
+
+        <!-- Cohort 3: Senior Secondary College -->
+        <div class="bg-white rounded-3xl p-7 border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
+          <div>
+            <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-2xl mb-5">
+              <i class="fas fa-graduation-cap"></i>
+            </div>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-purple-700 bg-purple-100 px-2.5 py-0.5 rounded-full">
+              Senior Secondary
+            </span>
+            <h3 class="text-xl font-extrabold text-slate-900 mt-2">Senior College (SSS 1 &ndash; 3)</h3>
+            <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+              Pure Sciences, Arts &amp; Humanities, and Commercial divisions. High-rigour curriculum preparing candidates for WAEC, NECO, and JAMB UTME with standard CBT practice.
+            </p>
+            <ul class="mt-4 space-y-2 text-xs text-slate-600 border-t border-slate-100 pt-3">
+              <li class="flex items-center gap-2"><i class="fas fa-check text-purple-500"></i> Science: Physics, Chemistry, Biology, F/Maths</li>
+              <li class="flex items-center gap-2"><i class="fas fa-check text-purple-500"></i> Arts: Literature, Government, CRS/IRS</li>
+              <li class="flex items-center gap-2"><i class="fas fa-check text-purple-500"></i> Commercial: Accounting, Commerce, Economics</li>
+            </ul>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-100">
+            <span class="text-[11px] font-semibold text-slate-500">Examinations: WAEC, NECO &amp; JAMB UTME</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       6. CAMPUS FACILITIES & LEARNING INFRASTRUCTURE
+       ═══════════════════════════════════════════════════════════════ -->
+  <section id="facilities" class="py-16 sm:py-20 bg-white border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-14">
+        <span class="text-xs font-bold uppercase tracking-widest text-sky-700 bg-sky-50 px-3 py-1 rounded-full border border-sky-200">
+          World-Class Infrastructure
+        </span>
+        <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-900 mt-3">
+          Inside De Portal Schools Campus, Ogijo
+        </h2>
+        <p class="text-slate-600 text-sm mt-2">
+          Modern educational facilities designed to nurture academic giants, sports champions, and grounded leaders.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        
+        <!-- Facility 1: STEM Science Labs -->
+        <div class="group bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300">
+          <div class="h-56 overflow-hidden relative">
+            <img 
+              src="https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=800&q=80" 
+              alt="Science Laboratory" 
+              class="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+            >
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
+            <span class="absolute bottom-3 left-4 text-xs font-bold text-sky-300 bg-slate-900/80 px-2.5 py-0.5 rounded-lg border border-slate-700">
+              STEM &amp; Innovation
+            </span>
+          </div>
+          <div class="p-6">
+            <h3 class="text-lg font-bold text-slate-900">Ultra-Modern Science Laboratories</h3>
+            <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+              Equipped with precision apparatus for Physics, Chemistry, and Biology practicals adhering strictly to WAEC and Cambridge benchmarks.
+            </p>
+          </div>
+        </div>
+
+        <!-- Facility 2: LaTeX JAMB CBT Center -->
+        <div class="group bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300">
+          <div class="h-56 overflow-hidden relative">
+            <img 
+              src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80" 
+              alt="Computer Based Test Center" 
+              class="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+            >
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
+            <span class="absolute bottom-3 left-4 text-xs font-bold text-emerald-300 bg-slate-900/80 px-2.5 py-0.5 rounded-lg border border-slate-700">
+              JAMB Standard CBT
+            </span>
+          </div>
+          <div class="p-6">
+            <h3 class="text-lg font-bold text-slate-900">LaTeX CBT Assessment Laboratory</h3>
+            <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+              Modern networked workstations supporting KaTeX mathematical formula rendering, timing simulations, and instant score reconciliation.
+            </p>
+          </div>
+        </div>
+
+        <!-- Facility 3: E-Library & Resource Hub -->
+        <div class="group bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300">
+          <div class="h-56 overflow-hidden relative">
+            <img 
+              src="https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=800&q=80" 
+              alt="Digital Library" 
+              class="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+            >
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
+            <span class="absolute bottom-3 left-4 text-xs font-bold text-amber-300 bg-slate-900/80 px-2.5 py-0.5 rounded-lg border border-slate-700">
+              Research &amp; Study
+            </span>
+          </div>
+          <div class="p-6">
+            <h3 class="text-lg font-bold text-slate-900">Digital Multimedia E-Library</h3>
+            <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+              Over 25,000 digital textbooks, encyclopedia archives, approved NERDC curriculum readers, and quiet study cubicles.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       7. PARENT SELF-SERVICE FEE & CLEARANCE CHECKER
+       ═══════════════════════════════════════════════════════════════ -->
+  <section id="clearance" class="py-16 sm:py-20 bg-gradient-to-b from-slate-900 to-sky-950 text-white border-y border-slate-800">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="bg-slate-900/90 border border-sky-500/30 rounded-3xl p-6 sm:p-10 shadow-2xl backdrop-blur-xl">
+        
+        <div class="text-center max-w-2xl mx-auto mb-8">
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 uppercase tracking-widest">
+            <i class="fas fa-id-card mr-1.5"></i> Parent Self-Service
           </span>
-          <h2 class="text-2xl sm:text-3xl font-black text-white mt-2">
+          <h2 class="text-2xl sm:text-3xl font-black text-white mt-3">
             Verify Student Fee &amp; Exam Clearance Status
           </h2>
-          <p class="text-slate-400 text-xs sm:text-sm mt-1">
-            Instantly check current term fee balance, past arrears, payment history, and examination clearance card status.
+          <p class="text-slate-300 text-xs sm:text-sm mt-2">
+            Instantly check current term fee status, past arrears, payment totals, and examination card clearance.
           </p>
         </div>
 
-        <!-- Search Bar -->
-        <div class="max-w-xl mx-auto mb-4">
+        <!-- Search Form -->
+        <div class="max-w-xl mx-auto">
           <form id="clearanceLookupForm" onsubmit="event.preventDefault(); lookupStudentClearance();" class="flex gap-2">
             <div class="relative flex-1">
               <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
@@ -308,498 +675,120 @@
                 type="text" 
                 id="clearanceSearchInput" 
                 required
-                placeholder="Enter Student ID or Reg No (e.g. EMC/2026/001)"
-                class="w-full pl-10 pr-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs sm:text-sm font-semibold focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 uppercase placeholder:normal-case placeholder:text-slate-500"
+                placeholder="Enter Student Reg No (e.g. DPS/2026/001)"
+                class="w-full pl-10 pr-4 py-3.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs sm:text-sm font-semibold focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 uppercase placeholder:normal-case placeholder:text-slate-500"
               >
             </div>
             <button 
               type="submit" 
-              class="px-5 py-3 rounded-xl bg-gradient-to-r from-sky-600 to-sky-500 hover:from-sky-500 hover:to-sky-400 text-white font-bold text-xs sm:text-sm transition flex items-center gap-1.5 shadow-md shadow-sky-600/30"
+              class="px-6 py-3.5 rounded-xl bg-gradient-to-r from-sky-600 to-sky-500 hover:from-sky-500 hover:to-sky-400 text-white font-bold text-xs sm:text-sm transition flex items-center gap-1.5 shadow-md shadow-sky-600/30 cursor-pointer"
             >
               <span>Verify</span>
               <i class="fas fa-arrow-right text-xs"></i>
             </button>
           </form>
 
-          <!-- Quick Test IDs -->
-          <div class="mt-2.5 flex flex-wrap items-center justify-center gap-2 text-xs text-slate-400">
-            <span>Quick Sample IDs:</span>
-            <button type="button" onclick="setQuickClearance('EMC/2026/001')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-sky-400 font-mono text-[11px] border border-slate-700">EMC/2026/001</button>
-            <button type="button" onclick="setQuickClearance('EMC/2026/002')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-sky-400 font-mono text-[11px] border border-slate-700">EMC/2026/002</button>
-            <button type="button" onclick="setQuickClearance('EMC/2026/003')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-sky-400 font-mono text-[11px] border border-slate-700">EMC/2026/003</button>
-          </div>
+          <p class="text-[11px] text-slate-400 text-center mt-3">
+            <i class="fas fa-shield-alt text-sky-400 mr-1"></i> Data synchronized with official school bursary database.
+          </p>
         </div>
 
         <!-- Result Box (Hidden until searched) -->
-        <div id="clearanceResultBox" class="hidden mt-6 p-5 rounded-2xl bg-slate-950 border border-slate-800">
+        <div id="clearanceResultBox" class="hidden mt-6 p-5 sm:p-6 rounded-2xl bg-slate-950 border border-slate-800">
           <div id="clearanceCardContent"></div>
         </div>
 
       </div>
+
     </div>
   </section>
 
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• CORE ACCOUNTING & BURSARY ENGINE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-  <section id="accounting" class="py-16 bg-white border-b border-slate-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <!-- ═══════════════════════════════════════════════════════════════
+       8. ADMISSIONS 2026/2027 & ENQUIRY FORM
+       ═══════════════════════════════════════════════════════════════ -->
+  <section id="admissions" class="py-16 sm:py-20 bg-slate-50 border-b border-slate-200">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
       
-      <div class="text-center max-w-3xl mx-auto mb-14">
-        <span class="text-xs font-bold uppercase tracking-widest text-sky-700 bg-sky-100 px-3 py-1 rounded-full border border-sky-200">
-          Double-Entry Accounting Architecture
-        </span>
-        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-3">
-          Majorly Engineered for Institutional Financial Precision
-        </h2>
-        <p class="text-slate-600 text-sm sm:text-base mt-2">
-          Eliminate school fee defaults, manual receipt tampering, and untracked expenses with BursarIQ's enterprise accounting modules.
-        </p>
-      </div>
-
-      <!-- Feature Grid: 6 Pillars of Bursary -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div class="bg-white rounded-3xl p-8 sm:p-12 border border-slate-200 shadow-xl">
         
-        <!-- Pillar 1: Arrears-First Recovery -->
-        <div class="p-6 rounded-3xl bg-slate-50 border border-slate-200 hover:border-emerald-400 hover:shadow-xl hover:shadow-emerald-500/10 transition group">
-          <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl mb-4 group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition duration-300">
-            <i class="fas fa-hand-holding-usd"></i>
-          </div>
-          <h3 class="text-base sm:text-lg font-bold text-slate-900 mb-2">Arrears-First Payment Recovery</h3>
-          <p class="text-xs text-slate-600 leading-relaxed">
-            Incoming tuition and fee payments are algorithmically prioritized to extinguish past unpaid arrears before crediting current term tuition, halting bad debts automatically.
-          </p>
-          <div class="mt-4 flex items-center text-xs font-bold text-emerald-700">
-            <span>Zero Debt Accumulation</span> <i class="fas fa-check-circle ml-1.5"></i>
-          </div>
-        </div>
-
-        <!-- Pillar 2: Digital Receipts -->
-        <div class="p-6 rounded-3xl bg-slate-50 border border-slate-200 hover:border-sky-400 hover:shadow-xl hover:shadow-sky-500/10 transition group">
-          <div class="w-12 h-12 rounded-2xl bg-sky-100 text-sky-700 flex items-center justify-center text-xl mb-4 group-hover:scale-110 group-hover:bg-sky-600 group-hover:text-white transition duration-300">
-            <i class="fas fa-receipt"></i>
-          </div>
-          <h3 class="text-base sm:text-lg font-bold text-slate-900 mb-2">Cryptographic Digital Receipts</h3>
-          <p class="text-xs text-slate-600 leading-relaxed">
-            Every transaction issues an official PDF receipt featuring bank reconciliation references, tuition itemizations, and verification hashes for parent peace of mind.
-          </p>
-          <div class="mt-4 flex items-center text-xs font-bold text-sky-700">
-            <span>Instant PDF Print &amp; Download</span> <i class="fas fa-print ml-1.5"></i>
-          </div>
-        </div>
-
-        <!-- Pillar 3: Income & Expenditure P&L -->
-        <div class="p-6 rounded-3xl bg-slate-50 border border-slate-200 hover:border-indigo-400 hover:shadow-xl hover:shadow-indigo-500/10 transition group">
-          <div class="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-700 flex items-center justify-center text-xl mb-4 group-hover:scale-110 group-hover:bg-indigo-600 group-hover:text-white transition duration-300">
-            <i class="fas fa-chart-pie"></i>
-          </div>
-          <h3 class="text-base sm:text-lg font-bold text-slate-900 mb-2">Income &amp; Expenditure Ledger</h3>
-          <p class="text-xs text-slate-600 leading-relaxed">
-            Real-time operating cashbook comparing daily collections against categorized operational expenses (fuel, diesel, maintenance, teaching aids) with surplus/deficit reporting.
-          </p>
-          <div class="mt-4 flex items-center text-xs font-bold text-indigo-700">
-            <span>Real-Time Audit Trail</span> <i class="fas fa-balance-scale ml-1.5"></i>
-          </div>
-        </div>
-
-        <!-- Pillar 4: Payroll & Loans -->
-        <div class="p-6 rounded-3xl bg-slate-50 border border-slate-200 hover:border-amber-400 hover:shadow-xl hover:shadow-amber-500/10 transition group">
-          <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center text-xl mb-4 group-hover:scale-110 group-hover:bg-amber-600 group-hover:text-white transition duration-300">
-            <i class="fas fa-money-check-alt"></i>
-          </div>
-          <h3 class="text-base sm:text-lg font-bold text-slate-900 mb-2">Staff Payroll &amp; Loan Ledger</h3>
-          <p class="text-xs text-slate-600 leading-relaxed">
-            Automated monthly salary computations factoring in allowances, statutory deductions, staff loan disbursements, and scheduled monthly loan repayments.
-          </p>
-          <div class="mt-4 flex items-center text-xs font-bold text-amber-700">
-            <span>Integrated Salary Slips</span> <i class="fas fa-file-invoice-dollar ml-1.5"></i>
-          </div>
-        </div>
-
-        <!-- Pillar 5: Stock & Inventory Control -->
-        <div class="p-6 rounded-3xl bg-slate-50 border border-slate-200 hover:border-purple-400 hover:shadow-xl hover:shadow-purple-500/10 transition group">
-          <div class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center text-xl mb-4 group-hover:scale-110 group-hover:bg-purple-600 group-hover:text-white transition duration-300">
-            <i class="fas fa-boxes"></i>
-          </div>
-          <h3 class="text-base sm:text-lg font-bold text-slate-900 mb-2">Stock &amp; Store Inventory</h3>
-          <p class="text-xs text-slate-600 leading-relaxed">
-            Tracks school uniforms, textbooks, science laboratory reagents, and stationery supplies. Auto-calculates total inventory valuation with low-stock warnings.
-          </p>
-          <div class="mt-4 flex items-center text-xs font-bold text-purple-700">
-            <span>Asset Valuation Ledger</span> <i class="fas fa-warehouse ml-1.5"></i>
-          </div>
-        </div>
-
-        <!-- Pillar 6: Clearance System -->
-        <div class="p-6 rounded-3xl bg-slate-50 border border-slate-200 hover:border-teal-400 hover:shadow-xl hover:shadow-teal-500/10 transition group">
-          <div class="w-12 h-12 rounded-2xl bg-teal-100 text-teal-700 flex items-center justify-center text-xl mb-4 group-hover:scale-110 group-hover:bg-teal-600 group-hover:text-white transition duration-300">
-            <i class="fas fa-id-badge"></i>
-          </div>
-          <h3 class="text-base sm:text-lg font-bold text-slate-900 mb-2">Examination Clearance Cards</h3>
-          <p class="text-xs text-slate-600 leading-relaxed">
-            Enforces exam hall admission rules. The system generates tamper-evident examination clearance photo-cards solely for candidates with fully verified bursary clearance.
-          </p>
-          <div class="mt-4 flex items-center text-xs font-bold text-teal-700">
-            <span>Exam Fraud Protection</span> <i class="fas fa-shield-alt ml-1.5"></i>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Action Banner to Open Bursary -->
-      <div class="mt-12 p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-sky-900 via-sky-800 to-slate-900 text-white flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl">
-        <div>
-          <h3 class="text-lg sm:text-xl font-bold">Authorized Bursars &amp; Administrators</h3>
-          <p class="text-xs text-sky-200 mt-1">Access the central accounting ledger, record payments, disburse salaries, and print audit reports.</p>
-        </div>
-        <div class="px-5 py-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-semibold flex items-center gap-2"><i class="fas fa-shield-alt text-emerald-400"></i> Zero-Loss Institutional Accounting System</div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• MULTI-SUBJECT JAMB CBT SHOWCASE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-  <section id="cbt" class="py-16 bg-slate-100 border-b border-slate-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-        <!-- Left Side: CBT Engine Details -->
-        <div class="lg:col-span-6 space-y-5">
-          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-800 border border-amber-300 uppercase tracking-widest">
-            <i class="fas fa-laptop-code mr-1.5"></i> Computer-Based Test Center
+        <div class="text-center max-w-2xl mx-auto mb-10">
+          <span class="text-xs font-bold uppercase tracking-widest text-sky-700 bg-sky-100 px-3 py-1 rounded-full border border-sky-200">
+            Admissions 2026/2027 Academic Year
           </span>
-
-          <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight">
-            Standard JAMB &amp; WAEC Multi-Subject CBT Platform
+          <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-900 mt-3">
+            Join the Citadel of Distinction
           </h2>
-
-          <p class="text-slate-600 text-sm leading-relaxed">
-            Prepare senior college students for national qualifying exams with our timed, responsive examination simulator. Supports mathematical formulas with KaTeX LaTeX rendering and real-time score grading.
+          <p class="text-slate-600 text-sm mt-2">
+            Admission forms are available for Creche, Nursery, Primary 1&ndash;6, JSS 1&ndash;3, and SSS 1&ndash;3.
           </p>
+        </div>
 
-          <!-- 8 Subjects Grid -->
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2">
-            <div class="p-3 bg-white rounded-xl border border-slate-200 text-center shadow-sm">
-              <i class="fas fa-book-open text-sky-600 text-base mb-1"></i>
-              <div class="text-xs font-bold text-slate-800">English</div>
-            </div>
-            <div class="p-3 bg-white rounded-xl border border-slate-200 text-center shadow-sm">
-              <i class="fas fa-square-root-variable text-emerald-600 text-base mb-1"></i>
-              <div class="text-xs font-bold text-slate-800">Mathematics</div>
-            </div>
-            <div class="p-3 bg-white rounded-xl border border-slate-200 text-center shadow-sm">
-              <i class="fas fa-dna text-teal-600 text-base mb-1"></i>
-              <div class="text-xs font-bold text-slate-800">Biology</div>
-            </div>
-            <div class="p-3 bg-white rounded-xl border border-slate-200 text-center shadow-sm">
-              <i class="fas fa-atom text-purple-600 text-base mb-1"></i>
-              <div class="text-xs font-bold text-slate-800">Physics</div>
-            </div>
-            <div class="p-3 bg-white rounded-xl border border-slate-200 text-center shadow-sm">
-              <i class="fas fa-flask text-pink-600 text-base mb-1"></i>
-              <div class="text-xs font-bold text-slate-800">Chemistry</div>
-            </div>
-            <div class="p-3 bg-white rounded-xl border border-slate-200 text-center shadow-sm">
-              <i class="fas fa-chart-line text-indigo-600 text-base mb-1"></i>
-              <div class="text-xs font-bold text-slate-800">Economics</div>
-            </div>
-            <div class="p-3 bg-white rounded-xl border border-slate-200 text-center shadow-sm">
-              <i class="fas fa-landmark text-amber-600 text-base mb-1"></i>
-              <div class="text-xs font-bold text-slate-800">Government</div>
-            </div>
-            <div class="p-3 bg-white rounded-xl border border-slate-200 text-center shadow-sm">
-              <i class="fas fa-store text-blue-600 text-base mb-1"></i>
-              <div class="text-xs font-bold text-slate-800">Commerce</div>
-            </div>
+        <!-- 4-Step Admission Journey -->
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-10 text-center">
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="w-8 h-8 rounded-full bg-sky-600 text-white font-bold text-sm flex items-center justify-center mx-auto mb-2">1</div>
+            <div class="font-bold text-xs text-slate-900">Application</div>
+            <div class="text-[11px] text-slate-500 mt-0.5">Submit form online or at campus</div>
           </div>
-
-          <div class="pt-3">
-            <div class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-amber-100 text-amber-900 font-bold text-xs border border-amber-300 shadow-sm">
-              <i class="fas fa-lock text-amber-600"></i> Administered Securely in Campus CBT Laboratory
-            </div>
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="w-8 h-8 rounded-full bg-sky-600 text-white font-bold text-sm flex items-center justify-center mx-auto mb-2">2</div>
+            <div class="font-bold text-xs text-slate-900">Assessment</div>
+            <div class="text-[11px] text-slate-500 mt-0.5">Placement exam &amp; evaluation</div>
+          </div>
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="w-8 h-8 rounded-full bg-sky-600 text-white font-bold text-sm flex items-center justify-center mx-auto mb-2">3</div>
+            <div class="font-bold text-xs text-slate-900">Interview</div>
+            <div class="text-[11px] text-slate-500 mt-0.5">Parent &amp; student dialogue</div>
+          </div>
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <div class="w-8 h-8 rounded-full bg-emerald-600 text-white font-bold text-sm flex items-center justify-center mx-auto mb-2">4</div>
+            <div class="font-bold text-xs text-slate-900">Enrollment</div>
+            <div class="text-[11px] text-slate-500 mt-0.5">Admission letter &amp; resumption</div>
           </div>
         </div>
 
-        <!-- Right Side: CBT Mock Preview Card -->
-        <div class="lg:col-span-6">
-          <div class="bg-slate-900 rounded-3xl p-6 shadow-2xl border border-slate-800 text-white space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-              <div class="flex items-center gap-2">
-                <span class="w-3 h-3 rounded-full bg-red-500"></span>
-                <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
-                <span class="w-3 h-3 rounded-full bg-green-500"></span>
-                <span class="text-xs font-mono text-slate-400 ml-2">CBT Examination Screen</span>
-              </div>
-              <span class="px-2 py-0.5 rounded bg-slate-800 text-emerald-400 font-mono text-xs font-bold">29:45 Remaining</span>
-            </div>
-
-            <div class="p-4 rounded-xl bg-slate-800/80 border border-slate-700/80">
-              <div class="flex justify-between text-xs text-slate-400 mb-2">
-                <span>Subject: <strong class="text-sky-400">Mathematics</strong></span>
-                <span>Question <strong>14 of 40</strong></span>
-              </div>
-              <p class="text-sm font-semibold text-slate-100">
-                If the quadratic equation \(2x^2 - 7x + k = 0\) has equal roots, find the exact value of \(k\).
-              </p>
-              <div class="grid grid-cols-2 gap-2 mt-3 text-xs">
-                <div class="p-2 rounded-lg bg-slate-900 border border-slate-700 text-slate-300">A. 49/8</div>
-                <div class="p-2 rounded-lg bg-emerald-950 border border-emerald-500 text-emerald-300 font-bold">B. 49/8 (Selected)</div>
-                <div class="p-2 rounded-lg bg-slate-900 border border-slate-700 text-slate-300">C. 7/4</div>
-                <div class="p-2 rounded-lg bg-slate-900 border border-slate-700 text-slate-300">D. 14</div>
-              </div>
-            </div>
-
-            <div class="flex items-center justify-between text-xs text-slate-400 pt-2">
-              <span>Single Attempt Enforcement</span>
-              <span class="text-emerald-400 font-bold">Instant WAEC Grade Generation</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• TEACHER PORTAL & ATTENDANCE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-  <section id="attendance" class="py-16 bg-white border-b border-slate-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-        <!-- Left Side: Teacher Portal Card -->
-        <div class="lg:col-span-5 order-2 lg:order-1">
-          <div class="bg-gradient-to-br from-slate-900 to-emerald-950 p-6 sm:p-8 rounded-3xl shadow-2xl border border-emerald-500/30 text-white space-y-5">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-emerald-500 text-slate-900 flex items-center justify-center font-bold text-lg">
-                  <i class="fas fa-chalkboard-teacher"></i>
-                </div>
-                <div>
-                  <h4 class="font-bold text-sm">Class Teacher Portal</h4>
-                  <p class="text-xs text-emerald-400">Secure Staff Phone &amp; Password Auth</p>
-                </div>
-              </div>
-            </div>
-
-            <div class="space-y-3 text-xs">
-              <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700 flex items-center justify-between">
-                <div>
-                  <span class="text-slate-400 block text-[10px] uppercase font-bold">Session Roll Call</span>
-                  <strong class="text-white">Morning Roll Call (AM)</strong>
-                </div>
-                <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold">Arrivals</span>
-              </div>
-              <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700 flex items-center justify-between">
-                <div>
-                  <span class="text-slate-400 block text-[10px] uppercase font-bold">Session Roll Call</span>
-                  <strong class="text-white">Afternoon Roll Call (PM)</strong>
-                </div>
-                <span class="px-2 py-0.5 rounded bg-sky-500/20 text-sky-400 font-bold">Dismissals</span>
-              </div>
-              <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700 flex items-center justify-between">
-                <div>
-                  <span class="text-slate-400 block text-[10px] uppercase font-bold">Accountability</span>
-                  <strong class="text-white">Assigned Class Teacher Lockdown</strong>
-                </div>
-                <span class="px-2 py-0.5 rounded bg-purple-500/20 text-purple-400 font-bold">Zero Fraud</span>
-              </div>
-            </div>
-
-            <div class="block w-full py-2.5 text-center rounded-xl bg-slate-800 text-slate-300 font-semibold text-xs border border-slate-700"><i class="fas fa-lock text-emerald-400 mr-1.5"></i> Authorized Staff Access Only</div>
-          </div>
-        </div>
-
-        <!-- Right Side: Details -->
-        <div class="lg:col-span-7 order-1 lg:order-2 space-y-5">
-          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-700 border border-emerald-300 uppercase tracking-widest">
-            <i class="fas fa-clipboard-check mr-1.5"></i> Daily Learners Attendance
-          </span>
-
-          <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight">
-            Class Teacher Morning &amp; Afternoon Attendance Roll Call
-          </h2>
-
-          <p class="text-slate-600 text-sm leading-relaxed">
-            School administrators generate unique login credentials (registered phone number + secure unique password) for teaching staff. Class teachers mark daily morning arrivals and afternoon departures for their assigned learners, with records immediately synchronized into termly broadsheets.
-          </p>
-
-          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
-            <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200">
-              <div class="text-emerald-600 text-lg mb-1"><i class="fas fa-check-double"></i></div>
-              <div class="font-bold text-slate-900 text-xs">One-Click Present</div>
-              <p class="text-[11px] text-slate-500 mt-0.5">Quick mark all present in seconds</p>
-            </div>
-            <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200">
-              <div class="text-amber-600 text-lg mb-1"><i class="fas fa-clock"></i></div>
-              <div class="font-bold text-slate-900 text-xs">Late &amp; Excused</div>
-              <p class="text-[11px] text-slate-500 mt-0.5">Custom remarks and reasons</p>
-            </div>
-            <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 col-span-2 sm:col-span-1">
-              <div class="text-sky-600 text-lg mb-1"><i class="fas fa-chart-bar"></i></div>
-              <div class="font-bold text-slate-900 text-xs">Report Card Sync</div>
-              <p class="text-[11px] text-slate-500 mt-0.5">Attendance rates appear on PDF result</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• EXAMS & RECORDS / BROADSHEET SHOWCASE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-  <section id="exams" class="py-16 bg-slate-50 border-b border-slate-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      
-      <div class="text-center max-w-3xl mx-auto mb-12">
-        <span class="text-xs font-bold uppercase tracking-widest text-purple-700 bg-purple-100 px-3 py-1 rounded-full border border-purple-200">
-          Exams &amp; Records Architecture
-        </span>
-        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-3">
-          Automated Broadsheets &amp; Official Terminal Report Cards
-        </h2>
-        <p class="text-slate-600 text-sm mt-2">
-          Class ranking (1st, 2nd, 3rd), terminal average calculations, psychomotor skill ratings, and one-click PDF printouts.
-        </p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="p-6 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-3">
-          <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold">
-            <i class="fas fa-table text-lg"></i>
-          </div>
-          <h3 class="text-base font-bold text-slate-900">Class-Wide Broadsheet Matrix</h3>
-          <p class="text-xs text-slate-600 leading-relaxed">
-            Consolidated terminal matrix aggregating student continuous assessment scores (CA 1, CA 2) and examination marks with automatic position rankings.
-          </p>
-          <span class="inline-block text-[11px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-200">Exportable to CSV</span>
-        </div>
-
-        <div class="p-6 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-3">
-          <div class="w-10 h-10 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center font-bold">
-            <i class="fas fa-file-pdf text-lg"></i>
-          </div>
-          <h3 class="text-base font-bold text-slate-900">Instant PDF Terminal Report Cards</h3>
-          <p class="text-xs text-slate-600 leading-relaxed">
-            Complete official Nigerian school report card featuring school crest, terminal average, attendance breakdown, Form Teacher comments, and Principal signature block.
-          </p>
-          <span class="inline-block text-[11px] font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-200">100% Print Ready</span>
-        </div>
-
-        <div class="p-6 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-3">
-          <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
-            <i class="fas fa-sync text-lg"></i>
-          </div>
-          <h3 class="text-base font-bold text-slate-900">CBT Score Synchronization</h3>
-          <p class="text-xs text-slate-600 leading-relaxed">
-            One-click automated synchronization scaling CBT test performance (40 marks) to terminal examination ledgers (60 marks) without duplicate data entry.
-          </p>
-          <span class="inline-block text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Zero Manual Transfer</span>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• CAMPUS FACILITIES & ABOUT â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-  <section id="about" class="py-16 bg-white border-b border-slate-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      
-      <div class="text-center max-w-3xl mx-auto mb-12">
-        <span class="text-xs font-bold uppercase tracking-widest text-sky-600 bg-sky-50 px-3 py-1 rounded-full border border-sky-200">
-          World-Class Infrastructure
-        </span>
-        <h2 class="text-3xl font-bold text-slate-900 mt-3">
-          Inside <span class="school-name-text">DE PORTAL SCHOOLS</span> Campus
-        </h2>
-        <p class="text-slate-500 text-sm mt-1">
-          Ultra-modern facilities designed to nurture academic giants, sports champions, and grounded leaders.
-        </p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Photo 1 -->
-        <div class="group relative rounded-2xl overflow-hidden shadow-md bg-white border border-slate-200 h-72">
-          <img src="https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?auto=format&fit=crop&w=800&q=80" alt="Main College Complex" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
-          <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/30 to-transparent flex flex-col justify-end p-5 text-white">
-            <span class="text-xs font-semibold text-sky-300">Central Block</span>
-            <h4 class="text-base font-bold">Administrative &amp; Bursary Complex</h4>
-            <p class="text-xs text-slate-200 mt-1 line-clamp-2">Houses the principal's office, bursary unit, council chambers, and digital records center.</p>
-          </div>
-        </div>
-
-        <!-- Photo 2 -->
-        <div class="group relative rounded-2xl overflow-hidden shadow-md bg-white border border-slate-200 h-72">
-          <img src="https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=800&q=80" alt="Science Laboratory" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
-          <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/30 to-transparent flex flex-col justify-end p-5 text-white">
-            <span class="text-xs font-semibold text-sky-300">STEM Innovation</span>
-            <h4 class="text-base font-bold">Ultra-Modern Science &amp; Robotics Lab</h4>
-            <p class="text-xs text-slate-200 mt-1 line-clamp-2">Equipped for Physics, Chemistry, Biology practicals adhering to WAEC &amp; Cambridge standards.</p>
-          </div>
-        </div>
-
-        <!-- Photo 3 -->
-        <div class="group relative rounded-2xl overflow-hidden shadow-md bg-white border border-slate-200 h-72">
-          <img src="https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=800&q=80" alt="Digital E-Library" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
-          <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/30 to-transparent flex flex-col justify-end p-5 text-white">
-            <span class="text-xs font-semibold text-sky-300">Resource Center</span>
-            <h4 class="text-base font-bold">Digital Multimedia E-Library</h4>
-            <p class="text-xs text-slate-200 mt-1 line-clamp-2">Over 25,000 digital journals, approved textbook catalogues, and high-speed internet cubicles.</p>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• ADMISSION & CONTACT FORM â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-  <section id="contact" class="py-16 bg-slate-100 border-t border-slate-200">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-xl">
-        
-        <div class="text-center max-w-xl mx-auto mb-8">
-          <span class="text-xs font-bold uppercase tracking-widest text-sky-700 bg-sky-50 px-3 py-1 rounded-full border border-sky-200">
-            Admissions &amp; Enquiries
-          </span>
-          <h2 class="text-2xl font-bold text-slate-900 mt-2">Connect with <span class="school-name-text">DE PORTAL SCHOOLS</span></h2>
-          <p class="text-xs text-slate-500 mt-1">Schedule a campus tour or request admission guidelines for the 2026/2027 academic year.</p>
-        </div>
-
+        <!-- Interactive Admission Enquiry Form -->
         <form id="publicEnquiryForm" onsubmit="event.preventDefault(); submitPublicEnquiry();" class="space-y-4">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Parent / Guardian Full Name *</label>
-              <input type="text" id="enqName" required placeholder="e.g. Chief &amp; Mrs. Adeleke" class="w-full p-3 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-sky-200 focus:outline-none">
+              <label class="block text-xs font-semibold text-slate-700 mb-1" for="enqName">Parent / Guardian Full Name *</label>
+              <input type="text" id="enqName" required placeholder="e.g. Chief &amp; Mrs. Adeleke" class="w-full p-3.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-sky-200 focus:outline-none">
             </div>
             <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">WhatsApp Phone Number *</label>
-              <input type="tel" id="enqPhone" required placeholder="e.g. 08012345678" class="w-full p-3 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-sky-200 focus:outline-none">
+              <label class="block text-xs font-semibold text-slate-700 mb-1" for="enqPhone">WhatsApp Phone Number *</label>
+              <input type="tel" id="enqPhone" required placeholder="e.g. 08012345678" class="w-full p-3.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-sky-200 focus:outline-none">
             </div>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Email Address *</label>
-              <input type="email" id="enqEmail" required placeholder="parent@example.com" class="w-full p-3 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-sky-200 focus:outline-none">
+              <label class="block text-xs font-semibold text-slate-700 mb-1" for="enqEmail">Email Address *</label>
+              <input type="email" id="enqEmail" required placeholder="parent@example.com" class="w-full p-3.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-sky-200 focus:outline-none">
             </div>
             <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Prospective Class of Entry</label>
-              <select id="enqClass" class="w-full p-3 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-sky-200 focus:outline-none">
-                <option value="JSS 1">JSS 1 (Junior College Year 1)</option>
-                <option value="JSS 2">JSS 2 (Transfer)</option>
-                <option value="JSS 3">JSS 3 (Transfer)</option>
+              <label class="block text-xs font-semibold text-slate-700 mb-1" for="enqClass">Class of Entry</label>
+              <select id="enqClass" class="w-full p-3.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-sky-200 focus:outline-none">
+                <option value="Creche / Nursery">Creche / Nursery</option>
+                <option value="Primary 1-6">Primary 1 &ndash; 6</option>
+                <option value="JSS 1">JSS 1 (Junior Secondary Year 1)</option>
+                <option value="JSS 2-3">JSS 2 &ndash; 3 (Transfer)</option>
                 <option value="SSS 1 Science">SSS 1 Science</option>
                 <option value="SSS 1 Art">SSS 1 Arts &amp; Humanities</option>
                 <option value="SSS 1 Commercial">SSS 1 Commercial</option>
-                <option value="SSS 2">SSS 2 (Transfer)</option>
-                <option value="SSS 3">SSS 3 (WAEC/NECO Final Year)</option>
-                <option value="Primary/Creche">Primary &amp; Early Years</option>
+                <option value="SSS 2-3">SSS 2 &ndash; 3 (Transfer)</option>
               </select>
             </div>
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-1">Tour Request or Enquiry Note</label>
-            <textarea id="enqNote" rows="3" placeholder="Tell us about your ward or your preferred campus tour date..." class="w-full p-3 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-sky-200 focus:outline-none"></textarea>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" for="enqNote">Tour Request or Specific Enquiry</label>
+            <textarea id="enqNote" rows="3" placeholder="Tell us about your ward or your preferred campus visit date..." class="w-full p-3.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-sky-200 focus:outline-none"></textarea>
           </div>
 
-          <button type="submit" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-sky-600 to-sky-500 hover:from-sky-700 hover:to-sky-600 text-white font-bold text-sm shadow-md shadow-sky-600/30 transition">
+          <button 
+            type="submit" 
+            class="w-full py-4 rounded-xl bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-700 hover:to-sky-800 text-white font-bold text-sm shadow-md shadow-sky-600/30 transition cursor-pointer"
+          >
             Submit Admission Enquiry
           </button>
         </form>
@@ -808,89 +797,318 @@
     </div>
   </section>
 
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• FOOTER & UNIVERSAL NAVIGATION â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-  <footer class="bg-slate-900 text-slate-400 text-xs py-12 border-t border-slate-800">
+  <!-- ═══════════════════════════════════════════════════════════════
+       9. CAMPUS LOCATION, OFFICIAL BANKING & CONTACT
+       ═══════════════════════════════════════════════════════════════ -->
+  <section id="contact" class="py-16 sm:py-20 bg-white border-b border-slate-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       
-      <!-- Top Footer Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+        <!-- Physical Location -->
+        <div class="p-8 rounded-3xl bg-slate-50 border border-slate-200 space-y-4">
+          <div class="w-12 h-12 rounded-2xl bg-sky-100 text-sky-700 flex items-center justify-center text-xl">
+            <i class="fas fa-map-marked-alt"></i>
+          </div>
+          <h3 class="text-xl font-extrabold text-slate-900">Ogijo Campus Location</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            <strong>De Portal Schools</strong> is located in the peaceful educational corridor of Imoro, Ogijo, Ogun State. Easily connected from Ikorodu, Sagamu, and surrounding Ogun/Lagos border towns.
+          </p>
+          <div class="space-y-2 text-xs text-slate-700 border-t border-slate-200 pt-3">
+            <div class="flex items-start gap-2.5">
+              <i class="fas fa-map-pin text-sky-600 mt-0.5"></i>
+              <span><strong>Address:</strong> 5-7 Olukayode Street, Imoro, Ogijo, Ogun State, Nigeria</span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <i class="fas fa-phone-alt text-emerald-600"></i>
+              <span><strong>Phone:</strong> 08012345678</span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <i class="fas fa-envelope text-indigo-600"></i>
+              <span><strong>Email:</strong> admin@deportalschools.edu.ng</span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <i class="fas fa-clock text-amber-600"></i>
+              <span><strong>Office Hours:</strong> Monday &ndash; Friday, 7:30 AM &ndash; 4:00 PM</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Official Bursary Bank Details -->
+        <div class="p-8 rounded-3xl bg-slate-900 text-white border border-slate-800 space-y-4">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl">
+            <i class="fas fa-university"></i>
+          </div>
+          <h3 class="text-xl font-extrabold text-white">Official Bursary Account</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            All tuition, BECE/WAEC exam fees, and development levies should be paid directly into the designated institutional bank account.
+          </p>
+          <div class="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-slate-400">Bank Name:</span>
+              <strong class="text-white">Zenith Bank Plc</strong>
+            </div>
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-slate-400">Account Name:</span>
+              <strong class="text-sky-300">DE PORTAL SCHOOLS - BURSARY</strong>
+            </div>
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-slate-400">Account Number:</span>
+              <strong class="text-emerald-400 font-mono text-base tracking-wider">1012345678</strong>
+            </div>
+          </div>
+          <p class="text-[11px] text-slate-400 italic">
+            * Always use the learner's full name and Reg No as payment reference, and present your teller or e-receipt to the bursary office for clearance.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       10. FOOTER & INSTITUTIONAL SIGNATURE
+       ═══════════════════════════════════════════════════════════════ -->
+  <footer class="bg-slate-950 text-slate-400 text-xs py-12 border-t border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-        
-        <!-- School Identity -->
+        <!-- Brand Identity -->
         <div class="space-y-3">
           <div class="flex items-center space-x-2 text-white font-bold text-base">
             <i class="fas fa-graduation-cap text-sky-400"></i>
             <span class="school-name-text">DE PORTAL SCHOOLS</span>
           </div>
           <p class="text-slate-400 text-[11px] leading-relaxed school-motto-text">
-            Knowledge, Character & Leadership
+            Gateway to Academic Excellence &amp; Moral Integrity
           </p>
           <div class="text-[11px] text-slate-400">
-            Official School Banking Details:
-            <div class="font-mono text-emerald-400 font-bold school-bank-text mt-1">Zenith Bank Plc &bull; 1012345678</div>
+            Campus: 5-7 Olukayode St, Imoro, Ogijo, Ogun State
           </div>
         </div>
 
-        <!-- School Information Links -->
+        <!-- Quick Links -->
         <div>
-          <h4 class="text-white font-semibold text-xs uppercase tracking-wider mb-3">Institutional Overview</h4>
+          <h4 class="text-white font-semibold text-xs uppercase tracking-wider mb-3">Institutional Links</h4>
           <ul class="space-y-2">
-            <li><a href="#about" class="hover:text-sky-400 transition flex items-center gap-1.5"><i class="fas fa-school text-sky-400"></i> About De Portal Schools</a></li>
-            <li><a href="#clearance-checker" class="hover:text-purple-400 transition flex items-center gap-1.5"><i class="fas fa-id-card text-purple-400"></i> Student Clearance Checker</a></li>
-            <li><a href="#contact" class="hover:text-emerald-400 transition flex items-center gap-1.5"><i class="fas fa-envelope text-emerald-400"></i> Contact &amp; Admissions</a></li>
-            <li><a href="admin/index.html" class="hover:text-slate-300 transition flex items-center gap-1.5 text-slate-500 text-[11px]"><i class="fas fa-user-shield text-slate-500"></i> Staff Portal Access</a></li>
+            <li><a href="#about" class="hover:text-white transition">About De Portal Schools</a></li>
+            <li><a href="#academics" class="hover:text-white transition">Academics &amp; Cohorts</a></li>
+            <li><a href="#facilities" class="hover:text-white transition">Campus Facilities</a></li>
+            <li><a href="#clearance" class="hover:text-white transition">Parent Clearance Checker</a></li>
+            <li><a href="#admissions" class="hover:text-white transition">Admissions 2026/2027</a></li>
           </ul>
         </div>
 
-        <!-- Academics Links -->
+        <!-- Academics -->
         <div>
-          <h4 class="text-white font-semibold text-xs uppercase tracking-wider mb-3">Academics &amp; Cohorts</h4>
-          <ul class="space-y-1.5 text-[11px]">
-            <li>Junior Secondary: JSS 1, JSS 2, JSS 3</li>
-            <li>Senior Science: SSS 1, SSS 2, SSS 3</li>
-            <li>Senior Arts &amp; Humanities</li>
-            <li>Senior Commercial Department</li>
-            <li>Primary &amp; Early Years Foundation</li>
+          <h4 class="text-white font-semibold text-xs uppercase tracking-wider mb-3">Academic Divisions</h4>
+          <ul class="space-y-2 text-[11px]">
+            <li>Creche, Nursery &amp; Early Years</li>
+            <li>Primary School (Classes 1&ndash;6)</li>
+            <li>Junior College (JSS 1&ndash;3 &bull; BECE)</li>
+            <li>Senior Science &amp; Technology</li>
+            <li>Senior Arts &amp; Commercial</li>
           </ul>
         </div>
 
-        <!-- Contact & Location -->
+        <!-- Staff Access Portal -->
         <div>
-          <h4 class="text-white font-semibold text-xs uppercase tracking-wider mb-3">Campus Office</h4>
-          <p class="mb-1 text-[11px]"><i class="fas fa-map-marker-alt text-sky-400 mr-1.5"></i> <span class="school-address-text">Campus Location</span></p>
-          <p class="mb-1 text-[11px]"><i class="fas fa-phone text-emerald-400 mr-1.5"></i> <span class="school-phone-text">08012345678</span></p>
-          <p class="text-[11px]"><i class="fas fa-envelope text-sky-400 mr-1.5"></i> <span class="school-email-text">admin@excellencemodel.edu.ng</span></p>
+          <h4 class="text-white font-semibold text-xs uppercase tracking-wider mb-3">Staff &amp; Operations</h4>
+          <p class="text-[11px] text-slate-400 mb-3">
+            Authorized administrative officers and faculty members can authenticate via the restricted portal gateway.
+          </p>
+          <button 
+            type="button" 
+            onclick="openStaffGatewayModal()"
+            class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-sky-400 hover:text-sky-300 border border-slate-700 text-xs font-bold transition flex items-center gap-2 cursor-pointer"
+          >
+            <i class="fas fa-lock text-amber-400"></i>
+            <span>Staff Portal Access</span>
+          </button>
         </div>
-
       </div>
 
-      <!-- Bottom Dock: Certified BursarIQ Banner -->
-      <div class="pt-6 border-t border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4 text-slate-500">
-        
-        <div class="flex items-center space-x-3">
-          <div class="bg-white p-1.5 rounded-lg shadow">
-            <img src="assets/images/bursariq-logo.png" alt="BursarIQ" class="h-5 w-auto">
-          </div>
-          <span class="text-[11px] text-slate-400">
-            Powered by <strong>BursarIQ OS v2.9</strong> &bull; <span class="text-emerald-400 font-semibold italic">"Every naira accounted for."</span>
-          </span>
+      <!-- Bottom Bar -->
+      <div class="pt-8 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-500 gap-3">
+        <div>
+          &copy; 2026 <strong>De Portal Schools</strong>, Ogijo, Ogun State. All rights reserved.
         </div>
-
-        <div class="text-[11px] text-slate-400">
-          &copy; <span class="school-session-text">2026/2027</span> <span class="school-name-text">DE PORTAL SCHOOLS</span>. All Rights Reserved.
+        <div class="flex items-center space-x-1.5 text-slate-400">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          <span>Powered by <strong class="text-slate-300">BursarIQ</strong> &mdash; Every naira accounted for.</span>
         </div>
-
       </div>
 
     </div>
   </footer>
 
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• CLIENT SCRIPTS & CLEARANCE VERIFICATION â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+  <!-- ═══════════════════════════════════════════════════════════════
+       11. MOBILE BOTTOM APP BAR (iOS / Android Native Feel)
+       ═══════════════════════════════════════════════════════════════ -->
+  <div class="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-200 z-50 lg:hidden bottom-app-bar shadow-lg">
+    <div class="grid grid-cols-5 h-16 items-center text-center">
+      <a href="#hero" class="flex flex-col items-center justify-center text-slate-600 hover:text-sky-600 text-[10px] font-bold">
+        <i class="fas fa-home text-base mb-1 text-sky-600"></i>
+        <span>Home</span>
+      </a>
+      <a href="#academics" class="flex flex-col items-center justify-center text-slate-600 hover:text-sky-600 text-[10px] font-semibold">
+        <i class="fas fa-graduation-cap text-base mb-1"></i>
+        <span>Academics</span>
+      </a>
+      <a href="#clearance" class="flex flex-col items-center justify-center text-slate-600 hover:text-sky-600 text-[10px] font-semibold">
+        <i class="fas fa-id-card text-base mb-1 text-emerald-600"></i>
+        <span>Clearance</span>
+      </a>
+      <a href="#admissions" class="flex flex-col items-center justify-center text-slate-600 hover:text-sky-600 text-[10px] font-semibold">
+        <i class="fas fa-user-plus text-base mb-1 text-amber-600"></i>
+        <span>Admissions</span>
+      </a>
+      <button 
+        type="button" 
+        onclick="openStaffGatewayModal()" 
+        class="flex flex-col items-center justify-center text-slate-600 hover:text-sky-600 text-[10px] font-semibold cursor-pointer"
+      >
+        <i class="fas fa-lock text-base mb-1 text-purple-600"></i>
+        <span>Staff</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       12. STAFF PORTAL GATEWAY MODAL (Protected Authorized Access)
+       ═══════════════════════════════════════════════════════════════ -->
+  <div id="staffGatewayModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+    <div class="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden">
+      <!-- Modal Header -->
+      <div class="bg-gradient-to-br from-slate-900 via-slate-900 to-sky-950 p-6 text-white text-center relative">
+        <button 
+          type="button" 
+          onclick="closeStaffGatewayModal()" 
+          class="absolute top-4 right-4 text-slate-400 hover:text-white text-sm w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center transition"
+        >
+          <i class="fas fa-times"></i>
+        </button>
+        <div class="w-12 h-12 rounded-2xl bg-sky-500/20 text-sky-300 flex items-center justify-center text-xl mx-auto mb-2 border border-sky-500/30">
+          <i class="fas fa-shield-alt"></i>
+        </div>
+        <h3 class="text-lg font-black tracking-tight">Staff &amp; Operations Gateway</h3>
+        <p class="text-xs text-slate-300 mt-0.5">Restricted to authorized De Portal Schools staff</p>
+      </div>
+
+      <!-- Modal Options -->
+      <div class="p-6 space-y-3">
+        <!-- Admin Portal Option -->
+        <a 
+          href="admin/index.html" 
+          class="p-4 rounded-2xl bg-slate-50 hover:bg-sky-50 border border-slate-200 hover:border-sky-300 flex items-center justify-between transition group"
+        >
+          <div class="flex items-center space-x-3.5">
+            <div class="w-10 h-10 rounded-xl bg-sky-600 text-white flex items-center justify-center text-lg shadow-md shadow-sky-600/30">
+              <i class="fas fa-user-shield"></i>
+            </div>
+            <div>
+              <h4 class="text-xs font-bold text-slate-900 group-hover:text-sky-700">Administrative Operations</h4>
+              <p class="text-[11px] text-slate-500">Principal, Bursar &amp; Records Office</p>
+            </div>
+          </div>
+          <i class="fas fa-arrow-right text-slate-400 group-hover:text-sky-600 text-xs"></i>
+        </a>
+
+        <!-- Teacher & Class Portal Option -->
+        <a 
+          href="teacher-login.html" 
+          class="p-4 rounded-2xl bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 flex items-center justify-between transition group"
+        >
+          <div class="flex items-center space-x-3.5">
+            <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-lg shadow-md shadow-emerald-600/30">
+              <i class="fas fa-chalkboard-teacher"></i>
+            </div>
+            <div>
+              <h4 class="text-xs font-bold text-slate-900 group-hover:text-emerald-700">Faculty &amp; Teacher Portal</h4>
+              <p class="text-[11px] text-slate-500">Attendance Register &amp; Performance</p>
+            </div>
+          </div>
+          <i class="fas fa-arrow-right text-slate-400 group-hover:text-emerald-600 text-xs"></i>
+        </a>
+
+        <!-- Student CBT Examination Center Option -->
+        <a 
+          href="cbt/index.html" 
+          class="p-4 rounded-2xl bg-slate-50 hover:bg-amber-50 border border-slate-200 hover:border-amber-300 flex items-center justify-between transition group"
+        >
+          <div class="flex items-center space-x-3.5">
+            <div class="w-10 h-10 rounded-xl bg-amber-600 text-white flex items-center justify-center text-lg shadow-md shadow-amber-600/30">
+              <i class="fas fa-laptop-code"></i>
+            </div>
+            <div>
+              <h4 class="text-xs font-bold text-slate-900 group-hover:text-amber-700">Student CBT Examination</h4>
+              <p class="text-[11px] text-slate-500">JAMB &amp; BECE Computer-Based Test</p>
+            </div>
+          </div>
+          <i class="fas fa-arrow-right text-slate-400 group-hover:text-amber-600 text-xs"></i>
+        </a>
+      </div>
+
+      <div class="p-4 bg-slate-50 border-t border-slate-200 text-center text-[11px] text-slate-500">
+        Unauthorized access attempts are monitored and logged.
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       13. CLIENT SCRIPTS (Live Clock, Clearance, Enquiry, PWA)
+       ═══════════════════════════════════════════════════════════════ -->
   <script src="js/data.js"></script>
   <script>
-    // Quick Clearance Test Helper
-    function setQuickClearance(id) {
-      document.getElementById('clearanceSearchInput').value = id;
-      lookupStudentClearance();
+    // Live Institutional Clock
+    function updateInstitutionalClock() {
+      const now = new Date();
+      const dateStr = now.toLocaleDateString("en-GB", { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+      const timeStr = now.toLocaleTimeString("en-GB", { hour12: true });
+      const full = `${dateStr} • ${timeStr}`;
+
+      const topClock = document.getElementById("top-clock-time");
+      if (topClock) topClock.textContent = full;
+
+      const drawerClock = document.getElementById("drawer-clock-time");
+      if (drawerClock) drawerClock.textContent = timeStr;
+    }
+    updateInstitutionalClock();
+    setInterval(updateInstitutionalClock, 1000);
+
+    // Mobile Drawer Toggle
+    function toggleMobileDrawer() {
+      const drawer = document.getElementById("mobileDrawer");
+      const icon = document.getElementById("menuIcon");
+      if (!drawer) return;
+      const isHidden = drawer.classList.contains("hidden");
+      if (isHidden) {
+        drawer.classList.remove("hidden");
+        if (icon) icon.className = "fas fa-times text-lg";
+      } else {
+        drawer.classList.add("hidden");
+        if (icon) icon.className = "fas fa-bars text-lg";
+      }
+    }
+
+    // Staff Gateway Modal Handlers
+    function openStaffGatewayModal() {
+      const modal = document.getElementById("staffGatewayModal");
+      if (modal) modal.classList.remove("hidden");
+    }
+    function closeStaffGatewayModal() {
+      const modal = document.getElementById("staffGatewayModal");
+      if (modal) modal.classList.add("hidden");
+    }
+
+    // Dismiss modal on backdrop click or ESC
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeStaffGatewayModal();
+    });
+    const staffModal = document.getElementById("staffGatewayModal");
+    if (staffModal) {
+      staffModal.addEventListener("click", (e) => {
+        if (e.target === staffModal) closeStaffGatewayModal();
+      });
     }
 
     // Live Student Fee Clearance Lookup
@@ -921,9 +1139,9 @@
 
       if (!student) {
         content.innerHTML = `
-          <div class="text-center py-4 text-red-400 text-xs font-semibold">
-            <i class="fas fa-exclamation-triangle text-base mb-1 block"></i>
-            No learner found matching Registration Number: "<strong>${input}</strong>". Please verify with the Bursary office.
+          <div class="text-center py-5 text-red-400 text-xs font-semibold">
+            <i class="fas fa-exclamation-triangle text-xl mb-2 block"></i>
+            No candidate record found matching: "<strong>${input}</strong>". Please verify your Registration Number with the De Portal Schools Bursary Office.
           </div>
         `;
         return;
@@ -935,14 +1153,14 @@
       content.innerHTML = `
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-4 mb-4">
           <div>
-            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Official Candidate Clearance Record</span>
-            <h3 class="text-lg font-black text-white">${student.name}</h3>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Official Candidate Clearance Verification</span>
+            <h3 class="text-lg font-black text-white mt-0.5">${student.name}</h3>
             <div class="text-xs text-sky-400 font-mono mt-0.5">Reg No: ${student.regNo || student.id} &bull; Class: ${student.class || student.currentClass}</div>
           </div>
           <div>
             ${isCleared ? `
               <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-xs font-black shadow-lg">
-                <i class="fas fa-check-circle"></i> OFFICIALLY CLEARED FOR EXAMS
+                <i class="fas fa-check-circle"></i> OFFICIALLY CLEARED FOR EXAMINATIONS
               </span>
             ` : `
               <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-500/20 text-red-400 border border-red-500/40 text-xs font-black shadow-lg">
@@ -954,26 +1172,26 @@
 
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs mb-4">
           <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
-            <div class="text-slate-400 text-[10px] uppercase font-bold">Term Fee</div>
-            <div class="text-base font-black text-white mt-0.5">â‚¦${(bal.termFeeExpected || 0).toLocaleString()}</div>
+            <div class="text-slate-400 text-[10px] uppercase font-bold">Term Fee Expected</div>
+            <div class="text-base font-black text-white mt-0.5">₦${(bal.termFeeExpected || 0).toLocaleString()}</div>
           </div>
           <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
             <div class="text-slate-400 text-[10px] uppercase font-bold">Past Arrears</div>
-            <div class="text-base font-black ${bal.arrearsBalance > 0 ? 'text-red-400' : 'text-slate-400'} mt-0.5">â‚¦${(bal.arrearsBalance || 0).toLocaleString()}</div>
+            <div class="text-base font-black ${bal.arrearsBalance > 0 ? 'text-red-400' : 'text-slate-400'} mt-0.5">₦${(bal.arrearsBalance || 0).toLocaleString()}</div>
           </div>
           <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
             <div class="text-slate-400 text-[10px] uppercase font-bold">Total Paid</div>
-            <div class="text-base font-black text-emerald-400 mt-0.5">â‚¦${(bal.totalPaidAll || 0).toLocaleString()}</div>
+            <div class="text-base font-black text-emerald-400 mt-0.5">₦${(bal.totalPaidAll || 0).toLocaleString()}</div>
           </div>
           <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
             <div class="text-slate-400 text-[10px] uppercase font-bold">Outstanding Balance</div>
-            <div class="text-base font-black ${bal.totalOutstanding > 0 ? 'text-amber-400 font-black' : 'text-emerald-400'} mt-0.5">â‚¦${(bal.totalOutstanding || 0).toLocaleString()}</div>
+            <div class="text-base font-black ${bal.totalOutstanding > 0 ? 'text-amber-400' : 'text-emerald-400'} mt-0.5">₦${(bal.totalOutstanding || 0).toLocaleString()}</div>
           </div>
         </div>
 
         <div class="text-[11px] text-slate-400 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-t border-slate-800 pt-3">
-          <span>Parent: <strong>${student.parentName || 'Parent / Guardian'}</strong> (${student.parentPhone || '--'})</span>
-          <span class="text-slate-500 italic">Bursary Hash: RVC-${student.id.substring(0,8).toUpperCase()}</span>
+          <span>Parent / Guardian: <strong>${student.parentName || 'Parent / Guardian'}</strong> (${student.parentPhone || '--'})</span>
+          <span class="text-slate-500 italic">Bursary Hash: DPS-${student.id.substring(0,8).toUpperCase()}</span>
         </div>
       `;
     }
@@ -986,7 +1204,7 @@
       const cls = document.getElementById('enqClass').value;
       const note = document.getElementById('enqNote').value.trim();
 
-      alert(`Thank you ${name}!\nYour admission enquiry for ${cls} has been submitted to the Admissions & Bursary unit.\nOur Admissions Officer will contact you on WhatsApp (${phone}) within 24 hours.`);
+      alert(`Thank you ${name}!\nYour admission enquiry for ${cls} has been submitted to the De Portal Schools Admissions Unit.\nOur Admissions Officer will reach out via WhatsApp (${phone}) shortly.`);
       document.getElementById('publicEnquiryForm').reset();
     }
   </script>
@@ -1000,4 +1218,3 @@
   </script>
 </body>
 </html>
-

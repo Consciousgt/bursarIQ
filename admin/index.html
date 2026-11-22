@@ -228,7 +228,8 @@
       const errorBox = document.getElementById("login-error-msg");
       const errorText = document.getElementById("error-text");
 
-      const result = De Portal SchoolsAuth.login(username, pass);
+      const auth = window.DPSAuth || window.RichVineAuth;
+      const result = auth ? auth.login(username, pass) : { success: false, message: "Authentication service not loaded. Please refresh." };
       if (result.success) {
         errorBox.classList.add("hidden");
         // Redirect to dashboard
@@ -240,7 +241,8 @@
     });
 
     // Check if user is already logged in
-    const currentUser = De Portal SchoolsAuth.getCurrentUser();
+    const auth = window.DPSAuth || window.RichVineAuth;
+    const currentUser = auth ? auth.getCurrentUser() : null;
     if (currentUser) {
       console.log("Active administrative session detected:", currentUser.username);
     }
@@ -252,7 +254,7 @@
       const timeStr = now.toLocaleTimeString("en-GB", { hour12: true });
       const clockEl = document.getElementById("login-clock-time");
       if (clockEl) {
-        clockEl.textContent = `${dateStr} â€¢ ${timeStr}`;
+        clockEl.textContent = `${dateStr} • ${timeStr}`;
       }
     }
     updateClock();

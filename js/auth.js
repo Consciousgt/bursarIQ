@@ -90,3 +90,11 @@ class RichVineAuth {
   }
 }
 
+// Global exposure for De Portal Schools Authentication
+if (typeof window !== "undefined") {
+  window.DPSAuth = RichVineAuth;
+  window.DePortalSchoolsAuth = RichVineAuth;
+  window.RichVineAuth = RichVineAuth;
+}
+
+

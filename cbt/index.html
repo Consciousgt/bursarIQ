@@ -190,13 +190,19 @@
       <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-sky-600 to-sky-400 text-white shadow-lg shadow-sky-500/30 mb-3">
         <i class="fas fa-graduation-cap text-3xl"></i>
       </div>
-      <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">DPS <span class="text-sky-600">COLLEGE</span></h1>
-      <p class="text-xs uppercase tracking-widest text-slate-500 font-bold mt-0.5">Soaring High</p>
+      <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight"><span class="school-name-text text-sky-800 font-black">DE PORTAL SCHOOLS</span></h1>
+      <p class="text-xs uppercase tracking-widest text-slate-500 font-bold mt-0.5">Gateway to Academic Excellence & Moral Integrity</p>
         <div id="cbt-bursariq-badge" class="mt-2 inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-slate-900 text-white text-xs font-semibold border border-emerald-400/30 shadow-sm">
           <img src="../assets/images/bursariq-logo.png" alt="BursarIQ" class="h-3.5 w-auto bg-white px-1.5 py-0.5 rounded">
           <span>Powered by <strong class="text-emerald-300">BursarIQ Assessment Engine</strong></span>
         </div>
-      <div class="mt-2 inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-sky-100 text-sky-800 border border-sky-200">
+      <div class="mt-2 flex flex-wrap items-center justify-center gap-2">
+      <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-slate-900 text-sky-300 border border-slate-700 shadow-sm">
+        <i class="far fa-clock text-sky-400 mr-1.5"></i>
+        <span id="cbt-live-clock-time">--:--:--</span>
+      </div>
+    </div>
+    <div class="mt-2 inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-sky-100 text-sky-800 border border-sky-200">
         <i class="fas fa-laptop-code mr-1.5 text-sky-600"></i> Computer-Based Test (CBT) Portal
       </div>
     </div>
@@ -293,18 +299,18 @@
                 id="student-id-input" 
                 required
                 autocomplete="off"
-                placeholder="e.g. RVC-2026-001 or RVC/2026/001" 
+                placeholder="e.g. DPS-2026-001 or DPS/2026/001" 
                 class="w-full pl-10 pr-4 py-3.5 rounded-xl border-2 border-slate-200 text-slate-800 font-semibold focus:border-sky-500 focus:ring-4 focus:ring-sky-100 outline-none uppercase placeholder:normal-case placeholder:text-slate-400 text-sm transition"
               >
             </div>
             <p class="text-[11px] text-slate-500 mt-1.5 flex items-center">
-              <i class="fas fa-info-circle mr-1 text-sky-600"></i> Use your official RichVine ID. Each student can only take this test once.
+              <i class="fas fa-info-circle mr-1 text-sky-600"></i> Use your official De Portal ID. Each student can only take this test once.
             </p>
             <div class="mt-2 text-[11px] text-slate-500 flex flex-wrap items-center gap-1.5 bg-slate-50 p-2 rounded-lg border border-slate-200">
               <span class="font-bold text-slate-600">Quick Test IDs:</span>
-              <button type="button" onclick="document.getElementById('student-id-input').value='RVC/2026/001'" class="px-2 py-0.5 rounded bg-sky-100 text-sky-800 hover:bg-sky-200 font-semibold transition cursor-pointer">SSS 1 (001)</button>
-              <button type="button" onclick="document.getElementById('student-id-input').value='RVC/2026/002'" class="px-2 py-0.5 rounded bg-sky-100 text-sky-800 hover:bg-sky-200 font-semibold transition cursor-pointer">SSS 2 (002)</button>
-              <button type="button" onclick="document.getElementById('student-id-input').value='RVC/2026/003'" class="px-2 py-0.5 rounded bg-sky-100 text-sky-800 hover:bg-sky-200 font-semibold transition cursor-pointer">SSS 3 (003)</button>
+              <button type="button" onclick="document.getElementById('student-id-input').value='DPS/2026/001'" class="px-2 py-0.5 rounded bg-sky-100 text-sky-800 hover:bg-sky-200 font-semibold transition cursor-pointer">SSS 1 (001)</button>
+              <button type="button" onclick="document.getElementById('student-id-input').value='DPS/2026/002'" class="px-2 py-0.5 rounded bg-sky-100 text-sky-800 hover:bg-sky-200 font-semibold transition cursor-pointer">SSS 2 (002)</button>
+              <button type="button" onclick="document.getElementById('student-id-input').value='DPS/2026/003'" class="px-2 py-0.5 rounded bg-sky-100 text-sky-800 hover:bg-sky-200 font-semibold transition cursor-pointer">SSS 3 (003)</button>
             </div>
           </div>
 
@@ -821,7 +827,7 @@
         <div class="font-bold mt-1 text-slate-800">Candidate Signature</div>
       </div>
       <div class="w-48">
-        <div class="border-b border-slate-900 pb-8 font-serif italic text-slate-400">RichVine CBT Automated</div>
+        <div class="border-b border-slate-900 pb-8 font-serif italic text-slate-400">De Portal Schools CBT Automated</div>
         <div class="font-bold mt-1 text-slate-800">CBT System Verifier</div>
       </div>
       <div class="w-48">
@@ -1133,7 +1139,7 @@
           if (allStudents.length === 0 && window.RichVineFirebase && !window.RichVineFirebase.ready) {
             showLoginAlert('Syncing with school database... please click Begin Examination in a moment.', 'warning');
           } else {
-            showLoginAlert('Student ID "' + query + '" not found in RichVine records. Try "001" or sample IDs above.', 'error');
+            showLoginAlert('Student ID "' + query + '" not found in De Portal Schools records. Try "001" or sample IDs above.', 'error');
           }
           return;
         }
@@ -1860,5 +1866,18 @@
       });
     }
   </script>
+
+  <script>
+    function updateCbtClock() {
+      const now = new Date();
+      const dateStr = now.toLocaleDateString("en-GB", { weekday: 'short', day: 'numeric', month: 'short' });
+      const timeStr = now.toLocaleTimeString("en-GB", { hour12: true });
+      const el = document.getElementById("cbt-live-clock-time");
+      if (el) el.textContent = `${dateStr} • ${timeStr}`;
+    }
+    updateCbtClock();
+    setInterval(updateCbtClock, 1000);
+  </script>
+
 </body>
 </html>

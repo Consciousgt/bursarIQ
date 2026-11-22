@@ -150,12 +150,14 @@ const RichVineApp = (() => {
 
   function _startLiveClock() {
     function tick() {
-      const clockEl = document.getElementById("live-clock-time");
-      if (!clockEl) return;
       const now = new Date();
       const dateStr = now.toLocaleDateString("en-GB", { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
       const timeStr = now.toLocaleTimeString("en-GB", { hour12: true });
-      clockEl.textContent = `${dateStr} • ${timeStr}`;
+      const fullText = `${dateStr} • ${timeStr}`;
+      const clockEl = document.getElementById("live-clock-time");
+      if (clockEl) clockEl.textContent = fullText;
+      const welcomeClock = document.getElementById("dash-welcome-clock");
+      if (welcomeClock) welcomeClock.textContent = fullText;
     }
     tick();
     setInterval(tick, 1000);
@@ -251,7 +253,11 @@ const RichVineApp = (() => {
     // Section counts
     const sections = window.SCHOOL_SECTIONS || {};
     for (const [key, sec] of Object.entries(sections)) {
-      const count = students.filter(s => s.section === key).length;
+      const count = students.filter(s => {
+        if (s.section === key) return true;
+        const res = typeof getSectionByClass === "function" ? getSectionByClass(s.class || s.currentClass) : null;
+        return res && res.id === key;
+      }).length;
       _setText(`dash-count-${key}`, count);
     }
 
@@ -1139,7 +1145,7 @@ const RichVineApp = (() => {
     var additionalFees = getAdditionalFeeItems();
 
     var bankName = (document.getElementById('fn-bank-name')?.value || dbCfg.bankDetails?.name || 'Zenith Bank Plc').trim();
-    var bankAcctName = (document.getElementById('fn-bank-acct-name')?.value || dbCfg.bankDetails?.accountName || 'RICHVINE COLLEGE').trim();
+    var bankAcctName = (document.getElementById('fn-bank-acct-name')?.value || dbCfg.bankDetails?.accountName || 'DE PORTAL SCHOOLS').trim();
     var bankAcctNo = (document.getElementById('fn-bank-acct-no')?.value || dbCfg.bankDetails?.accountNumber || '1017482910').trim();
 
     var feeMap = {};
@@ -1179,7 +1185,7 @@ const RichVineApp = (() => {
     var additionalFees = getAdditionalFeeItems();
 
     var bankName = (document.getElementById('fn-bank-name')?.value || 'Zenith Bank Plc').trim();
-    var bankAcctName = (document.getElementById('fn-bank-acct-name')?.value || 'RICHVINE COLLEGE').trim();
+    var bankAcctName = (document.getElementById('fn-bank-acct-name')?.value || 'DE PORTAL SCHOOLS').trim();
     var bankAcctNo = (document.getElementById('fn-bank-acct-no')?.value || '1017482910').trim();
 
     // Persist bank details to DB config
@@ -3812,7 +3818,7 @@ const RichVineApp = (() => {
       <!DOCTYPE html>
       <html>
       <head>
-        <title>RichVine College — CBT Result Slip: ${_escape(sub.studentName)}</title>
+        <title>De Portal Schools — CBT Result Slip: ${_escape(sub.studentName)}</title>
         <style>
           body { font-family: 'Times New Roman', serif; margin: 40px; color: #111; }
           .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 20px; }
@@ -3835,7 +3841,7 @@ const RichVineApp = (() => {
           <h1>DE PORTAL SCHOOLS</h1>
           <p><strong>Motto: Soaring High</strong></p>
           <p>5-7 Olukayode Street, Imoro, Ogijo, Shagamu - Ikorodu Road, Shagamu, Ogun State</p>
-          <p>Admin Contact: 09053126809 | Email: admissions@richvinecollege.edu.ng</p>
+          <p>Admin Contact: 09053126809 | Email: admin@deportalschools.edu.ng</p>
           <div class="badge-box">OFFICIAL COMPUTER-BASED TEST (CBT) EXAMINATION RESULT SLIP</div>
         </div>
 
@@ -3889,7 +3895,7 @@ const RichVineApp = (() => {
             <div class="sig-line">Candidate Signature</div>
           </div>
           <div>
-            <div class="sig-line" style="font-style:italic;color:#666">RichVine Automated Verifier</div>
+            <div class="sig-line" style="font-style:italic;color:#666">De Portal Schools Automated Verifier</div>
           </div>
           <div>
             <div class="sig-line">Principal / Exam Officer</div>

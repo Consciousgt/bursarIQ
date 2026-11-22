@@ -88,8 +88,8 @@
           <i class="fas fa-globe"></i>
           <span class="hidden md:inline">Public Site</span>
         </a>
-        <div class="hidden sm:flex items-center gap-1.5 text-xs text-slate-300 bg-slate-900/60 px-3 py-1.5 rounded-lg border border-slate-700">
-          <i class="far fa-calendar-alt text-emerald-400"></i>
+        <div class="flex items-center gap-1.5 text-[11px] sm:text-xs text-slate-300 bg-slate-900/60 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-slate-700">
+          <i class="far fa-clock text-emerald-400"></i>
           <span id="headerTodayDate">--</span>
         </div>
         <button 
@@ -609,12 +609,20 @@
       rolePill.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1';
     }
 
-    // Today Date Setup
+    // Today Date & Live Clock Setup
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('attendanceDate').value = today;
-    document.getElementById('headerTodayDate').textContent = new Date().toLocaleDateString('en-GB', {
-      weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'
-    });
+    function updateTeacherHeaderClock() {
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('en-GB', {
+        weekday: 'short', day: 'numeric', month: 'short'
+      });
+      const timeStr = now.toLocaleTimeString('en-GB', { hour12: true });
+      const el = document.getElementById('headerTodayDate');
+      if (el) el.textContent = `${dateStr} • ${timeStr}`;
+    }
+    updateTeacherHeaderClock();
+    setInterval(updateTeacherHeaderClock, 1000);
 
     // Logout
     document.getElementById('logoutBtn').addEventListener('click', () => {
