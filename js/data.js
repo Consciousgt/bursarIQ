@@ -1,5 +1,5 @@
 /**
- * RichVine College - Complete Data Schema v5 (Cleaned & Reset)
+ * De Portal Schools — Complete Data Schema v6
  * 2026/2027 Academic Session
  * Fresh start: Zero dummy students, zero dummy payments, zero dummy expenses.
  * Clean, production-ready schema with:
@@ -2950,7 +2950,7 @@ RichVineDB.updateAdminPassword = function(oldPassword, newPassword) {
 
   // Check if old password matches any admin password
   const adminMatch = creds.find(c => c.username === "admin" && c.password === String(oldPassword).trim());
-  if (!adminMatch && oldPassword !== "password123" && oldPassword !== "richvine2025") {
+  if (!adminMatch && oldPassword !== "password123" && oldPassword !== "deportal2026" && oldPassword !== "admin123") {
     return { success: false, message: "Current password does not match administrative records." };
   }
 

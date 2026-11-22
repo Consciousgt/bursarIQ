@@ -1,5 +1,5 @@
 ﻿/**
- * RichVine College - Firebase Config v5
+ * De Portal Schools — Firebase Config v6
  * Real-Time Cloud Synchronization, Multi-Tab Persistent Cache & Spark Free-Tier Quota Shield
  */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
@@ -31,7 +31,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 
-// â”€â”€ Multi-Tab Persistent IndexedDB Cache (Quota Shield) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Multi-Tab Persistent IndexedDB Cache (Quota Shield) ───────────────────────
 // Firestore caches documents in IndexedDB across tabs and page reloads.
 // Unchanged documents are served from local cache with ZERO server reads!
 let db;
@@ -41,13 +41,13 @@ try {
       tabManager: persistentMultipleTabManager()
     })
   });
-  console.log("[DePortal Firebase] Persistent multi-tab IndexedDB cache active âœ“ (Quota Shield Active)");
+  console.log("[DePortal Firebase] Persistent multi-tab IndexedDB cache active ✓ (Quota Shield Active)");
 } catch (e) {
   console.warn("[DePortal Firebase] Local cache init note, falling back to standard getFirestore:", e.message);
   db = getFirestore(app);
 }
 
-// â”€â”€â”€ Window Bridge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Window Bridge ─────────────────────────────────────────────────────────
 window.RichVineFirebase = {
   ready: false,
   _syncing: false,
@@ -111,7 +111,7 @@ window.RichVineFirebase = {
     }
   },
 
-  // â”€â”€ Permanent Cloud Tombstone Logger â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Permanent Cloud Tombstone Logger ─────────────────────────────────────
   async recordCloudDeletion(col, id) {
     if (!col || !id) return;
     const tombstoneId = `${col}_${id}`;
@@ -132,7 +132,7 @@ window.RichVineFirebase = {
     }
   },
 
-  // â”€â”€ Flush Pending Offline Writes (Zero-Read Spark Quota Protection) â”€â”€â”€â”€â”€â”€â”€
+  // ── Flush Pending Offline Writes (Zero-Read Spark Quota Protection) ───────
   async _flushPendingOfflineChanges() {
     const localDb = window.RichVineDB ? window.RichVineDB.get() : {};
     let changed = false;
@@ -182,7 +182,7 @@ window.RichVineFirebase = {
     }
   },
 
-  // â”€â”€ Two-Way Cloud Synchronization with Free-Tier Protection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Two-Way Cloud Synchronization with Free-Tier Protection ───────────────
   async syncWithCloud(force = false) {
     if (this._syncing) return;
     const now = Date.now();
@@ -356,7 +356,7 @@ window.RichVineFirebase = {
       localStorage.setItem("dps_last_cloud_sync", String(Date.now()));
       this.ready = true;
       this._setSyncStatus("synced", "Cloud Synced");
-      console.log("[DePortal Firebase] Manual cloud reconciliation complete âœ“");
+      console.log("[DePortal Firebase] Manual cloud reconciliation complete ✓");
     } catch (e) {
       console.warn("[DePortal Firebase] Sync notice:", e.message);
       this._setSyncStatus("offline", "Offline Mode");
@@ -369,7 +369,7 @@ window.RichVineFirebase = {
     return this.syncWithCloud(true);
   },
 
-  // â”€â”€ Students â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Students ────────────────────────────────────────────────────────────
   async saveStudent(student) {
     try {
       if (!student || !student.id) return;
@@ -398,7 +398,7 @@ window.RichVineFirebase = {
     }
   },
 
-  // â”€â”€ Payments â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Payments ────────────────────────────────────────────────────────────
   async savePayment(payment) {
     try {
       if (!payment || !payment.id) return;
@@ -426,7 +426,7 @@ window.RichVineFirebase = {
     }
   },
 
-  // â”€â”€ Expenses â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Expenses ────────────────────────────────────────────────────────────
   async saveExpenses(expensesList) {
     if (!Array.isArray(expensesList) || !expensesList.length) return;
     try {
@@ -442,7 +442,7 @@ window.RichVineFirebase = {
         await batch.commit();
       }
       this._setSyncStatus("synced", "Cloud Synced");
-      console.log(`[Firebase] Synced ${expensesList.length} expenses to cloud âœ“`);
+      console.log(`[Firebase] Synced ${expensesList.length} expenses to cloud ✓`);
     } catch (e) {
       console.warn("[Firebase] Batch saveExpenses failed, falling back to individual:", e.message);
       for (const expense of expensesList) {
@@ -476,7 +476,7 @@ window.RichVineFirebase = {
     }
   },
 
-  // â”€â”€ Staff & Salary â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Staff & Salary ────────────────────────────────────────────────────────
   async saveStaff(staff) {
     try {
       if (!staff || !staff.id) return;
@@ -551,7 +551,7 @@ window.RichVineFirebase = {
     }
   },
 
-  // â”€â”€ Inventory & Stocks â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Inventory & Stocks ──────────────────────────────────────────────────
   async saveStockItem(item) {
     try {
       if (!item || !item.id) return;
@@ -594,7 +594,7 @@ window.RichVineFirebase = {
     }
   },
 
-  // â”€â”€ CBT Examination Submissions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── CBT Examination Submissions ─────────────────────────────────────────
   async saveCbtSubmission(submission) {
     try {
       if (!submission || !submission.id) return;
@@ -622,7 +622,7 @@ window.RichVineFirebase = {
     }
   },
 
-  // â”€â”€ Audit Logs (Local Storage Managed - Zero Quota Overhead) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Audit Logs (Local Storage Managed - Zero Quota Overhead) ────────────
   async saveTeacher(teacher) {
     if (!db || !teacher?.id) return;
     try {
@@ -756,7 +756,7 @@ window.RichVineFirebase = {
     }
   },
 
-  // â”€â”€ Realtime Multi-Device Listeners (Cached & Debounced) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Realtime Multi-Device Listeners (Cached & Debounced) ─────────────────
   initRealtimeSync(callbacks = {}) {
     if (this._realtimeActive) return;
     this._realtimeActive = true;

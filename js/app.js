@@ -1,5 +1,5 @@
 /**
- * RichVine College — Main App Controller v5
+ * De Portal Schools — Main App Controller v6
  * - Accepts any amount including kobo (step="any") with commas
  * - Currency formatting helper (parseAmount, formatAmount)
  * - Auto-formats input fields on blur and typing

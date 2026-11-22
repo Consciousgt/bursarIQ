@@ -1,22 +1,19 @@
 rules_version = '2';
 
 // ===============================================================
-// BursarIQ - Cloud Firestore Security Rules v5
+// BursarIQ - Cloud Firestore Security Rules v6
 // Firebase Project: bursariq
+// Institution: DE PORTAL SCHOOLS, OGIJO
 // Academic Session: 2026/2027
-// Last Updated: 2026-11-13
-// Changelog v5:
-//   - Updated project reference header from richvine-4696c to bursariq.
-//   - Added schema validators and access control rules for 3 institutional collections:
-//     * teachers: Educator credentials, roles, subject allocations, and status.
-//     * attendance: Daily roll-call attendance logs, attendanceMap, session tracking, and remarks.
-//     * examRecords: Continuous assessment scores (CA1, CA2), exam scores, broadsheet totals, grades, and remarks.
-//   - Maintained full backwards compatibility with all 13 existing collections:
-//     students, payments, expenses, auditLogs, clearance, stocks, stockSales,
-//     stockRestocks, cbtSubmissions, staff, salaries, staffLoans, deletedRecords.
+// Last Updated: 2026-11-22
+// Changelog v6:
+//   - Added comprehensive schema validator and routing for collection 17: weeklyPerformance (Subject Teacher continuous assessments)
+//   - Added routing and access controls for collection 18: schoolSettings (Institutional configuration & credentials)
+//   - Fixed validator field checks (data.keys().hasAll) and optional field constraints
+//   - Fully compatible with Firebase Spark Free Tier and Offline-First IndexedDB caching
 // ===============================================================
 //
-// Collections Covered:
+// Collections Covered (18 Collections):
 // 1. `students`: Learners across Primary, Junior College, Senior College. Arrears & clearance attributes.
 // 2. `payments`: Fee transactions, multi-item receipts, arrears deduction tracking.
 // 3. `expenses`: School expenditure logs categorized across periods and payment methods.
@@ -33,6 +30,8 @@ rules_version = '2';
 // 14. `teachers`: Educator credentials, assigned classes, subjects, portal access passwords, and status.
 // 15. `attendance`: Daily student roll call sessions, attendanceMap/records, markedBy.
 // 16. `examRecords`: Termly continuous assessments (ca1, ca2), exam marks, total score, letter grade, and remark.
+// 17. `weeklyPerformance`: Subject teacher weekly performance tracking (notes, behaviour, attentiveness, test scores).
+// 18. `schoolSettings`: Institutional branding, address, bank details, and configuration.
 // ===============================================================
 
 service cloud.firestore {
@@ -430,21 +429,28 @@ service cloud.firestore {
         (!('updatedAt' in data) || data.updatedAt == null || (data.updatedAt is string && data.updatedAt.size() <= 60) || (data.updatedAt is number && data.updatedAt > 0) || data.updatedAt is timestamp);
     }
 
-        function isValidWeeklyPerformance(perfId) {
+    // 13. WEEKLY STUDENT PERFORMANCE (Subject Teacher Assessment)
+    function isValidWeeklyPerformance(perfId) {
       let data = request.resource.data;
-      return hasAllFields(['studentId', 'className', 'subject']) &&
-        data.id == perfId &&
+      return data.keys().hasAll(['studentId', 'className', 'subject']) &&
+        (!('id' in data) || data.id == perfId) &&
         validStringLength('studentId', 1, 60) &&
         validStringLength('className', 1, 50) &&
         validStringLength('subject', 1, 80) &&
+        validOptionalString('id', 0, 80) &&
         validOptionalString('studentName', 0, 150) &&
         validOptionalString('regNo', 0, 50) &&
+        validOptionalString('week', 0, 30) &&
+        validOptionalString('term', 0, 50) &&
+        validOptionalString('session', 0, 35) &&
         validOptionalString('notes', 0, 50) &&
         validOptionalString('behaviour', 0, 50) &&
         validOptionalString('attentiveness', 0, 50) &&
         validOptionalString('teacherRemark', 0, 300) &&
         validOptionalString('recordedBy', 0, 100) &&
-        (!('testScore' in data) || (data.testScore is number && data.testScore >= 0 && data.testScore <= 100));
+        (!('testScore' in data) || (data.testScore is number && data.testScore >= 0 && data.testScore <= 100)) &&
+        (!('createdAt' in data) || data.createdAt == null || (data.createdAt is string && data.createdAt.size() <= 60) || (data.createdAt is number && data.createdAt > 0) || data.createdAt is timestamp) &&
+        (!('updatedAt' in data) || data.updatedAt == null || (data.updatedAt is string && data.updatedAt.size() <= 60) || (data.updatedAt is number && data.updatedAt > 0) || data.updatedAt is timestamp);
     }
 
     function isExamRecordUpdateValid(recordId) {
@@ -586,6 +592,13 @@ service cloud.firestore {
     match /weeklyPerformance/{perfId} {
       allow read: if canReadData();
       allow create, update: if canWriteData() && isValidWeeklyPerformance(perfId);
+      allow delete: if canWriteData();
+    }
+
+    // 18. SCHOOL SETTINGS / CONFIGURATION
+    match /schoolSettings/{settingId} {
+      allow read: if canReadData();
+      allow create, update: if canWriteData();
       allow delete: if canWriteData();
     }
 

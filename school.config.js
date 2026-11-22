@@ -1,10 +1,10 @@
 ﻿/**
  * ===================================================================
- * DE PORTAL SCHOOLS â€” MASTER INSTITUTIONAL CONFIGURATION FILE
- * Powered by BursarIQ â€” "Every naira accounted for."
+ * DE PORTAL SCHOOLS — MASTER INSTITUTIONAL CONFIGURATION FILE
+ * Powered by BursarIQ — "Every naira accounted for."
  * ===================================================================
  * 
- * ðŸ’¡ EDITABLE VIA ADMIN PORTAL SETTINGS:
+ * 💡 EDITABLE VIA ADMIN PORTAL SETTINGS:
  * The settings configured here or in the Admin Portal "System Settings"
  * tab will automatically brand and configure the entire platform:
  * Landing page, Admin Dashboard, Receipts, Broadsheets, Login portals,
@@ -23,7 +23,7 @@
   }
 
   const defaultConfig = {
-    // â”€â”€ 1. Basic School Identity â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── 1. Basic School Identity ──────────────────────────────────────
     schoolName: "DE PORTAL SCHOOLS",
     schoolShortName: "DE PORTAL",
     acronym: "DPS",
@@ -31,20 +31,20 @@
     logoText: "DPS", // Initials displayed on circular badges/crest
     logoUrl: "assets/images/bursariq-logo.png", // Path to school badge or default
     
-    // â”€â”€ 2. Contact & Physical Location â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── 2. Contact & Physical Location ────────────────────────────────
     address: "5-7 Olukayode Street, Imoro, Ogijo, Ogun State, Nigeria",
     phone: "08012345678",
     adminContact: "08012345678",
     contactEmail: "admin@deportalschools.edu.ng",
     websiteUrl: "https://deportalschools.edu.ng",
     
-    // â”€â”€ 3. Academic Calendar & Currency â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── 3. Academic Calendar & Currency ───────────────────────────────
     currentSession: "2026/2027",
     currentTerm: "1st Term",
-    currencySymbol: "â‚¦",
+    currencySymbol: "₦",
     currencyCode: "NGN",
     
-    // â”€â”€ 4. Official Banking Details (Printed on Invoices & Receipts) â”€â”€
+    // ── 4. Official Banking Details (Printed on Invoices & Receipts) ──
     bankDetails: {
       bankName: "Zenith Bank Plc",
       accountName: "DE PORTAL SCHOOLS - BURSARY",
@@ -52,7 +52,7 @@
       tinNumber: "TIN-9876543210"
     },
     
-    // â”€â”€ 5. System Administrator Credentials â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── 5. System Administrator Credentials ───────────────────────────
         adminCredentials: [
       { username: "admin", password: "password123", role: "Super Administrator", name: "Principal Administrator" },
       { username: "admin", password: "admin123", role: "Super Administrator", name: "Principal Administrator" },
@@ -61,7 +61,7 @@
       { username: "records", password: "record123", role: "Records Officer", name: "Mr. D. Okon (Academic Secretary)" }
     ],
 
-    // â”€â”€ 6. Cloud Database Connection (Google Firebase) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── 6. Cloud Database Connection (Google Firebase) ────────────────
     firebaseConfig: {
       apiKey: "AIzaSyDPR_ELiTuxM8jObdJeWSIzfqotWJXnf-c",
       authDomain: "bursariq.firebaseapp.com",
