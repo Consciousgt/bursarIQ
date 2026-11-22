@@ -1075,6 +1075,38 @@
       }
       .modal-footer { flex-shrink: 0; }
     }
+  
+    /* Teacher Class Multi-Select Chip Styling */
+    .tch-class-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 11px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      background: #ffffff;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+      transition: all 0.15s ease-in-out;
+      user-select: none;
+    }
+    .tch-class-chip:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+    }
+    .tch-class-chip.selected {
+      background: #0284c7 !important;
+      color: #ffffff !important;
+      border-color: #0369a1 !important;
+      box-shadow: 0 1px 3px rgba(2, 132, 199, 0.3);
+    }
+    .tch-class-chip.selected::after {
+      content: " ✓";
+      font-weight: 800;
+    }
+
   </style>
 
 </head>
@@ -5223,28 +5255,39 @@ Ibrahim Zainab Folashade, JSS 2A, Female, Alhaji Ibrahim, 08034567892, 12 Imoro 
           <div>
             <label style="font-size:12px;font-weight:700;color:var(--gray-700);display:block;margin-bottom:4px">Assigned Class (Roll Call)</label>
             <select id="tch-form-class" class="form-control">
-              <option value="">None (Subject Specialist)</option>
-              <option value="SSS 1 Science">SSS 1 Science</option>
-              <option value="SSS 1 Art">SSS 1 Art</option>
-              <option value="SSS 1 Commercial">SSS 1 Commercial</option>
-              <option value="SSS 2 Science">SSS 2 Science</option>
-              <option value="SSS 2 Art">SSS 2 Art</option>
-              <option value="SSS 2 Commercial">SSS 2 Commercial</option>
-              <option value="SSS 3 Science">SSS 3 Science</option>
-              <option value="SSS 3 Art">SSS 3 Art</option>
-              <option value="SSS 3 Commercial">SSS 3 Commercial</option>
-              <option value="JSS 1A">JSS 1A</option>
-              <option value="JSS 1B">JSS 1B</option>
-              <option value="JSS 2A">JSS 2A</option>
-              <option value="JSS 2B">JSS 2B</option>
-              <option value="JSS 3A">JSS 3A</option>
-              <option value="JSS 3B">JSS 3B</option>
-              <option value="Primary 1">Primary 1</option>
-              <option value="Primary 2">Primary 2</option>
-              <option value="Primary 3">Primary 3</option>
-              <option value="Primary 4">Primary 4</option>
-              <option value="Primary 5">Primary 5</option>
-              <option value="Primary 6">Primary 6</option>
+              <option value="">None (Subject Specialist Only)</option>
+              <optgroup label="Primary Section">
+                <option value="Creche / Preparatory I">Creche / Preparatory I</option>
+                <option value="Preparatory II">Preparatory II</option>
+                <option value="Nursery I">Nursery I</option>
+                <option value="Nursery II">Nursery II</option>
+                <option value="Primary 1">Primary 1</option>
+                <option value="Primary 2">Primary 2</option>
+                <option value="Primary 3">Primary 3</option>
+                <option value="Primary 4">Primary 4</option>
+                <option value="Primary 5">Primary 5</option>
+              </optgroup>
+              <optgroup label="Junior Secondary Section">
+                <option value="JSS 1">JSS 1</option>
+                <option value="JSS 2">JSS 2</option>
+                <option value="JSS 3">JSS 3</option>
+              </optgroup>
+              <optgroup label="Senior Secondary (Grade Class Teachers)">
+                <option value="SS 1 (Art, Commercial, Science)">SS 1 (Art, Commercial, Science)</option>
+                <option value="SS 2 (Art, Commercial, Science)">SS 2 (Art, Commercial, Science)</option>
+                <option value="SS 3 (Art, Commercial, Science)">SS 3 (Art, Commercial, Science)</option>
+              </optgroup>
+              <optgroup label="Senior Secondary (Departmental Arms)">
+                <option value="SSS 1 Science">SSS 1 Science</option>
+                <option value="SSS 1 Art">SSS 1 Art</option>
+                <option value="SSS 1 Commercial">SSS 1 Commercial</option>
+                <option value="SSS 2 Science">SSS 2 Science</option>
+                <option value="SSS 2 Art">SSS 2 Art</option>
+                <option value="SSS 2 Commercial">SSS 2 Commercial</option>
+                <option value="SSS 3 Science">SSS 3 Science</option>
+                <option value="SSS 3 Art">SSS 3 Art</option>
+                <option value="SSS 3 Commercial">SSS 3 Commercial</option>
+              </optgroup>
             </select>
           </div>
           <div>
@@ -5260,9 +5303,94 @@ Ibrahim Zainab Folashade, JSS 2A, Female, Alhaji Ibrahim, 08034567892, 12 Imoro 
           <input type="text" id="tch-form-subjects" class="form-control" placeholder="e.g. Mathematics, Physics, Chemistry">
         </div>
         <div>
-          <label style="font-size:12px;font-weight:700;color:var(--gray-700);display:block;margin-bottom:4px">Classes Offering These Subjects (Subject Arms)</label>
-          <input type="text" id="tch-form-assigned-classes" class="form-control" placeholder="e.g. SSS 1 Science, SSS 1 Art, SSS 2 Commercial">
-          <p style="font-size:11px;color:var(--gray-500);margin-top:2px">Comma-separated class arms where this teacher takes subjects.</p>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <label style="font-size:12px;font-weight:700;color:var(--gray-700)">
+              <i class="fas fa-layer-group" style="color:#0284c7"></i> Classes Offering These Subjects (Subject Arms) *
+            </label>
+            <span id="tch-classes-counter" class="badge" style="background:#e0f2fe;color:#0369a1;font-size:11px;font-weight:700;padding:2px 8px;border-radius:12px">
+              0 selected
+            </span>
+          </div>
+          
+          <!-- Quick action selector toolbar -->
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">
+            <button type="button" class="btn-secondary" style="font-size:10px;padding:3px 8px;font-weight:600" onclick="RichVineApp.quickSelectTeacherClasses('primary')">
+              + All Primary
+            </button>
+            <button type="button" class="btn-secondary" style="font-size:10px;padding:3px 8px;font-weight:600" onclick="RichVineApp.quickSelectTeacherClasses('junior')">
+              + All Junior
+            </button>
+            <button type="button" class="btn-secondary" style="font-size:10px;padding:3px 8px;font-weight:600" onclick="RichVineApp.quickSelectTeacherClasses('senior')">
+              + All Senior
+            </button>
+            <button type="button" class="btn-secondary" style="font-size:10px;padding:3px 8px;font-weight:600" onclick="RichVineApp.quickSelectTeacherClasses('all')">
+              Select All
+            </button>
+            <button type="button" class="btn-secondary" style="font-size:10px;padding:3px 8px;color:#dc2626;font-weight:600" onclick="RichVineApp.quickSelectTeacherClasses('clear')">
+              Clear
+            </button>
+          </div>
+
+          <!-- Multi-select chips container -->
+          <div id="tch-classes-picker" style="max-height:190px;overflow-y:auto;border:1px solid #cbd5e1;border-radius:8px;padding:10px;background:#f8fafc;display:flex;flex-direction:column;gap:10px">
+            <!-- Primary Section -->
+            <div>
+              <div style="font-size:11px;font-weight:800;color:#059669;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px">
+                Primary Section
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px">
+                <button type="button" class="tch-class-chip" data-section="primary" data-class="Creche / Preparatory I" onclick="RichVineApp.toggleTeacherClassChip(this)">Creche / Preparatory I</button>
+                <button type="button" class="tch-class-chip" data-section="primary" data-class="Preparatory II" onclick="RichVineApp.toggleTeacherClassChip(this)">Preparatory II</button>
+                <button type="button" class="tch-class-chip" data-section="primary" data-class="Nursery I" onclick="RichVineApp.toggleTeacherClassChip(this)">Nursery I</button>
+                <button type="button" class="tch-class-chip" data-section="primary" data-class="Nursery II" onclick="RichVineApp.toggleTeacherClassChip(this)">Nursery II</button>
+                <button type="button" class="tch-class-chip" data-section="primary" data-class="Primary 1" onclick="RichVineApp.toggleTeacherClassChip(this)">Primary 1</button>
+                <button type="button" class="tch-class-chip" data-section="primary" data-class="Primary 2" onclick="RichVineApp.toggleTeacherClassChip(this)">Primary 2</button>
+                <button type="button" class="tch-class-chip" data-section="primary" data-class="Primary 3" onclick="RichVineApp.toggleTeacherClassChip(this)">Primary 3</button>
+                <button type="button" class="tch-class-chip" data-section="primary" data-class="Primary 4" onclick="RichVineApp.toggleTeacherClassChip(this)">Primary 4</button>
+                <button type="button" class="tch-class-chip" data-section="primary" data-class="Primary 5" onclick="RichVineApp.toggleTeacherClassChip(this)">Primary 5</button>
+              </div>
+            </div>
+
+            <!-- Junior Secondary Section -->
+            <div>
+              <div style="font-size:11px;font-weight:800;color:#0284c7;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px">
+                Junior Secondary Section
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px">
+                <button type="button" class="tch-class-chip" data-section="junior" data-class="JSS 1" onclick="RichVineApp.toggleTeacherClassChip(this)">JSS 1</button>
+                <button type="button" class="tch-class-chip" data-section="junior" data-class="JSS 2" onclick="RichVineApp.toggleTeacherClassChip(this)">JSS 2</button>
+                <button type="button" class="tch-class-chip" data-section="junior" data-class="JSS 3" onclick="RichVineApp.toggleTeacherClassChip(this)">JSS 3</button>
+              </div>
+            </div>
+
+            <!-- Senior Secondary Section -->
+            <div>
+              <div style="font-size:11px;font-weight:800;color:#7c3aed;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px">
+                Senior Secondary Section
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px">
+                <button type="button" class="tch-class-chip" data-section="senior" data-class="SS 1 (Art, Commercial, Science)" onclick="RichVineApp.toggleTeacherClassChip(this)">SS 1 (All Arms)</button>
+                <button type="button" class="tch-class-chip" data-section="senior" data-class="SSS 1 Science" onclick="RichVineApp.toggleTeacherClassChip(this)">SSS 1 Science</button>
+                <button type="button" class="tch-class-chip" data-section="senior" data-class="SSS 1 Art" onclick="RichVineApp.toggleTeacherClassChip(this)">SSS 1 Art</button>
+                <button type="button" class="tch-class-chip" data-section="senior" data-class="SSS 1 Commercial" onclick="RichVineApp.toggleTeacherClassChip(this)">SSS 1 Commercial</button>
+
+                <button type="button" class="tch-class-chip" data-section="senior" data-class="SS 2 (Art, Commercial, Science)" onclick="RichVineApp.toggleTeacherClassChip(this)">SS 2 (All Arms)</button>
+                <button type="button" class="tch-class-chip" data-section="senior" data-class="SSS 2 Science" onclick="RichVineApp.toggleTeacherClassChip(this)">SSS 2 Science</button>
+                <button type="button" class="tch-class-chip" data-section="senior" data-class="SSS 2 Art" onclick="RichVineApp.toggleTeacherClassChip(this)">SSS 2 Art</button>
+                <button type="button" class="tch-class-chip" data-section="senior" data-class="SSS 2 Commercial" onclick="RichVineApp.toggleTeacherClassChip(this)">SSS 2 Commercial</button>
+
+                <button type="button" class="tch-class-chip" data-section="senior" data-class="SS 3 (Art, Commercial, Science)" onclick="RichVineApp.toggleTeacherClassChip(this)">SS 3 (All Arms)</button>
+                <button type="button" class="tch-class-chip" data-section="senior" data-class="SSS 3 Science" onclick="RichVineApp.toggleTeacherClassChip(this)">SSS 3 Science</button>
+                <button type="button" class="tch-class-chip" data-section="senior" data-class="SSS 3 Art" onclick="RichVineApp.toggleTeacherClassChip(this)">SSS 3 Art</button>
+                <button type="button" class="tch-class-chip" data-section="senior" data-class="SSS 3 Commercial" onclick="RichVineApp.toggleTeacherClassChip(this)">SSS 3 Commercial</button>
+              </div>
+            </div>
+          </div>
+          <!-- Hidden input keeping comma-separated list synced -->
+          <input type="hidden" id="tch-form-assigned-classes">
+          <p style="font-size:11px;color:var(--gray-500);margin-top:4px">
+            Click/tap any class above to assign. Selected classes turn solid blue with a checkmark. Multiple classes can be selected.
+          </p>
         </div>
         <div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">

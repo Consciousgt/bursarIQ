@@ -53,19 +53,95 @@ const ALL_CLASSES = [
   ...SCHOOL_SECTIONS.senior.classes
 ];
 
+function normalizeClassCode(str) {
+  if (!str) return "";
+  let s = String(str).toLowerCase().trim();
+  // Standardize common variations
+  s = s.replace(/preparatory|prepatory/g, "prep");
+  s = s.replace(/creache|creche/g, "creche");
+  s = s.replace(/nursary|nursery/g, "nur");
+  s = s.replace(/primary|pry|basic/g, "pri");
+  s = s.replace(/junior|j\.s\.?|js\s+/g, "jss");
+  s = s.replace(/senior|s\.s\.?|ss\s+/g, "sss");
+  // Normalize Roman numerals at end or boundary
+  s = s.replace(/\biii\b|iii$/g, "3");
+  s = s.replace(/\bii\b|ii$/g, "2");
+  s = s.replace(/\bi\b|i$/g, "1");
+  return s.replace(/[^a-z0-9]/g, "");
+}
+
+function isClassMatch(studentClass, targetClass) {
+  if (!studentClass || !targetClass) return false;
+  if (targetClass === "All" || targetClass === "" || targetClass === "all") return true;
+
+  const scRaw = String(studentClass).toLowerCase().trim();
+  const tcRaw = String(targetClass).toLowerCase().trim();
+  if (scRaw === tcRaw) return true;
+
+  const sc = normalizeClassCode(studentClass);
+  const tc = normalizeClassCode(targetClass);
+  if (sc === tc) return true;
+
+  // Senior Secondary Grade Level matching
+  // (e.g. Class Teacher manages SS 1 Art, Commercial, Science as one grade)
+  const isTargetSS1 = tc.includes("ss1") || tc.includes("sss1");
+  const isStudentSS1 = sc.includes("ss1") || sc.includes("sss1");
+  if (isTargetSS1 && isStudentSS1) {
+    if (tcRaw.includes("science") && !tcRaw.includes("art") && !scRaw.includes("science")) return false;
+    if (tcRaw.includes("art") && !tcRaw.includes("commercial") && !scRaw.includes("art")) return false;
+    if (tcRaw.includes("commercial") && !tcRaw.includes("science") && !scRaw.includes("commercial")) return false;
+    return true;
+  }
+
+  const isTargetSS2 = tc.includes("ss2") || tc.includes("sss2");
+  const isStudentSS2 = sc.includes("ss2") || sc.includes("sss2");
+  if (isTargetSS2 && isStudentSS2) {
+    if (tcRaw.includes("science") && !tcRaw.includes("art") && !scRaw.includes("science")) return false;
+    if (tcRaw.includes("art") && !tcRaw.includes("commercial") && !scRaw.includes("art")) return false;
+    if (tcRaw.includes("commercial") && !tcRaw.includes("science") && !scRaw.includes("commercial")) return false;
+    return true;
+  }
+
+  const isTargetSS3 = tc.includes("ss3") || tc.includes("sss3");
+  const isStudentSS3 = sc.includes("ss3") || sc.includes("sss3");
+  if (isTargetSS3 && isStudentSS3) {
+    if (tcRaw.includes("science") && !tcRaw.includes("art") && !scRaw.includes("science")) return false;
+    if (tcRaw.includes("art") && !tcRaw.includes("commercial") && !scRaw.includes("art")) return false;
+    if (tcRaw.includes("commercial") && !tcRaw.includes("science") && !scRaw.includes("commercial")) return false;
+    return true;
+  }
+
+  // Junior Secondary
+  if ((tc.includes("jss1") || tc.includes("js1")) && (sc.includes("jss1") || sc.includes("js1"))) return true;
+  if ((tc.includes("jss2") || tc.includes("js2")) && (sc.includes("jss2") || sc.includes("js2"))) return true;
+  if ((tc.includes("jss3") || tc.includes("js3")) && (sc.includes("jss3") || sc.includes("js3"))) return true;
+
+  // Primary Section / Early Years
+  if ((tc.includes("creche") || tc.includes("prep1")) && (sc.includes("creche") || sc.includes("prep1"))) return true;
+  if (tc.includes("prep2") && sc.includes("prep2")) return true;
+  if (tc.includes("nur1") && sc.includes("nur1")) return true;
+  if (tc.includes("nur2") && sc.includes("nur2")) return true;
+
+  for (let p = 1; p <= 5; p++) {
+    if (tc.includes("pri" + p) && sc.includes("pri" + p)) return true;
+  }
+
+  return false;
+}
+
 function getSectionByClass(className) {
   if (!className) return SCHOOL_SECTIONS.primary;
   const clean = String(className).toLowerCase().trim();
   // Check junior classes
-  if (clean.includes("jss") || clean.includes("junior") || clean.includes("bece") || clean.startsWith("j.s") || clean.startsWith("js ")) {
+  if (clean.includes("jss") || clean.includes("junior") || clean.includes("bece") || clean.startsWith("j.s") || clean.startsWith("js ") || clean === "jss1" || clean === "jss2" || clean === "jss3") {
     return SCHOOL_SECTIONS.junior;
   }
   // Check senior classes
-  if (clean.includes("sss") || clean.includes("senior") || clean.includes("waec") || clean.includes("neco") || clean.startsWith("s.s") || clean.startsWith("ss ") || clean.startsWith("ss1") || clean.startsWith("ss2") || clean.startsWith("ss3")) {
+  if (clean.includes("sss") || clean.includes("senior") || clean.includes("waec") || clean.includes("neco") || clean.startsWith("s.s") || clean.startsWith("ss ") || clean.startsWith("ss1") || clean.startsWith("ss2") || clean.startsWith("ss3") || clean.includes("art") || clean.includes("commercial") || clean.includes("science")) {
     return SCHOOL_SECTIONS.senior;
   }
   // Check primary and early years
-  if (clean.includes("primary") || clean.includes("pry") || clean.includes("nursery") || clean.includes("nur") || clean.includes("creche") || clean.includes("day care") || clean.includes("kindergarten") || clean.includes("kg") || clean.includes("basic")) {
+  if (clean.includes("primary") || clean.includes("pry") || clean.includes("nursery") || clean.includes("nur") || clean.includes("creche") || clean.includes("creache") || clean.includes("prep") || clean.includes("day care") || clean.includes("kindergarten") || clean.includes("kg") || clean.includes("basic")) {
     return SCHOOL_SECTIONS.primary;
   }
   for (const [key, sec] of Object.entries(SCHOOL_SECTIONS)) {
@@ -184,9 +260,9 @@ const DEFAULT_DATA = {
       name: "Mr. Emmanuel Adebayo",
       phone: "08012345678",
       password: "password123",
-      assignedClass: "SSS 1 Science",
-      assignedClasses: ["SSS 1 Science", "SSS 1 Art", "SSS 1 Commercial"],
-      role: "Class Teacher",
+      assignedClass: "SS 1 (Art, Commercial, Science)",
+      assignedClasses: ["SS 1 (Art, Commercial, Science)", "SSS 1 Science", "SSS 1 Art", "SSS 1 Commercial"],
+      role: "Class & Subject Teacher",
       subjects: ["Mathematics", "Physics"],
       status: "Active",
       createdAt: 1729000000000
@@ -197,9 +273,9 @@ const DEFAULT_DATA = {
       name: "Mrs. Funmilayo Adeleke",
       phone: "08023456789",
       password: "password123",
-      assignedClass: "JSS 2B",
-      assignedClasses: ["JSS 2B", "JSS 2A"],
-      role: "Class Teacher",
+      assignedClass: "JSS 2",
+      assignedClasses: ["JSS 1", "JSS 2", "JSS 3"],
+      role: "Class & Subject Teacher",
       subjects: ["English Language", "Literature in English"],
       status: "Active",
       createdAt: 1729000001000
@@ -210,9 +286,9 @@ const DEFAULT_DATA = {
       name: "Mr. Chukwudi Okafor",
       phone: "08034567890",
       password: "password123",
-      assignedClass: "SSS 2 Commercial",
-      assignedClasses: ["SSS 2 Commercial", "SSS 2 Art"],
-      role: "Class Teacher",
+      assignedClass: "SS 2 (Art, Commercial, Science)",
+      assignedClasses: ["SS 2 (Art, Commercial, Science)", "SSS 2 Commercial", "SSS 2 Art", "SSS 2 Science"],
+      role: "Class & Subject Teacher",
       subjects: ["Economics", "Commerce"],
       status: "Active",
       createdAt: 1729000002000
@@ -223,12 +299,25 @@ const DEFAULT_DATA = {
       name: "Dr. (Mrs) Ngozi Eze",
       phone: "08045678901",
       password: "password123",
-      assignedClass: "Unassigned",
+      assignedClass: "None",
       assignedClasses: ["SSS 1 Science", "SSS 2 Science", "SSS 3 Science"],
       role: "Subject Teacher",
       subjects: ["Biology", "Chemistry"],
       status: "Active",
       createdAt: 1729000003000
+    },
+    {
+      id: "TCH-005",
+      staffId: "STF/007",
+      name: "Mrs. Adeola Bakare",
+      phone: "08056789012",
+      password: "password123",
+      assignedClass: "Creche / Preparatory I",
+      assignedClasses: ["Creche / Preparatory I", "Preparatory II", "Nursery I", "Nursery II", "Primary 1"],
+      role: "Class & Subject Teacher",
+      subjects: ["Basic Science", "English Language", "Mathematics"],
+      status: "Active",
+      createdAt: 1729000004000
     }
   ],
   attendance: [],
@@ -3312,6 +3401,8 @@ RichVineDB._getOrdinalSuffix = function(n) {
 window.RichVineDB = RichVineDB;
 window.SCHOOL_SECTIONS = SCHOOL_SECTIONS;
 window.ALL_CLASSES = ALL_CLASSES;
+  window.isClassMatch = isClassMatch;
+  RichVineDB.isClassMatch = isClassMatch;
 window.getSectionByClass = getSectionByClass;
 window.DAYCARE_BILLING_CYCLES = DAYCARE_BILLING_CYCLES;
 window.TUTORIAL_CLASSES = TUTORIAL_CLASSES;

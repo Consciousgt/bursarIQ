@@ -179,6 +179,13 @@
             </button>
           </div>
 
+          <!-- Class Arm Selector (for Grade / Multi-Arm Class Teachers) -->
+          <div id="attendanceClassSelectorWrap" class="flex items-center gap-2 bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-700">
+            <label for="attendanceClassSelect" class="text-xs text-slate-400 font-semibold">Class:</label>
+            <select id="attendanceClassSelect" onchange="loadAttendanceRoster()" class="bg-transparent text-white text-xs font-semibold focus:outline-none cursor-pointer">
+            </select>
+          </div>
+
           <!-- Date Input -->
           <div class="flex items-center gap-2 bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-700">
             <label for="attendanceDate" class="text-xs text-slate-400 font-semibold">Date:</label>
@@ -715,7 +722,8 @@
 
     function loadAttendanceRoster() {
       const selectedDate = document.getElementById('attendanceDate').value;
-      const targetClass = currentTeacher.assignedClass;
+      const classSel = document.getElementById('attendanceClassSelect');
+      const targetClass = (classSel && classSel.value) ? classSel.value : currentTeacher.assignedClass;
 
       let students = [];
       if (window.RichVineDB && window.RichVineDB.getStudents) {
@@ -723,7 +731,11 @@
       }
       if (students.length === 0 && window.RichVineDB) {
         const raw = window.RichVineDB.getStudents();
-        students = raw.filter(s => (s.class || '').toLowerCase().trim() === (targetClass || '').toLowerCase().trim());
+        students = raw.filter(s => {
+          const sc = s.currentClass || s.class || '';
+          if (window.isClassMatch) return window.isClassMatch(sc, targetClass);
+          return sc.toLowerCase().trim() === (targetClass || '').toLowerCase().trim();
+        });
       }
 
       attendanceStudents = students;
@@ -899,13 +911,36 @@
         availableClasses = window.RichVineDB.getClassesForTeacher(currentTeacher);
       }
       if (availableClasses.length === 0) {
-        availableClasses = window.ALL_CLASSES || ["SSS 1 Science", "SSS 1 Art", "SSS 1 Commercial", "SSS 2 Science", "SSS 2 Commercial", "JSS 2B"];
+        availableClasses = window.ALL_CLASSES || [
+          "Creche / Preparatory I", "Preparatory II", "Nursery I", "Nursery II",
+          "Primary 1", "Primary 2", "Primary 3", "Primary 4", "Primary 5",
+          "JSS 1", "JSS 2", "JSS 3",
+          "SS 1 (Art, Commercial, Science)", "SSS 1 Science", "SSS 1 Art", "SSS 1 Commercial",
+          "SS 2 (Art, Commercial, Science)", "SSS 2 Science", "SSS 2 Art", "SSS 2 Commercial",
+          "SS 3 (Art, Commercial, Science)", "SSS 3 Science", "SSS 3 Art", "SSS 3 Commercial"
+        ];
       }
 
       classSelects.forEach(sel => {
         if (!sel) return;
         sel.innerHTML = availableClasses.map(c => '<option value="' + c + '">' + c + '</option>').join('');
       });
+
+      // 3. Populate Attendance Class Selector for Class Teachers
+      const attClassSel = document.getElementById('attendanceClassSelect');
+      if (attClassSel) {
+        const attClassesSet = new Set();
+        if (currentTeacher.assignedClass && currentTeacher.assignedClass !== 'None' && currentTeacher.assignedClass !== 'Unassigned') {
+          attClassesSet.add(currentTeacher.assignedClass);
+        }
+        if (Array.isArray(currentTeacher.assignedClasses)) {
+          currentTeacher.assignedClasses.forEach(c => attClassesSet.add(c));
+        }
+        if (attClassesSet.size === 0) {
+          attClassesSet.add(currentTeacher.assignedClass || "Unassigned");
+        }
+        attClassSel.innerHTML = Array.from(attClassesSet).map(c => '<option value="' + c + '">' + c + '</option>').join('');
+      }
     }
 
     function onWeeklyFilterChange() {
@@ -928,7 +963,11 @@
       }
       if (students.length === 0 && window.RichVineDB) {
         const raw = window.RichVineDB.getStudents();
-        students = raw.filter(s => (s.class || '').toLowerCase().trim() === (className || '').toLowerCase().trim());
+        students = raw.filter(s => {
+          const sc = s.currentClass || s.class || '';
+          if (window.isClassMatch) return window.isClassMatch(sc, className);
+          return sc.toLowerCase().trim() === (className || '').toLowerCase().trim();
+        });
       }
       weeklyStudents = students;
 
@@ -1162,7 +1201,11 @@
       }
       if (students.length === 0 && window.RichVineDB) {
         const raw = window.RichVineDB.getStudents();
-        students = raw.filter(s => (s.class || '').toLowerCase().trim() === (className || '').toLowerCase().trim());
+        students = raw.filter(s => {
+          const sc = s.currentClass || s.class || '';
+          if (window.isClassMatch) return window.isClassMatch(sc, className);
+          return sc.toLowerCase().trim() === (className || '').toLowerCase().trim();
+        });
       }
       examStudents = students;
 

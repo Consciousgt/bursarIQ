@@ -6219,6 +6219,69 @@ const RichVineApp = (() => {
     return pwd;
   }
 
+
+  function toggleTeacherClassChip(btn) {
+    if (!btn) return;
+    btn.classList.toggle("selected");
+    _updateTeacherClassesFromChips();
+  }
+
+  function quickSelectTeacherClasses(action) {
+    const chips = document.querySelectorAll("#tch-classes-picker .tch-class-chip");
+    if (!chips.length) return;
+
+    if (action === "clear") {
+      chips.forEach(c => c.classList.remove("selected"));
+    } else if (action === "all") {
+      chips.forEach(c => c.classList.add("selected"));
+    } else if (action === "primary" || action === "junior" || action === "senior") {
+      chips.forEach(c => {
+        if (c.getAttribute("data-section") === action) {
+          c.classList.add("selected");
+        }
+      });
+    }
+    _updateTeacherClassesFromChips();
+  }
+
+  function _updateTeacherClassesFromChips() {
+    const selectedChips = Array.from(document.querySelectorAll("#tch-classes-picker .tch-class-chip.selected"));
+    const selectedClasses = selectedChips.map(c => c.getAttribute("data-class"));
+    const hiddenInput = document.getElementById("tch-form-assigned-classes");
+    if (hiddenInput) {
+      hiddenInput.value = selectedClasses.join(", ");
+    }
+    const counter = document.getElementById("tch-classes-counter");
+    if (counter) {
+      counter.textContent = selectedClasses.length + " selected";
+    }
+  }
+
+  function syncTeacherClassChips(classesList) {
+    let list = [];
+    if (Array.isArray(classesList)) {
+      list = classesList;
+    } else if (typeof classesList === "string" && classesList.trim()) {
+      list = classesList.split(",").map(s => s.trim()).filter(Boolean);
+    }
+    const chips = document.querySelectorAll("#tch-classes-picker .tch-class-chip");
+    chips.forEach(chip => {
+      const cls = chip.getAttribute("data-class");
+      const isMatch = list.some(target => {
+        if (typeof isClassMatch === "function") {
+          return isClassMatch(cls, target) || isClassMatch(target, cls);
+        }
+        return cls.toLowerCase().trim() === String(target).toLowerCase().trim();
+      });
+      if (isMatch) {
+        chip.classList.add("selected");
+      } else {
+        chip.classList.remove("selected");
+      }
+    });
+    _updateTeacherClassesFromChips();
+  }
+
   function openAddTeacherModal(teacherId) {
     const modalTitle = document.getElementById("modal-teacher-title");
     const idInput = document.getElementById("tch-form-id");
@@ -6244,17 +6307,21 @@ const RichVineApp = (() => {
       if (subjectsInput) subjectsInput.value = (t.subjects || []).join(", ");
       if (assignedClassesInput) assignedClassesInput.value = (t.assignedClasses || []).join(", ");
       if (pwdInput) pwdInput.value = t.password || "";
+
+      syncTeacherClassChips(t.assignedClasses || (t.assignedClass ? [t.assignedClass] : []));
     } else {
       if (modalTitle) modalTitle.innerHTML = '<i class="fas fa-user-plus" style="color:#f59e0b"></i> Generate Teacher Login';
       if (idInput) idInput.value = "";
       if (nameInput) nameInput.value = "";
       if (phoneInput) phoneInput.value = "";
       if (roleSelect) roleSelect.value = "Class & Subject Teacher";
-      if (classSelect) classSelect.value = "SSS 1 Science";
+      if (classSelect) classSelect.value = "SS 1 (Art, Commercial, Science)";
       if (statusSelect) statusSelect.value = "active";
       if (subjectsInput) subjectsInput.value = "";
       if (assignedClassesInput) assignedClassesInput.value = "";
       generateTeacherPassword();
+
+      syncTeacherClassChips([]);
     }
     openModal("modal-add-teacher");
   }
@@ -6267,7 +6334,6 @@ const RichVineApp = (() => {
     const assignedClass = document.getElementById("tch-form-class")?.value;
     const status = document.getElementById("tch-form-status")?.value || "active";
     const subjectsRaw = document.getElementById("tch-form-subjects")?.value || "";
-    const assignedClassesRaw = document.getElementById("tch-form-assigned-classes")?.value || "";
     const password = document.getElementById("tch-form-password")?.value.trim();
 
     if (!name || !phone || !password) {
@@ -6275,11 +6341,21 @@ const RichVineApp = (() => {
       return;
     }
 
-    const subjects = subjectsRaw.split(",").map(s => s.trim()).filter(Boolean);
-    let assignedClasses = assignedClassesRaw.split(",").map(s => s.trim()).filter(Boolean);
+    // Collect multi-selected classes from chips
+    const selectedChips = Array.from(document.querySelectorAll("#tch-classes-picker .tch-class-chip.selected"));
+    let assignedClasses = selectedChips.map(c => c.getAttribute("data-class")).filter(Boolean);
+
+    // Fallback to text/hidden input if no chips selected
+    if (assignedClasses.length === 0) {
+      const assignedClassesRaw = document.getElementById("tch-form-assigned-classes")?.value || "";
+      assignedClasses = assignedClassesRaw.split(",").map(s => s.trim()).filter(Boolean);
+    }
+
     if (assignedClass && !assignedClasses.includes(assignedClass)) {
       assignedClasses.unshift(assignedClass);
     }
+
+    const subjects = subjectsRaw.split(",").map(s => s.trim()).filter(Boolean);
 
     const payload = {
       name,
@@ -7128,6 +7204,9 @@ const RichVineApp = (() => {
     saveTeacherModal,
     deleteTeacher,
     toggleTeacherStatus,
+    toggleTeacherClassChip,
+    quickSelectTeacherClasses,
+    syncTeacherClassChips,
     loadAttendanceTab,
     viewAttendanceBreakdown,
     loadExamsRecordsTab,
