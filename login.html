@@ -87,6 +87,11 @@
     >
     <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-sky-950/80 to-slate-900/90"></div>
     <div class="absolute inset-0 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:24px_24px] opacity-20"></div>
+    <!-- Dynamic Ambient Particles Live Canvas -->
+    <canvas class="ambient-live-canvas absolute inset-0 w-full h-full pointer-events-none z-[1]" data-theme="sky"></canvas>
+    <!-- Soft Ambient Glowing Orbs -->
+    <div class="absolute -top-24 -left-24 w-80 h-80 bg-sky-500/15 rounded-full blur-3xl pointer-events-none animate-pulse"></div>
+    <div class="absolute -bottom-24 -right-24 w-80 h-80 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none animate-pulse"></div>
   </div>
 
   <!-- Main Login Container -->
@@ -314,6 +319,7 @@
       });
     }
   </script>
+  <script src="js/ambient-particles.js"></script>
 </body>
 </html>
 

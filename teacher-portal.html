@@ -120,8 +120,11 @@
   <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6">
 
     <!-- Teacher Info & Assignment Hub Banner -->
-    <div class="bg-gradient-to-r from-emerald-900/40 via-slate-800 to-sky-900/40 border border-emerald-500/30 rounded-2xl p-4 md:p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-xl">
-      <div class="space-y-1.5">
+    <div class="relative overflow-hidden bg-gradient-to-r from-emerald-900/40 via-slate-800 to-sky-900/40 border border-emerald-500/30 rounded-2xl p-4 md:p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-xl">
+      <!-- Live Ambient Particle Effect for Staff Hub -->
+      <canvas class="ambient-live-canvas absolute inset-0 w-full h-full pointer-events-none opacity-50 z-0" data-theme="emerald"></canvas>
+      <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
+      <div class="space-y-1.5 relative z-10">
         <div class="flex items-center gap-2 flex-wrap">
           <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1" id="teacherRolePill">
             <i class="fas fa-user-check"></i> Class & Subject Teacher
@@ -145,7 +148,7 @@
       </div>
 
       <!-- Master Portal Nav Tabs -->
-      <div class="flex flex-nowrap sm:flex-wrap items-center gap-2 pt-2 lg:pt-0 overflow-x-auto pb-1 max-w-full" style="-webkit-overflow-scrolling:touch;scrollbar-width:none" id="portalNavButtons">
+      <div class="relative z-10 flex flex-nowrap sm:flex-wrap items-center gap-2 pt-2 lg:pt-0 overflow-x-auto pb-1 max-w-full" style="-webkit-overflow-scrolling:touch;scrollbar-width:none" id="portalNavButtons">
         <button onclick="switchMasterTab('attendance')" id="tabBtnAttendance" class="flex-shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-emerald-600 text-white shadow-lg shadow-emerald-600/30">
           <i class="fas fa-clipboard-check"></i> Daily Roll Call
         </button>
@@ -1452,6 +1455,7 @@
     <div>Class Teacher Signature: ______________________</div>
     <div>Principal Stamp &amp; Date: ______________________</div>
   </div>
+  <script src="js/ambient-particles.js"></script>
 </body>
 </html>`;
 
@@ -1540,5 +1544,6 @@
       });
     }
   </script>
+  <script src="js/ambient-particles.js"></script>
 </body>
 </html>

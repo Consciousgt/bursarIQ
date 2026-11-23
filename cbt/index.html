@@ -183,10 +183,12 @@
   <!-- ═════════════════════════════════════════════════════════════════════════ -->
   <!-- SCREEN 1: STUDENT VERIFICATION & LOGIN PORTAL -->
   <!-- ═════════════════════════════════════════════════════════════════════════ -->
-  <div id="screen-login" class="flex-1 flex flex-col justify-center items-center px-4 py-6 sm:py-10 max-w-xl mx-auto w-full">
+  <div id="screen-login" class="relative flex-1 flex flex-col justify-center items-center px-4 py-6 sm:py-10 max-w-xl mx-auto w-full">
+    <!-- Live Ambient Particles Effect -->
+    <canvas class="ambient-live-canvas absolute inset-0 w-full h-full pointer-events-none opacity-40 z-0" data-theme="sky"></canvas>
     
     <!-- School Brand Header -->
-    <div class="text-center mb-6">
+    <div class="text-center mb-6 relative z-10">
       <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-sky-600 to-sky-400 text-white shadow-lg shadow-sky-500/30 mb-3">
         <i class="fas fa-graduation-cap text-3xl"></i>
       </div>
@@ -208,7 +210,7 @@
     </div>
 
     <!-- Test Info Box -->
-    <div class="w-full bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-5">
+    <div class="w-full bg-white relative z-10 rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-5">
       <div class="bg-gradient-to-r from-sky-700 via-sky-600 to-sky-500 px-5 py-4 text-white">
         <div class="flex items-center justify-between">
           <span class="text-xs font-bold uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-full">Senior College</span>
@@ -846,6 +848,7 @@
   <!-- SCRIPTS & APPLICATION LOGIC -->
   <!-- ═════════════════════════════════════════════════════════════════════════ -->
   <script src="../js/dps-students.js?v=20261122"></script>
+  <script src="../js/ambient-particles.js"></script>
   <script src="../js/data.js?v=20261028_v16_safe_recovery"></script>
   <script src="../js/cbt-questions.js?v=20261028_v16_safe_recovery"></script>
   <script type="module" src="../js/firebase-config.js?v=20261028_v16_safe_recovery"></script>
