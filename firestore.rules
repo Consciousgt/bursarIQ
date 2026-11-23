@@ -602,6 +602,12 @@ service cloud.firestore {
       allow delete: if canWriteData();
     }
 
+    match /schoolConfig/{configId} {
+      allow read: if canReadData();
+      allow create, update: if canWriteData();
+      allow delete: if canWriteData();
+    }
+
     // Default Deny
     match /{document=**} {
       allow read, write: if false;

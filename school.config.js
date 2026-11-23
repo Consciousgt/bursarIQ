@@ -73,7 +73,14 @@
       messagingSenderId: "882141938065",
       appId: "1:882141938065:web:e7725268061ce571f45a30",
       measurementId: "G-BQ7M82MBK7"
-    }
+    },
+
+    // ── 6. Default Administrative Accounts ────────────────────────────
+    adminCredentials: [
+      { username: "admin", password: "password123", role: "Super Administrator", name: "Principal Administrator" },
+      { username: "bursar", password: "bursar123", role: "Chief Bursary Officer", name: "Mrs. A. Adeleke (Chief Bursar)" },
+      { username: "records", password: "record123", role: "Records Officer", name: "Mr. D. Okon (Academic Secretary)" }
+    ]
   };
 
   function buildMergedConfig() {
@@ -84,6 +91,9 @@
     }
     if (saved.firebaseConfig) {
       merged.firebaseConfig = Object.assign({}, defaultConfig.firebaseConfig, saved.firebaseConfig);
+    }
+    if (saved.adminCredentials && Array.isArray(saved.adminCredentials) && saved.adminCredentials.length > 0) {
+      merged.adminCredentials = saved.adminCredentials;
     }
     return merged;
   }

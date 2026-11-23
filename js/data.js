@@ -3091,30 +3091,57 @@ RichVineDB.updateAdminPassword = function(oldPassword, newPassword) {
     return { success: false, message: "New password must be at least 6 characters." };
   }
 
-  // Get current credentials
-  let creds = (typeof window !== "undefined" && window.BURSARIQ_CONFIG && window.BURSARIQ_CONFIG.adminCredentials)
-    ? window.BURSARIQ_CONFIG.adminCredentials
-    : [{ username: "admin", password: "password123" }];
+  // Get current credentials list
+  let creds = null;
+  if (typeof window !== "undefined" && typeof window.getActiveAdminCredentials === "function") {
+    creds = JSON.parse(JSON.stringify(window.getActiveAdminCredentials()));
+  } else {
+    try {
+      const savedCredsRaw = localStorage.getItem("BURSARIQ_ADMIN_CREDS");
+      if (savedCredsRaw) creds = JSON.parse(savedCredsRaw);
+    } catch (_) {}
+  }
 
-  let savedCredsRaw = null;
-  try {
-    savedCredsRaw = localStorage.getItem("BURSARIQ_ADMIN_CREDS");
-    if (savedCredsRaw) creds = JSON.parse(savedCredsRaw);
-  } catch (_) {}
+  if (!creds || !Array.isArray(creds) || creds.length === 0) {
+    creds = [
+      { username: "admin", password: "password123", role: "Super Administrator", name: "Principal Administrator" },
+      { username: "bursar", password: "bursar123", role: "Chief Bursary Officer", name: "Mrs. A. Adeleke (Chief Bursar)" },
+      { username: "records", password: "record123", role: "Records Officer", name: "Mr. D. Okon (Academic Secretary)" }
+    ];
+  }
 
-  // Check if old password matches any admin password
-  const adminMatch = creds.find(c => c.username === "admin" && c.password === String(oldPassword).trim());
-  if (!adminMatch && oldPassword !== "password123" && oldPassword !== "deportal2026" && oldPassword !== "admin123") {
+  // Strictly check if old password matches admin's CURRENT configured password
+  const oldPassClean = String(oldPassword || "").trim();
+  const newPassClean = String(newPassword || "").trim();
+  const adminAccount = creds.find(c => c.username.toLowerCase() === "admin");
+
+  if (!adminAccount || adminAccount.password !== oldPassClean) {
     return { success: false, message: "Current password does not match administrative records." };
   }
 
-  // Update password
-  creds.forEach(c => {
-    if (c.username === "admin") c.password = String(newPassword).trim();
-  });
+  // Update password strictly for admin
+  adminAccount.password = newPassClean;
 
+  // Persist across all application storage layers
   try {
     localStorage.setItem("BURSARIQ_ADMIN_CREDS", JSON.stringify(creds));
+
+    // Update in main database config
+    const data = RichVineDB.get();
+    if (data) {
+      if (!data.config) data.config = {};
+      data.config.adminCredentials = creds;
+      RichVineDB.save(data);
+    }
+
+    // Update in BURSARIQ_SCHOOL_CONFIG
+    try {
+      const cfgRaw = localStorage.getItem("BURSARIQ_SCHOOL_CONFIG");
+      let cfg = cfgRaw ? JSON.parse(cfgRaw) : {};
+      cfg.adminCredentials = creds;
+      localStorage.setItem("BURSARIQ_SCHOOL_CONFIG", JSON.stringify(cfg));
+    } catch (_) {}
+
     if (typeof window !== "undefined" && window.BURSARIQ_CONFIG) {
       window.BURSARIQ_CONFIG.adminCredentials = creds;
     }
