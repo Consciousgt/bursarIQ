@@ -4,7 +4,7 @@
  */
 const RichVineReports = (() => {
   const currency = "₦";
-  const school = config?.schoolName || 'DE PORTAL SCHOOLS';
+  const school = (typeof window !== 'undefined' && window.BURSARIQ_CONFIG && window.BURSARIQ_CONFIG.schoolName) ? window.BURSARIQ_CONFIG.schoolName : 'DE PORTAL SCHOOLS';
   const addr     = "5-7 Olukayode Street, Imoro, Ogijo, Shagamu - Ikorodu Road, Shagamu, Ogun State";
 
   // ── Date range helpers ──────────────────────────────────────────────────
@@ -34,45 +34,111 @@ const RichVineReports = (() => {
     return { startDate, endDate: today, label };
   }
 
-  // ── Print helper — uses Blob URL (works on file://, no popup permissions needed) ──
+  // ── Universal Multi-Platform Print Helper (Desktop, iOS Safari & Android Mobile) ──
   function printHtmlDocument(html, title) {
-    try {
-      // PRIMARY: Blob URL approach — works on file://, http://, https://
-      // No popup blocker issues because we're opening a real navigatable URL
-      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-      const blobUrl = URL.createObjectURL(blob);
-      const win = window.open(blobUrl, '_blank');
-      if (win) {
-        win.focus();
-        // Revoke after enough time to load
-        setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
-        return;
+    const docTitle = title || "De Portal Schools Official Document";
+
+    // Ensure print-trigger script is embedded in html so new window triggers print automatically
+    const autoPrintScript = `
+      <script>
+        (function() {
+          function doPrint() {
+            setTimeout(function() {
+              window.focus();
+              try { window.print(); } catch(e) { console.error('Print trigger error:', e); }
+            }, 450);
+          }
+          if (document.readyState === 'complete') {
+            doPrint();
+          } else {
+            window.addEventListener('load', doPrint);
+          }
+        })();
+      <\/script>
+    `;
+
+    let finalHtml = html;
+    if (!finalHtml.includes("window.print()") || !finalHtml.includes("addEventListener('load'")) {
+      if (finalHtml.includes("</body>")) {
+        finalHtml = finalHtml.replace("</body>", autoPrintScript + "</body>");
+      } else {
+        finalHtml += autoPrintScript;
       }
-      // If window.open returns null, fall through to iframe
-      URL.revokeObjectURL(blobUrl);
-    } catch (e) {
-      console.warn('Blob URL print failed:', e);
     }
 
-    // FALLBACK: Hidden iframe (works when popup is blocked)
+    // METHOD 1: Direct window.open synchronous write (fastest, standard popup behavior)
     try {
-      let iframe = document.getElementById('rv-print-frame');
-      if (iframe) iframe.remove();
-      iframe = document.createElement('iframe');
-      iframe.id = 'rv-print-frame';
-      iframe.style.cssText = 'position:fixed;width:1px;height:1px;border:none;left:-9999px;top:-9999px;opacity:0';
-      document.body.appendChild(iframe);
-      const doc = iframe.contentDocument || iframe.contentWindow.document;
-      doc.open('text/html', 'replace');
-      doc.write(html);
-      doc.close();
-      setTimeout(() => {
-        try { iframe.contentWindow.focus(); iframe.contentWindow.print(); }
-        catch(err) { alert('Could not open print dialog. Please allow popups for this page.'); }
-      }, 500);
+      const win = window.open("", "_blank");
+      if (win) {
+        win.document.open("text/html", "replace");
+        win.document.write(finalHtml);
+        win.document.close();
+        win.document.title = docTitle;
+        try { win.focus(); } catch(_) {}
+        return win;
+      }
+    } catch (e1) {
+      console.warn("Direct window.open failed, trying Blob URL:", e1);
+    }
+
+    // METHOD 2: Blob URL (ideal for sandboxed environments or file:// protocol)
+    try {
+      const blob = new Blob([finalHtml], { type: "text/html;charset=utf-8" });
+      const blobUrl = URL.createObjectURL(blob);
+      const win = window.open(blobUrl, "_blank");
+      if (win) {
+        try { win.focus(); } catch(_) {}
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 120000);
+        return win;
+      }
     } catch (e2) {
-      console.error('iframe print failed:', e2);
-      alert('Print failed. Please allow popups for this site and try again.');
+      console.warn("Blob URL print failed:", e2);
+    }
+
+    // METHOD 3: Interactive In-App Print Modal Preview (guaranteed fallback on mobile iOS/Android if popups are blocked)
+    try {
+      let overlay = document.getElementById("dps-print-modal-overlay");
+      if (overlay) overlay.remove();
+      overlay = document.createElement("div");
+      overlay.id = "dps-print-modal-overlay";
+      overlay.style.cssText = "position:fixed;inset:0;z-index:999999;background:rgba(15,23,42,0.85);backdrop-filter:blur(4px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;";
+      overlay.innerHTML = `
+        <div style="background:#fff;border-radius:16px;max-width:960px;width:100%;height:92vh;display:flex;flex-direction:column;box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);overflow:hidden;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:#0f172a;color:#fff;border-bottom:1px solid #334155;">
+            <div style="font-weight:700;font-size:13.5px;display:flex;align-items:center;gap:8px;">
+              <span>🖨️ ${docTitle}</span>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button id="dps-print-now-btn" style="background:#0284c7;color:#fff;border:none;padding:7px 16px;border-radius:8px;font-weight:700;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+                <i class="fas fa-print"></i> Print / Save PDF
+              </button>
+              <button id="dps-print-close-btn" style="background:#475569;color:#fff;border:none;padding:7px 14px;border-radius:8px;font-weight:600;font-size:12px;cursor:pointer;">
+                ✕ Close
+              </button>
+            </div>
+          </div>
+          <iframe id="dps-print-preview-frame" style="flex:1;border:none;width:100%;height:100%;background:#fff;"></iframe>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+      const frame = document.getElementById("dps-print-preview-frame");
+      const fdoc = frame.contentDocument || frame.contentWindow.document;
+      fdoc.open();
+      fdoc.write(finalHtml);
+      fdoc.close();
+
+      document.getElementById("dps-print-close-btn").onclick = () => overlay.remove();
+      document.getElementById("dps-print-now-btn").onclick = () => {
+        try {
+          frame.contentWindow.focus();
+          frame.contentWindow.print();
+        } catch(e) {
+          window.print();
+        }
+      };
+    } catch (e3) {
+      console.error("Print overlay fallback failed:", e3);
+      window.print();
     }
   }
 
@@ -4711,7 +4777,9 @@ const RichVineReports = (() => {
     printTutorialReceipt,
     printTutorialStudentStatement,
     printTutorialMonthlyNotice,
-    printStakeholdersRevenueReport
+    printStakeholdersRevenueReport,
+    printBroadsheet: (...args) => (window.RichVineApp && window.RichVineApp.printBroadsheet ? window.RichVineApp.printBroadsheet(...args) : window.print()),
+    printReportCard: (...args) => (window.RichVineApp && window.RichVineApp.printReportCard ? window.RichVineApp.printReportCard(...args) : window.print())
   };
 })();
 

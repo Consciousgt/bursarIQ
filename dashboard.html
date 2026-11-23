@@ -1107,6 +1107,57 @@
       font-weight: 800;
     }
 
+  
+    /* ════ Mobile iOS / Android Responsiveness: Stakeholders & Tutorial ════ */
+    @media (max-width: 768px) {
+      .modal {
+        width: 95vw !important;
+        max-width: 95vw !important;
+        max-height: 90vh !important;
+        margin: auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+      }
+      #modal-stakeholders-breakdown .modal {
+        width: 95vw !important;
+        max-width: 95vw !important;
+      }
+      #stakeholders-breakdown-body {
+        padding: 14px !important;
+        max-height: 75vh !important;
+        -webkit-overflow-scrolling: touch !important;
+      }
+      .tut-kpi-grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
+        gap: 10px !important;
+      }
+      .tut-nav-tabs-bar {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        white-space: nowrap !important;
+        scrollbar-width: none !important;
+        padding-bottom: 4px !important;
+      }
+      .tut-nav-tabs-bar::-webkit-scrollbar {
+        display: none !important;
+      }
+      .tut-nav-tabs-bar button {
+        flex-shrink: 0 !important;
+        font-size: 11.5px !important;
+        padding: 8px 12px !important;
+      }
+      .table-responsive {
+        -webkit-overflow-scrolling: touch !important;
+        overflow-x: auto !important;
+        width: 100% !important;
+      }
+      #tut-matrix-table th, #tut-matrix-table td {
+        padding: 6px 8px !important;
+        font-size: 11px !important;
+        white-space: nowrap !important;
+      }
+    }
+
   </style>
 
 </head>
@@ -2737,7 +2788,7 @@
     </div>
 
     <!-- Summary KPI Stat Cards -->
-    <div class="stat-grid" style="grid-template-columns:repeat(auto-fit, minmax(210px, 1fr));gap:14px;margin-bottom:20px">
+    <div class="stat-grid tut-kpi-grid" style="grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));gap:12px;margin-bottom:20px">
       <div class="stat-card" style="border-left:4px solid #f59e0b">
         <div class="stat-icon" style="background:#fef3c7;color:#d97706"><i class="fas fa-user-graduate"></i></div>
         <div>
@@ -2790,7 +2841,7 @@
     </div>
 
     <!-- Navigation Sub-Tabs -->
-    <div style="display:flex;gap:8px;border-bottom:2px solid var(--gray-200);margin-bottom:18px">
+    <div class="tut-nav-tabs-bar" style="display:flex;gap:8px;border-bottom:2px solid var(--gray-200);margin-bottom:18px;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap">
       <button id="tut-tab-btn-learners" class="btn-sm active" onclick="RichVineApp.switchTutorialSubTab('learners')" style="padding:8px 18px;font-weight:700;border-radius:8px 8px 0 0;cursor:pointer;border:none;background:var(--sky);color:#fff">
         <i class="fas fa-users"></i> Tutorial Learners Roster
       </button>
@@ -3044,7 +3095,7 @@
         <i class="fas fa-clipboard-check" style="color:#10b981"></i> Daily Attendance Register (Morning & Afternoon)
       </h2>
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        <button class="btn-secondary" onclick="window.print()">
+        <button class="btn-secondary" onclick="RichVineApp.printAttendanceLog()">
           <i class="fas fa-print"></i> Print Register
         </button>
       </div>

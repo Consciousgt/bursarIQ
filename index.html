@@ -68,6 +68,56 @@
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
     }
+  
+    /* ════ Sophisticated 3D Animations & Kinetic Micro-Interactions ════ */
+    .hero-perspective {
+      perspective: 1200px;
+    }
+    .tilt-card-3d {
+      transform-style: preserve-3d;
+      transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.25s ease;
+      will-change: transform;
+    }
+    .tilt-card-3d:hover {
+      box-shadow: 0 30px 60px -15px rgba(2, 132, 199, 0.25), 0 0 20px rgba(56, 189, 248, 0.15);
+    }
+    .tilt-card-inner {
+      transform: translateZ(28px);
+    }
+    .floating-3d-badge {
+      animation: floatBadge 4s ease-in-out infinite alternate;
+      will-change: transform;
+    }
+    .floating-3d-badge-alt {
+      animation: floatBadgeAlt 5s ease-in-out infinite alternate;
+      will-change: transform;
+    }
+    @keyframes floatBadge {
+      0% { transform: translateY(0px) rotate(0deg) translateZ(10px); }
+      100% { transform: translateY(-8px) rotate(1.5deg) translateZ(25px); }
+    }
+    @keyframes floatBadgeAlt {
+      0% { transform: translateY(0px) rotate(0deg) translateZ(15px); }
+      100% { transform: translateY(9px) rotate(-1.5deg) translateZ(30px); }
+    }
+    .mesh-gradient-bg {
+      background: radial-gradient(circle at 20% 30%, rgba(2, 132, 199, 0.18) 0%, transparent 45%),
+                  radial-gradient(circle at 80% 70%, rgba(16, 185, 129, 0.15) 0%, transparent 45%),
+                  radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.08) 0%, transparent 55%);
+    }
+    .glow-ring {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      filter: blur(40px);
+      opacity: 0.35;
+      animation: pulseGlow 6s ease-in-out infinite alternate;
+    }
+    @keyframes pulseGlow {
+      0% { opacity: 0.25; transform: scale(0.95); }
+      100% { opacity: 0.45; transform: scale(1.08); }
+    }
+
   </style>
 
   <link rel="manifest" href="manifest.json">
@@ -85,9 +135,9 @@
           <span>5-7 Olukayode St, Imoro, Ogijo, Ogun State</span>
         </span>
         <span class="text-slate-700">&bull;</span>
-        <a href="tel:08012345678" class="flex items-center gap-1.5 hover:text-white transition">
+        <a href="tel:09053126809" class="flex items-center gap-1.5 hover:text-white transition">
           <i class="fas fa-phone-alt text-emerald-400"></i>
-          <span>08012345678</span>
+          <span>09053126809</span>
         </a>
         <span class="text-slate-700">&bull;</span>
         <span class="text-sky-300 font-semibold flex items-center gap-1.5">
@@ -96,23 +146,15 @@
         </span>
       </div>
 
-      <!-- Live Clock & Staff Modal Trigger -->
-      <div class="flex items-center space-x-4">
-        <div class="flex items-center gap-1.5 text-sky-300 bg-slate-800/80 px-2.5 py-0.5 rounded border border-slate-700 font-mono text-[11px]">
-          <i class="far fa-clock text-sky-400"></i>
-          <span id="top-clock-time">--:--:--</span>
+      <!-- Live Clock -->
+        <div class="flex items-center space-x-4">
+          <div class="flex items-center gap-1.5 text-sky-300 bg-slate-800/80 px-2.5 py-0.5 rounded border border-slate-700 font-mono text-[11px]">
+            <i class="far fa-clock text-sky-400"></i>
+            <span id="top-clock-time">--:--:--</span>
+          </div>
         </div>
-        <button 
-          type="button"
-          onclick="openStaffGatewayModal()"
-          class="text-xs font-semibold text-slate-300 hover:text-white flex items-center gap-1 bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded-lg border border-slate-700 transition cursor-pointer"
-        >
-          <i class="fas fa-lock text-amber-400"></i>
-          <span>Staff Access</span>
-        </button>
       </div>
-    </div>
-  </aside>
+    </aside>
 
   <!-- ═══════════════════════════════════════════════════════════════
        2. PRIMARY BRAND HEADER & NAVIGATION
@@ -160,14 +202,6 @@
 
       <!-- Action Buttons (Desktop) -->
       <div class="hidden lg:flex items-center space-x-3">
-        <button 
-          type="button"
-          onclick="openStaffGatewayModal()"
-          class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 transition flex items-center gap-1.5 cursor-pointer"
-        >
-          <i class="fas fa-shield-alt text-amber-500"></i>
-          <span>Staff Gateway</span>
-        </button>
         <a 
           href="#admissions" 
           class="px-4 py-2.5 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-700 hover:to-sky-800 shadow-md shadow-sky-600/25 transition flex items-center gap-1.5"
@@ -221,13 +255,6 @@
         </a>
       </div>
       <div class="pt-2 flex gap-2">
-        <button 
-          type="button" 
-          onclick="toggleMobileDrawer(); openStaffGatewayModal();"
-          class="flex-1 py-2.5 rounded-xl text-xs font-bold text-slate-800 bg-slate-100 border border-slate-300 text-center flex items-center justify-center gap-1.5"
-        >
-          <i class="fas fa-lock text-amber-500"></i> Staff Gateway
-        </button>
         <a 
           href="#admissions" 
           onclick="toggleMobileDrawer()" 
@@ -254,7 +281,15 @@
       <div class="absolute inset-0 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:24px_24px] opacity-15"></div>
     </div>
 
-    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 w-full">
+        <!-- Sophisticated Kinetic 3D Portal Canvas -->
+    <canvas id="hero-3d-canvas" class="absolute inset-0 z-[1] w-full h-full pointer-events-none opacity-60"></canvas>
+    
+    <!-- Ambient 3D Glowing Orbs -->
+    <div class="glow-ring w-96 h-96 bg-sky-500 -top-20 -left-20 z-[2]"></div>
+    <div class="glow-ring w-80 h-80 bg-emerald-500 -bottom-20 -right-20 z-[2]"></div>
+    <div class="glow-ring w-72 h-72 bg-amber-500 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[2] opacity-20"></div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 w-full hero-perspective">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
         
         <!-- Left: School Vision, Mission & Calls to Action -->
@@ -316,7 +351,7 @@
 
         <!-- Right: Institutional Highlights Card -->
         <div class="lg:col-span-5">
-          <div class="bg-slate-900/90 backdrop-blur-xl border border-slate-800 p-6 sm:p-8 rounded-3xl shadow-2xl space-y-4">
+          <div class="bg-slate-900/90 backdrop-blur-xl border border-slate-800/80 p-6 sm:p-8 rounded-3xl shadow-2xl space-y-4 tilt-card-3d" id="hero-tilt-card">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
               <div>
                 <span class="text-[10px] font-black text-sky-400 uppercase tracking-widest">Citadel of Excellence</span>
@@ -325,6 +360,16 @@
               <div class="w-10 h-10 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center text-lg font-bold">
                 <i class="fas fa-award"></i>
               </div>
+            </div>
+
+                        <!-- Floating 3D Micro-Pill -->
+            <div class="flex items-center justify-between gap-2 pt-1">
+              <span class="floating-3d-badge inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-400/30 text-sky-300 text-[11px] font-bold shadow-sm">
+                <i class="fas fa-sparkles text-sky-400"></i> British &amp; Nigerian Curriculum
+              </span>
+              <span class="floating-3d-badge-alt inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-400/30 text-emerald-300 text-[11px] font-bold shadow-sm">
+                <i class="fas fa-check-circle text-emerald-400"></i> WAEC / BECE Accredited
+              </span>
             </div>
 
             <!-- Advantage 1 -->
@@ -756,7 +801,7 @@
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1" for="enqPhone">WhatsApp Phone Number *</label>
-              <input type="tel" id="enqPhone" required placeholder="e.g. 08012345678" class="w-full p-3.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-sky-200 focus:outline-none">
+              <input type="tel" id="enqPhone" required placeholder="e.g. 09053126809" class="w-full p-3.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-sky-200 focus:outline-none">
             </div>
           </div>
 
@@ -820,7 +865,7 @@
             </div>
             <div class="flex items-center gap-2.5">
               <i class="fas fa-phone-alt text-emerald-600"></i>
-              <span><strong>Phone:</strong> 08012345678</span>
+              <span><strong>Phone:</strong> 09053126809</span>
             </div>
             <div class="flex items-center gap-2.5">
               <i class="fas fa-envelope text-indigo-600"></i>
@@ -918,60 +963,38 @@
           </p>
           <button 
             type="button" 
-            onclick="openStaffGatewayModal()"
-            class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-sky-400 hover:text-sky-300 border border-slate-700 text-xs font-bold transition flex items-center gap-2 cursor-pointer"
+            onclick="openStaffGatewayModal()" 
+            class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-sky-400 border border-slate-700 font-bold text-xs flex items-center gap-2 transition cursor-pointer shadow-sm"
           >
-            <i class="fas fa-lock text-amber-400"></i>
-            <span>Staff Portal Access</span>
+            <i class="fas fa-shield-alt text-sky-400"></i>
+            <span>Staff Gateway Access</span>
           </button>
         </div>
+
       </div>
 
-      <!-- Bottom Bar -->
-      <div class="pt-8 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-500 gap-3">
+      <!-- Footer Bottom Copyright & Quick Links -->
+      <div class="border-t border-slate-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500">
         <div>
-          &copy; 2026 <strong>De Portal Schools</strong>, Ogijo, Ogun State. All rights reserved.
+          &copy; 2026/2027 <span class="school-name-text font-semibold text-slate-400">DE PORTAL SCHOOLS</span>. All rights reserved.
         </div>
-        <div class="flex items-center space-x-1.5 text-slate-400">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-          <span>Powered by <strong class="text-slate-300">BursarIQ</strong> &mdash; Every naira accounted for.</span>
+        <div class="flex items-center gap-4">
+          <a href="login.html" class="hover:text-slate-300 transition flex items-center gap-1">
+            <i class="fas fa-user-shield text-sky-400"></i> Admin Portal
+          </a>
+          <span class="text-slate-700">&bull;</span>
+          <a href="teacher-login.html" class="hover:text-slate-300 transition flex items-center gap-1">
+            <i class="fas fa-chalkboard-teacher text-emerald-400"></i> Teacher Portal
+          </a>
+          <span class="text-slate-700">&bull;</span>
+          <a href="cbt/index.html" class="hover:text-slate-300 transition flex items-center gap-1">
+            <i class="fas fa-laptop-code text-amber-400"></i> Student CBT
+          </a>
         </div>
       </div>
 
     </div>
   </footer>
-
-  <!-- ═══════════════════════════════════════════════════════════════
-       11. MOBILE BOTTOM APP BAR (iOS / Android Native Feel)
-       ═══════════════════════════════════════════════════════════════ -->
-  <div class="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-200 z-50 lg:hidden bottom-app-bar shadow-lg">
-    <div class="grid grid-cols-5 h-16 items-center text-center">
-      <a href="#hero" class="flex flex-col items-center justify-center text-slate-600 hover:text-sky-600 text-[10px] font-bold">
-        <i class="fas fa-home text-base mb-1 text-sky-600"></i>
-        <span>Home</span>
-      </a>
-      <a href="#academics" class="flex flex-col items-center justify-center text-slate-600 hover:text-sky-600 text-[10px] font-semibold">
-        <i class="fas fa-graduation-cap text-base mb-1"></i>
-        <span>Academics</span>
-      </a>
-      <a href="#clearance" class="flex flex-col items-center justify-center text-slate-600 hover:text-sky-600 text-[10px] font-semibold">
-        <i class="fas fa-id-card text-base mb-1 text-emerald-600"></i>
-        <span>Clearance</span>
-      </a>
-      <a href="#admissions" class="flex flex-col items-center justify-center text-slate-600 hover:text-sky-600 text-[10px] font-semibold">
-        <i class="fas fa-user-plus text-base mb-1 text-amber-600"></i>
-        <span>Admissions</span>
-      </a>
-      <button 
-        type="button" 
-        onclick="openStaffGatewayModal()" 
-        class="flex flex-col items-center justify-center text-slate-600 hover:text-sky-600 text-[10px] font-semibold cursor-pointer"
-      >
-        <i class="fas fa-lock text-base mb-1 text-purple-600"></i>
-        <span>Staff</span>
-      </button>
-    </div>
-  </div>
 
   <!-- ═══════════════════════════════════════════════════════════════
        12. STAFF PORTAL GATEWAY MODAL (Protected Authorized Access)
@@ -1217,5 +1240,221 @@
       });
     }
   </script>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       SOPHISTICATED 3D KINETIC PORTAL ENGINE (High-Performance Vanilla 3D)
+       ═══════════════════════════════════════════════════════════════ -->
+  <script>
+    (function() {
+      // 1. Kinetic 3D Canvas (Interconnected Portal Geometry)
+      const canvas = document.getElementById('hero-3d-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let width, height, dpr;
+      let animFrameId;
+      let mouseX = 0, mouseY = 0, targetMouseX = 0, targetMouseY = 0;
+      let rotX = 0.2, rotY = 0, rotZ = 0;
+
+      function resize() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        width = canvas.parentElement.offsetWidth;
+        height = canvas.parentElement.offsetHeight;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        ctx.scale(dpr, dpr);
+        if (typeof rebuild3DGeometry === 'function') rebuild3DGeometry();
+      }
+      window.addEventListener('resize', resize, { passive: true });
+      resize();
+
+      // Mouse / Touch Parallax
+      window.addEventListener('mousemove', (e) => {
+        targetMouseX = (e.clientX / window.innerWidth - 0.5) * 1.2;
+        targetMouseY = (e.clientY / window.innerHeight - 0.5) * 1.2;
+      }, { passive: true });
+
+      // Generate 3D Rings & Vertices (Dynamically scaled on resize / orientation change)
+      const NODES_COUNT = 36;
+      const INNER_COUNT = 24;
+      let nodes = [];
+      let innerNodes = [];
+
+      function rebuild3DGeometry() {
+        const baseRadius = Math.max(120, Math.min(width, height) * 0.32);
+        const innerRadius = baseRadius * 0.55;
+        nodes = [];
+        for (let i = 0; i < NODES_COUNT; i++) {
+          const theta = (i / NODES_COUNT) * Math.PI * 2;
+          nodes.push({
+            x0: Math.cos(theta) * baseRadius,
+            y0: Math.sin(theta) * baseRadius,
+            z0: Math.sin(theta * 3) * 45,
+            size: 2.5 + (i % 3 === 0 ? 1.5 : 0.5),
+            color: i % 3 === 0 ? '#38bdf8' : (i % 3 === 1 ? '#34d399' : '#fbbf24')
+          });
+        }
+        innerNodes = [];
+        for (let i = 0; i < INNER_COUNT; i++) {
+          const phi = (i / INNER_COUNT) * Math.PI * 2;
+          innerNodes.push({
+            x0: Math.cos(phi) * innerRadius,
+            y0: 0,
+            z0: Math.sin(phi) * innerRadius,
+            size: 2,
+            color: i % 2 === 0 ? '#38bdf8' : '#a7f3d0'
+          });
+        }
+      }
+
+      function project3D(x, y, z, cx, cy) {
+        const fov = 420;
+        const scale = fov / (fov + z);
+        return {
+          x: cx + x * scale,
+          y: cy + y * scale,
+          scale: scale,
+          visible: z > -fov
+        };
+      }
+
+      let isHeroVisible = true;
+      if ('IntersectionObserver' in window) {
+        const heroSection = document.getElementById('hero');
+        const observer = new IntersectionObserver((entries) => {
+          isHeroVisible = entries[0].isIntersecting;
+          if (isHeroVisible && !animFrameId) render();
+        }, { threshold: 0.05 });
+        if (heroSection) observer.observe(heroSection);
+      }
+
+      function render() {
+        if (!isHeroVisible) {
+          animFrameId = null;
+          return;
+        }
+
+        ctx.clearRect(0, 0, width, height);
+
+        // Smooth mouse inertia
+        mouseX += (targetMouseX - mouseX) * 0.05;
+        mouseY += (targetMouseY - mouseY) * 0.05;
+
+        // Rotation increments
+        rotY += 0.0035;
+        rotX = 0.25 + mouseY * 0.35;
+        rotZ = mouseX * 0.25;
+
+        const cx = width > 1024 ? width * 0.65 : width * 0.5;
+        const cy = height * 0.48;
+
+        const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
+        const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
+        const cosZ = Math.cos(rotZ), sinZ = Math.sin(rotZ);
+
+        function transformPoint(p) {
+          // Y-axis rotation
+          let x1 = p.x0 * cosY - p.z0 * sinY;
+          let z1 = p.x0 * sinY + p.z0 * cosY;
+          let y1 = p.y0;
+
+          // X-axis rotation
+          let y2 = y1 * cosX - z1 * sinX;
+          let z2 = y1 * sinX + z1 * cosX;
+          let x2 = x1;
+
+          // Z-axis rotation
+          let x3 = x2 * cosZ - y2 * sinZ;
+          let y3 = x2 * sinZ + y2 * cosZ;
+          let z3 = z2;
+
+          return { x: x3, y: y3, z: z3 };
+        }
+
+        // Draw connections for primary ring
+        const projectedNodes = nodes.map(n => {
+          const t = transformPoint(n);
+          return { ...n, p: project3D(t.x, t.y, t.z, cx, cy), z: t.z };
+        });
+
+        // Soft connective lines
+        ctx.lineWidth = 1;
+        for (let i = 0; i < projectedNodes.length; i++) {
+          const a = projectedNodes[i];
+          const b = projectedNodes[(i + 1) % projectedNodes.length];
+          if (a.p.visible && b.p.visible) {
+            const alpha = Math.max(0.08, Math.min(0.45, (a.z + 120) / 240));
+            ctx.strokeStyle = `rgba(56, 189, 248, ${alpha})`;
+            ctx.beginPath();
+            ctx.moveTo(a.p.x, a.p.y);
+            ctx.lineTo(b.p.x, b.p.y);
+            ctx.stroke();
+
+            // Connect to cross-opposites for geometric lattice
+            if (i % 3 === 0) {
+              const cross = projectedNodes[(i + 12) % projectedNodes.length];
+              ctx.strokeStyle = `rgba(16, 185, 129, ${alpha * 0.6})`;
+              ctx.beginPath();
+              ctx.moveTo(a.p.x, a.p.y);
+              ctx.lineTo(cross.p.x, cross.p.y);
+              ctx.stroke();
+            }
+          }
+        }
+
+        // Draw Nodes
+        projectedNodes.forEach(n => {
+          if (!n.p.visible) return;
+          const alpha = Math.max(0.2, Math.min(0.9, (n.z + 120) / 240));
+          ctx.fillStyle = n.color;
+          ctx.globalAlpha = alpha;
+          ctx.beginPath();
+          ctx.arc(n.p.x, n.p.y, n.size * n.p.scale, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        // Inner Gyroscope Ring
+        const projectedInner = innerNodes.map(n => {
+          const t = transformPoint(n);
+          return { ...n, p: project3D(t.x, t.y, t.z, cx, cy), z: t.z };
+        });
+
+        ctx.strokeStyle = 'rgba(245, 158, 11, 0.25)';
+        for (let i = 0; i < projectedInner.length; i++) {
+          const a = projectedInner[i];
+          const b = projectedInner[(i + 1) % projectedInner.length];
+          if (a.p.visible && b.p.visible) {
+            ctx.beginPath();
+            ctx.moveTo(a.p.x, a.p.y);
+            ctx.lineTo(b.p.x, b.p.y);
+            ctx.stroke();
+          }
+        }
+
+        ctx.globalAlpha = 1.0;
+        animFrameId = requestAnimationFrame(render);
+      }
+      render();
+
+      // 2. Interactive 3D Card Tilt Engine
+      const tiltCard = document.getElementById('hero-tilt-card');
+      if (tiltCard && window.matchMedia('(hover: hover)').matches) {
+        tiltCard.addEventListener('mousemove', (e) => {
+          const rect = tiltCard.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+          const rotateX = ((y - centerY) / centerY) * -9;
+          const rotateY = ((x - centerX) / centerX) * 9;
+          tiltCard.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(1.02, 1.02, 1.02)`;
+        });
+
+        tiltCard.addEventListener('mouseleave', () => {
+          tiltCard.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+        });
+      }
+    })();
+  </script>
+
 </body>
 </html>

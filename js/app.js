@@ -6077,63 +6077,63 @@ const RichVineApp = (() => {
     if (body) {
       body.innerHTML = `
         <!-- Hero Total -->
-        <div style="background:linear-gradient(135deg, #fef3c7, #fde68a);border:1px solid #fcd34d;border-radius:12px;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
-          <div>
-            <div style="font-size:12px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:0.5px">Total Stakeholders Revenue Realized</div>
-            <div style="font-size:26px;font-weight:900;color:#78350f;margin-top:2px">₦${formatAmount(summary.totalStakeholdersRevenue, true)}</div>
-            <div style="font-size:11px;color:#b45309;margin-top:2px">
+        <div style="background:linear-gradient(135deg, #fef3c7, #fde68a);border:1px solid #fcd34d;border-radius:12px;padding:16px 18px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px">
+          <div style="flex:1;min-width:200px">
+            <div style="font-size:11px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:0.5px">Total Stakeholders Revenue Realized</div>
+            <div style="font-size:clamp(20px, 4vw, 26px);font-weight:900;color:#78350f;margin-top:2px">₦${formatAmount(summary.totalStakeholdersRevenue, true)}</div>
+            <div style="font-size:10.5px;color:#b45309;margin-top:2px">
               ✓ Pooled into School Operating Total Revenue &bull; Tracked separately from regular term school fees
             </div>
           </div>
-          <div style="display:flex;flex-direction:column;gap:6px">
-            <button class="btn-sm btn-primary" onclick="RichVineReports.printStakeholdersRevenueReport()" style="background:#78350f;border:none">
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <button class="btn-sm btn-primary" onclick="RichVineReports.printStakeholdersRevenueReport()" style="background:#78350f;border:none;padding:6px 12px;font-size:11.5px">
               <i class="fas fa-print"></i> Print Statement
             </button>
-            <button class="btn-sm btn-secondary" onclick="RichVineApp.closeModal('modal-stakeholders-breakdown');RichVineApp.switchTab('tutorial')">
+            <button class="btn-sm btn-secondary" onclick="RichVineApp.closeModal('modal-stakeholders-breakdown');RichVineApp.switchTab('tutorial')" style="padding:6px 12px;font-size:11.5px">
               <i class="fas fa-external-link-alt"></i> Go to Tutorial Section
             </button>
           </div>
         </div>
 
-        <!-- 4 Key Inflow Categories -->
-        <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:10px;margin-bottom:18px">
+        <!-- 4 Key Inflow Categories (Fluid Grid) -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(135px, 1fr));gap:10px;margin-bottom:16px">
           <div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid #0284c7;border-radius:8px;padding:10px">
-            <div style="font-size:10.5px;color:var(--gray-500);font-weight:600">Monthly Tuition</div>
-            <div style="font-size:15px;font-weight:800;color:#0284c7;margin-top:2px">₦${formatAmount(summary.monthlyTuitionRevenue, true)}</div>
+            <div style="font-size:10px;color:var(--gray-500);font-weight:600">Monthly Tuition</div>
+            <div style="font-size:14px;font-weight:800;color:#0284c7;margin-top:2px">₦${formatAmount(summary.monthlyTuitionRevenue, true)}</div>
             <div style="font-size:9.5px;color:var(--gray-400)">Oct 2026 onwards</div>
           </div>
 
           <div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid #7c3aed;border-radius:8px;padding:10px">
-            <div style="font-size:10.5px;color:var(--gray-500);font-weight:600">Exam Fees</div>
-            <div style="font-size:15px;font-weight:800;color:#7c3aed;margin-top:2px">₦${formatAmount(summary.examFeesRevenue, true)}</div>
+            <div style="font-size:10px;color:var(--gray-500);font-weight:600">Exam Fees</div>
+            <div style="font-size:14px;font-weight:800;color:#7c3aed;margin-top:2px">₦${formatAmount(summary.examFeesRevenue, true)}</div>
             <div style="font-size:9.5px;color:var(--gray-400)">WAEC, NECO, BECE</div>
           </div>
 
           <div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid #f59e0b;border-radius:8px;padding:10px">
-            <div style="font-size:10.5px;color:var(--gray-500);font-weight:600">Special Levies</div>
-            <div style="font-size:15px;font-weight:800;color:#d97706;margin-top:2px">₦${formatAmount(summary.optionalFeesRevenue, true)}</div>
+            <div style="font-size:10px;color:var(--gray-500);font-weight:600">Special Levies</div>
+            <div style="font-size:14px;font-weight:800;color:#d97706;margin-top:2px">₦${formatAmount(summary.optionalFeesRevenue, true)}</div>
             <div style="font-size:9.5px;color:var(--gray-400)">Practical &amp; Logistics</div>
           </div>
 
           <div style="background:#f8fafc;border:1px solid #e2e8f0;border-left:4px solid #10b981;border-radius:8px;padding:10px">
-            <div style="font-size:10.5px;color:var(--gray-500);font-weight:600">Class Inflows</div>
-            <div style="font-size:12px;font-weight:700;color:#0f172a;margin-top:2px">
+            <div style="font-size:10px;color:var(--gray-500);font-weight:600">Class Inflows</div>
+            <div style="font-size:11.5px;font-weight:700;color:#0f172a;margin-top:2px">
               SS3: <b>₦${formatAmount(summary.ss3Revenue, true)}</b><br>
               JSS3: <b>₦${formatAmount(summary.jss3Revenue, true)}</b>
             </div>
           </div>
         </div>
 
-        <!-- Monthly Timeline -->
-        <h4 style="margin:16px 0 8px;font-size:12.5px;font-weight:700">Monthly Tuition Inflow Timeline</h4>
-        <div style="display:grid;grid-template-columns:repeat(5, 1fr);gap:8px;margin-bottom:18px">
+        <!-- Monthly Timeline (Fluid Grid) -->
+        <h4 style="margin:14px 0 8px;font-size:12px;font-weight:700">Monthly Tuition Inflow Timeline</h4>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(85px, 1fr));gap:6px;margin-bottom:16px">
           ${monthCards}
         </div>
 
-        <!-- Recent Payments Table -->
-        <h4 style="margin:16px 0 8px;font-size:12.5px;font-weight:700">Recent Stakeholders Remittances</h4>
-        <div style="max-height:220px;overflow-y:auto;border:1px solid #e2e8f0;border-radius:8px">
-          <table class="data-table" style="font-size:11.5px;margin:0">
+        <!-- Recent Payments Table (Touch Scrollable) -->
+        <h4 style="margin:14px 0 8px;font-size:12px;font-weight:700">Recent Stakeholders Remittances</h4>
+        <div style="max-height:220px;overflow-y:auto;overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid #e2e8f0;border-radius:8px">
+          <table class="data-table" style="font-size:11px;margin:0;min-width:520px">
             <thead>
               <tr><th>Receipt No</th><th>Date</th><th>Learner</th><th>Class</th><th>Category</th><th>Amount</th><th>Action</th></tr>
             </thead>
@@ -6408,6 +6408,80 @@ const RichVineApp = (() => {
   }
 
   // ── DAILY ATTENDANCE TAB (ADMIN) ──────────────────────────────────────────
+    function printAttendanceLog() {
+    const filterClass = document.getElementById("att-filter-class")?.value || "All";
+    const filterSession = document.getElementById("att-filter-session")?.value || "All";
+    const tbody = document.getElementById("att-table-body");
+    if (!tbody) return showAlert("Attendance table not found.", "warning");
+
+    const cfg = (RichVineDB.getConfig ? RichVineDB.getConfig() : {}) || {};
+    const schoolName = cfg.schoolName || (window.BURSARIQ_CONFIG && window.BURSARIQ_CONFIG.schoolName) || "DE PORTAL SCHOOLS";
+    const schoolMotto = cfg.motto || (window.BURSARIQ_CONFIG && window.BURSARIQ_CONFIG.motto) || "Gateway to Academic Excellence & Moral Integrity";
+
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Daily Attendance Register — ${filterClass} (${filterSession})</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Segoe UI', Arial, sans-serif; background:#fff; color:#0f172a; padding:18px; }
+    .header { text-align:center; border-bottom:3px double #10b981; padding-bottom:12px; margin-bottom:16px; }
+    .header h1 { font-size:22px; color:#059669; font-weight:900; margin:0; }
+    .header p { font-size:11px; color:#475569; margin:3px 0 0; }
+    .meta-bar { display:flex; justify-content:space-between; background:#ecfdf5; border:1px solid #a7f3d0; padding:8px 14px; border-radius:6px; margin-bottom:16px; font-size:12px; font-weight:700; color:#065f46; }
+    table { width:100%; border-collapse:collapse; font-size:11px; }
+    th, td { border:1px solid #cbd5e1; padding:6px 8px; }
+    th { background:#f1f5f9; color:#0f172a; font-weight:800; }
+    .footer { margin-top:30px; display:flex; justify-content:space-between; font-size:12px; color:#475569; padding-top:14px; }
+    @media print {
+      body { padding:8px; }
+      .no-print { display:none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>${schoolName}</h1>
+    <p>${schoolMotto}</p>
+    <div style="font-size:13px;font-weight:800;color:#0f172a;margin-top:6px;text-transform:uppercase;letter-spacing:0.5px">Official Daily Roll Call &amp; Attendance Register</div>
+  </div>
+  <div class="meta-bar">
+    <div>Class: <strong>${filterClass}</strong></div>
+    <div>Session: <strong>${filterSession}</strong></div>
+    <div>Printed: <strong>${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</strong></div>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Class</th>
+        <th>Session</th>
+        <th>Present</th>
+        <th>Absent</th>
+        <th>Late</th>
+        <th>Attendance Rate</th>
+        <th>Class Teacher</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${tbody.innerHTML.replace(/<button[\s\S]*?<\/button>/gi, '')}
+    </tbody>
+  </table>
+  <div class="footer">
+    <div>Class Teacher Signature: ______________________</div>
+    <div>Principal Stamp &amp; Date: ______________________</div>
+  </div>
+</body>
+</html>`;
+
+    if (typeof RichVineReports !== 'undefined' && RichVineReports.printHtmlDocument) {
+      RichVineReports.printHtmlDocument(html, `Attendance_${filterClass.replace(/\s+/g, '_')}`);
+    } else {
+      window.print();
+    }
+  }
+
   function loadAttendanceTab() {
     const filterClass = document.getElementById("att-filter-class")?.value || "All";
     const filterSession = document.getElementById("att-filter-session")?.value || "All";
@@ -6658,7 +6732,68 @@ const RichVineApp = (() => {
   }
 
   function printBroadsheet() {
-    window.print();
+    const cls = document.getElementById("er-bs-class")?.value || "All Classes";
+    const term = document.getElementById("er-bs-term")?.value || "1st Term";
+    const session = document.getElementById("er-bs-session")?.value || "2026/2027";
+    const table = document.getElementById("broadsheet-table");
+    if (!table) return showAlert("Broadsheet table not found.", "warning");
+
+    const cfg = (RichVineDB.getConfig ? RichVineDB.getConfig() : {}) || {};
+    const schoolName = cfg.schoolName || (window.BURSARIQ_CONFIG && window.BURSARIQ_CONFIG.schoolName) || "DE PORTAL SCHOOLS";
+    const schoolMotto = cfg.motto || (window.BURSARIQ_CONFIG && window.BURSARIQ_CONFIG.motto) || "Gateway to Academic Excellence & Moral Integrity";
+    const schoolAddress = cfg.address || (window.BURSARIQ_CONFIG && window.BURSARIQ_CONFIG.schoolAddress) || "5-7 Olukayode Street, Imoro, Ogijo, Ogun State";
+    const schoolPhone = cfg.phone || (window.BURSARIQ_CONFIG && window.BURSARIQ_CONFIG.schoolPhone) || "09053126809";
+
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Class Broadsheet — ${cls} (${term})</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Segoe UI', Arial, sans-serif; background:#fff; color:#0f172a; padding:18px; }
+    .header { text-align:center; border-bottom:3px double #0284c7; padding-bottom:12px; margin-bottom:16px; }
+    .header h1 { font-size:22px; color:#0284c7; font-weight:900; margin:0; }
+    .header p { font-size:11px; color:#475569; margin:3px 0 0; }
+    .meta-bar { display:flex; justify-content:space-between; background:#f0f9ff; border:1px solid #bae6fd; padding:8px 14px; border-radius:6px; margin-bottom:16px; font-size:12px; font-weight:700; color:#0369a1; }
+    table { width:100%; border-collapse:collapse; font-size:11px; }
+    th, td { border:1px solid #cbd5e1; padding:6px 8px; }
+    th { background:#f1f5f9; color:#0f172a; font-weight:800; }
+    .footer { margin-top:30px; display:flex; justify-content:space-between; font-size:12px; color:#475569; padding-top:14px; }
+    @media print {
+      body { padding:8px; }
+      .no-print { display:none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>${schoolName}</h1>
+    <p>${schoolMotto} &bull; ${schoolAddress} &bull; Tel: ${schoolPhone}</p>
+    <div style="font-size:13px;font-weight:800;color:#0f172a;margin-top:6px;text-transform:uppercase;letter-spacing:0.5px">Official Class Broadsheet &amp; Academic Ledger</div>
+  </div>
+  <div class="meta-bar">
+    <div>Class: <strong>${cls}</strong></div>
+    <div>Term: <strong>${term}</strong></div>
+    <div>Session: <strong>${session}</strong></div>
+    <div>Date: <strong>${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</strong></div>
+  </div>
+  <table>
+    ${table.innerHTML}
+  </table>
+  <div class="footer">
+    <div>Class Teacher Signature: ______________________</div>
+    <div>Academic Dean Signature: ______________________</div>
+    <div>Principal Stamp &amp; Date: ______________________</div>
+  </div>
+</body>
+</html>`;
+
+    if (typeof RichVineReports !== 'undefined' && RichVineReports.printHtmlDocument) {
+      RichVineReports.printHtmlDocument(html, `Broadsheet_${cls.replace(/\s+/g, '_')}_${term}`);
+    } else {
+      window.print();
+    }
   }
 
   function renderReportCard() {
@@ -6806,7 +6941,42 @@ const RichVineApp = (() => {
   }
 
   function printReportCard() {
-    window.print();
+    let sheet = document.getElementById("printable-report-sheet");
+    if (!sheet) {
+      const studentId = document.getElementById("er-rc-student")?.value;
+      if (!studentId) return showAlert("Please select a student from the dropdown first to view and print their report card.", "warning");
+      renderReportCard();
+      sheet = document.getElementById("printable-report-sheet");
+    }
+    if (!sheet) return showAlert("Could not generate report card content.", "warning");
+
+    const stName = document.querySelector("#printable-report-sheet strong")?.textContent || "Student";
+    const term = document.getElementById("er-rc-term")?.value || "1st Term";
+
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Terminal Report Card — ${stName}</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Segoe UI', Arial, sans-serif; background:#fff; color:#0f172a; padding:20px; }
+    @media print {
+      body { padding:8px; }
+      .no-print { display:none !important; }
+    }
+  </style>
+</head>
+<body>
+  ${sheet.outerHTML}
+</body>
+</html>`;
+
+    if (typeof RichVineReports !== 'undefined' && RichVineReports.printHtmlDocument) {
+      RichVineReports.printHtmlDocument(html, `ReportCard_${stName.replace(/\s+/g, '_')}_${term}`);
+    } else {
+      window.print();
+    }
   }
 
   function syncCbtScoresToExams() {
@@ -7224,6 +7394,7 @@ const RichVineApp = (() => {
     quickSelectTeacherClasses,
     syncTeacherClassChips,
     loadAttendanceTab,
+    printAttendanceLog,
     viewAttendanceBreakdown,
     loadExamsRecordsTab,
     switchErSubTab,

@@ -350,6 +350,15 @@ const DEFAULT_DATA = {
 
 // ─── LocalStorage + Firebase DB Manager (High-Performance In-Memory Caching) ──
 class RichVineDB {
+  static _getAdminUser(fallback = "Super Admin") {
+    try {
+      if (typeof sessionStorage !== "undefined") {
+        return RichVineDB._getAdminUser() || RichVineDB._getAdminUser() || fallback;
+      }
+    } catch (e) {}
+    return fallback;
+  }
+
   static KEY = "DPS_PORTAL_SCHOOLS_DB_V2";
   static _cache = null;
 
@@ -1227,7 +1236,7 @@ class RichVineDB {
     payment.receiptNo = payment.receiptNo || `RVCPAY/${year}/${String(nextReceipt).padStart(4, "0")}`;
     payment.timestamp = payment.timestamp || Date.now();
     payment.session = payment.session || "2026/2027";
-    payment.recordedBy = sessionStorage.getItem("richvine_admin_username") || "Super Admin";
+    payment.recordedBy = RichVineDB._getAdminUser("Super Admin");
     payment.section = getSectionByClass(payment.studentClass)?.id || "junior";
 
     // ── Multi-item handling & validation ───────────────────────────────
@@ -1419,7 +1428,7 @@ class RichVineDB {
     if (!db.expenses) db.expenses = [];
 
     const session = db.config?.currentSession || "2026/2027";
-    const recordedBy = sessionStorage.getItem("richvine_admin_username") || "Super Admin";
+    const recordedBy = RichVineDB._getAdminUser("Super Admin");
 
     const accountsMap = {
       general: "General / Central Account",
@@ -1723,7 +1732,7 @@ class RichVineDB {
       isSalaryLinked: true,
       salaryId,
       staffId,
-      recordedBy: sessionStorage.getItem("richvine_admin_username") || "Super Admin",
+      recordedBy: RichVineDB._getAdminUser("Super Admin"),
       session: db.config?.currentSession || "2026/2027"
     };
     db.expenses.unshift(linkedExpense);
@@ -1873,7 +1882,7 @@ class RichVineDB {
     const db = this.get();
     if (!db.stocks) db.stocks = [];
     const now = Date.now();
-    const recordedBy = sessionStorage.getItem('richvine_admin_username') || 'Admin';
+    const recordedBy = RichVineDB._getAdminUser("Admin");
     const openingQty = Math.max(0, Math.round(Number(fields.openingQty) || 0));
     const item = {
       id: `STK-${now}-${Math.floor(Math.random() * 999999)}`,
@@ -1967,7 +1976,7 @@ class RichVineDB {
     const qty = Math.max(1, Math.round(Number(fields.quantity) || 1));
     if (item.quantityLeft < qty) return { error: `Insufficient stock. Only ${item.quantityLeft} ${item.unit}(s) left.` };
     const now = Date.now();
-    const recordedBy = sessionStorage.getItem('richvine_admin_username') || 'Admin';
+    const recordedBy = RichVineDB._getAdminUser("Admin");
     const costPrice = Number(fields.costPrice !== undefined ? fields.costPrice : item.costPrice) || 0;
     const sellingPrice = Number(fields.sellingPrice !== undefined ? fields.sellingPrice : item.sellingPrice) || 0;
     const totalCost = Math.round(costPrice * qty * 100) / 100;
@@ -2017,7 +2026,7 @@ class RichVineDB {
     const item = (db.stocks || []).find(s => s.id === stockId);
     if (!item) return null;
     const now = Date.now();
-    const recordedBy = sessionStorage.getItem('richvine_admin_username') || 'Admin';
+    const recordedBy = RichVineDB._getAdminUser("Admin");
     const qty = Math.max(1, Math.round(Number(fields.quantity) || 1));
     const costPrice = Math.round((Number(fields.costPrice) || Number(item.costPrice) || 0) * 100) / 100;
     const restock = {
@@ -2191,7 +2200,7 @@ class RichVineDB {
       isLoanLinked: true,
       loanId,
       staffId,
-      recordedBy: sessionStorage.getItem("richvine_admin_username") || "Super Admin",
+      recordedBy: RichVineDB._getAdminUser("Super Admin"),
       session: db.config?.currentSession || "2026/2027"
     };
     db.expenses.unshift(linkedExpense);
@@ -2211,7 +2220,7 @@ class RichVineDB {
       balanceAfter: newBalance,
       timestamp: now,
       createdAt: new Date().toISOString(),
-      recordedBy: sessionStorage.getItem("richvine_admin_username") || "Super Admin"
+      recordedBy: RichVineDB._getAdminUser("Super Admin")
     };
     db.staffLoans.unshift(loanTxn);
 
@@ -2274,7 +2283,7 @@ class RichVineDB {
       balanceAfter: newBalance,
       timestamp: now,
       createdAt: new Date().toISOString(),
-      recordedBy: sessionStorage.getItem("richvine_admin_username") || "Super Admin"
+      recordedBy: RichVineDB._getAdminUser("Super Admin")
     };
     db.staffLoans.unshift(loanTxn);
 
@@ -2798,7 +2807,7 @@ class RichVineDB {
       paymentMethod: data.paymentMethod || "Bank Transfer",
       reference: String(data.reference || "").trim(),
       date: data.date || new Date().toISOString().slice(0, 10),
-      recordedBy: data.recordedBy || sessionStorage.getItem("richvine_admin_username") || "Super Admin",
+      recordedBy: data.recordedBy || RichVineDB._getAdminUser("Super Admin"),
       notes: String(data.notes || "").trim(),
       createdAt: Date.now()
     };
@@ -3004,7 +3013,7 @@ class RichVineDB {
       timestamp: Date.now(),
       date: new Date().toLocaleString("en-GB"),
       action: "DATABASE_RESET",
-      user: sessionStorage.getItem("dps_admin_username") || "Admin",
+      user: RichVineDB._getAdminUser("Admin"),
       details: "De Portal Schools Database cleared and reset to fresh state."
     }];
     try {
@@ -3020,7 +3029,7 @@ class RichVineDB {
       timestamp: Date.now(),
       date: new Date().toLocaleString("en-GB"),
       action,
-      user: sessionStorage.getItem("richvine_admin_username") || "Super Admin",
+      user: RichVineDB._getAdminUser("Super Admin"),
       details
     };
   }

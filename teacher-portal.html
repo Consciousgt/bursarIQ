@@ -56,6 +56,16 @@
       background-size: 1em;
       padding-right: 2rem;
     }
+  
+    /* Prevent iOS auto-zoom on form inputs */
+    @media screen and (max-width: 768px) {
+      input, select, textarea {
+        font-size: 16px !important;
+      }
+      #portalNavButtons::-webkit-scrollbar {
+        display: none !important;
+      }
+    }
   </style>
   <!-- PWA Manifest & Service Worker -->
   <link rel="manifest" href="manifest.json">
@@ -135,17 +145,17 @@
       </div>
 
       <!-- Master Portal Nav Tabs -->
-      <div class="flex flex-wrap items-center gap-2 pt-2 lg:pt-0" id="portalNavButtons">
-        <button onclick="switchMasterTab('attendance')" id="tabBtnAttendance" class="px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-emerald-600 text-white shadow-lg shadow-emerald-600/30">
+      <div class="flex flex-nowrap sm:flex-wrap items-center gap-2 pt-2 lg:pt-0 overflow-x-auto pb-1 max-w-full" style="-webkit-overflow-scrolling:touch;scrollbar-width:none" id="portalNavButtons">
+        <button onclick="switchMasterTab('attendance')" id="tabBtnAttendance" class="flex-shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-emerald-600 text-white shadow-lg shadow-emerald-600/30">
           <i class="fas fa-clipboard-check"></i> Daily Roll Call
         </button>
-        <button onclick="switchMasterTab('weekly')" id="tabBtnWeekly" class="px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">
+        <button onclick="switchMasterTab('weekly')" id="tabBtnWeekly" class="flex-shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">
           <i class="fas fa-chart-line text-amber-400"></i> Weekly Performance
         </button>
-        <button onclick="switchMasterTab('exams')" id="tabBtnExams" class="px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">
+        <button onclick="switchMasterTab('exams')" id="tabBtnExams" class="flex-shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">
           <i class="fas fa-file-signature text-purple-400"></i> Midterm & Exams
         </button>
-        <button onclick="switchMasterTab('history')" id="tabBtnHistory" class="px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">
+        <button onclick="switchMasterTab('history')" id="tabBtnHistory" class="flex-shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">
           <i class="fas fa-history text-sky-400"></i> Attendance Logs
         </button>
       </div>
@@ -535,7 +545,7 @@
           </h3>
           <p class="text-xs text-slate-400">Official log of morning and afternoon roll calls for this class</p>
         </div>
-        <button onclick="window.print()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-xs font-semibold transition flex items-center gap-2">
+        <button onclick="printTeacherAttendanceLog()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-xs font-semibold transition flex items-center gap-2">
           <i class="fas fa-print"></i> Print Official Log
         </button>
       </div>
@@ -569,6 +579,7 @@
   <!-- Scripts -->
   <script src="js/dps-students.js?v=20261122"></script>
   <script src="js/data.js"></script>
+  <script src="js/reports.js"></script>
   <script src="js/firebase-config.js"></script>
 
   <script>
@@ -1382,6 +1393,75 @@
     // ═══════════════════════════════════════════════════════════════
     // 6. Tab 4: Attendance History Log
     // ═══════════════════════════════════════════════════════════════
+        function printTeacherAttendanceLog() {
+      const tbody = document.getElementById("historyTableBody");
+      const cls = currentTeacher ? currentTeacher.assignedClass : "My Class";
+      const cfg = (typeof RichVineDB !== 'undefined' && RichVineDB.getConfig ? RichVineDB.getConfig() : {}) || {};
+      const schoolName = cfg.schoolName || (window.BURSARIQ_CONFIG && window.BURSARIQ_CONFIG.schoolName) || "DE PORTAL SCHOOLS";
+      const teacherName = currentTeacher ? currentTeacher.name : "Class Teacher";
+
+      const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Class Attendance Log — ${cls}</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Segoe UI', Arial, sans-serif; background:#fff; color:#0f172a; padding:18px; }
+    .header { text-align:center; border-bottom:3px double #10b981; padding-bottom:12px; margin-bottom:16px; }
+    .header h1 { font-size:22px; color:#059669; font-weight:900; margin:0; }
+    .header p { font-size:11px; color:#475569; margin:3px 0 0; }
+    .meta-bar { display:flex; justify-content:space-between; background:#ecfdf5; border:1px solid #a7f3d0; padding:8px 14px; border-radius:6px; margin-bottom:16px; font-size:12px; font-weight:700; color:#065f46; }
+    table { width:100%; border-collapse:collapse; font-size:11px; }
+    th, td { border:1px solid #cbd5e1; padding:6px 8px; }
+    th { background:#f1f5f9; color:#0f172a; font-weight:800; }
+    .footer { margin-top:30px; display:flex; justify-content:space-between; font-size:12px; color:#475569; padding-top:14px; }
+    @media print {
+      body { padding:8px; }
+      .no-print { display:none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>${schoolName}</h1>
+    <div style="font-size:13px;font-weight:800;color:#0f172a;margin-top:6px;text-transform:uppercase;letter-spacing:0.5px">Official Class Attendance Register &amp; Daily Roll Call Log</div>
+  </div>
+  <div class="meta-bar">
+    <div>Class Arm: <strong>${cls}</strong></div>
+    <div>Class Teacher: <strong>${teacherName}</strong></div>
+    <div>Printed: <strong>${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</strong></div>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Session</th>
+        <th>Present</th>
+        <th>Absent</th>
+        <th>Late</th>
+        <th>Attendance %</th>
+        <th>Marked By</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${tbody ? tbody.innerHTML : '<tr><td colspan="7">No records</td></tr>'}
+    </tbody>
+  </table>
+  <div class="footer">
+    <div>Class Teacher Signature: ______________________</div>
+    <div>Principal Stamp &amp; Date: ______________________</div>
+  </div>
+</body>
+</html>`;
+
+      if (typeof RichVineReports !== 'undefined' && RichVineReports.printHtmlDocument) {
+        RichVineReports.printHtmlDocument(html, `Attendance_Log_${cls.replace(/\s+/g, '_')}`);
+      } else {
+        window.print();
+      }
+    }
+
     function loadHistoryTable() {
       const tbody = document.getElementById('historyTableBody');
       const targetClass = currentTeacher.assignedClass;
