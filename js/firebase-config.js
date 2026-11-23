@@ -158,7 +158,7 @@ window.RichVineFirebase = {
     }
 
     // 2. Process pending offline uploads across all collections
-    const collections = ["students", "payments", "expenses", "stocks", "stockSales", "stockRestocks", "cbtSubmissions", "staff", "salaries", "staffLoans", "teachers", "attendance", "examRecords", "weeklyPerformance"];
+    const collections = ["students", "payments", "expenses", "stocks", "stockSales", "stockRestocks", "cbtSubmissions", "staff", "salaries", "staffLoans", "clearance", "teachers", "attendance", "examRecords", "weeklyPerformance"];
     for (const colName of collections) {
       const list = Array.isArray(localDb[colName]) ? localDb[colName] : [];
       for (const item of list) {
@@ -220,7 +220,7 @@ window.RichVineFirebase = {
     this._setSyncStatus("syncing", "Syncing Cloud...");
 
     try {
-      const collections = ["students", "payments", "expenses", "stocks", "stockSales", "stockRestocks", "cbtSubmissions", "staff", "salaries", "teachers", "attendance", "examRecords", "weeklyPerformance"];
+      const collections = ["students", "payments", "expenses", "stocks", "stockSales", "stockRestocks", "cbtSubmissions", "staff", "salaries", "staffLoans", "clearance", "teachers", "attendance", "examRecords", "weeklyPerformance"];
       const localDb = window.RichVineDB ? window.RichVineDB.get() : {};
       let changed = false;
 
@@ -746,6 +746,20 @@ window.RichVineFirebase = {
       this._setSyncStatus("synced", "Cloud Synced");
     } catch (e) {
       console.warn("[Firebase] Error deleting exam record from cloud:", e.message);
+    }
+  },
+
+  async saveSchoolConfig(config) {
+    if (!db || !config) return;
+    try {
+      const clean = this._sanitize(config);
+      clean.updatedAt = new Date().toISOString();
+      await setDoc(doc(db, "schoolSettings", "institutionalConfig"), clean, { merge: true });
+      await setDoc(doc(db, "schoolConfig", "current"), clean, { merge: true });
+      this._setSyncStatus("synced", "Cloud Synced");
+      console.log("[Firebase] School configuration successfully synced to cloud.");
+    } catch (e) {
+      console.warn("[Firebase] Error saving school config to cloud:", e.message);
     }
   },
 
