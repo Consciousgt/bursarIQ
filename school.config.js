@@ -4,22 +4,34 @@
  * Powered by BursarIQ — "Every naira accounted for."
  * ===================================================================
  * 
- * 💡 EDITABLE VIA ADMIN PORTAL SETTINGS:
- * The settings configured here or in the Admin Portal "System Settings"
- * tab will automatically brand and configure the entire platform:
- * Landing page, Admin Dashboard, Receipts, Broadsheets, Login portals,
- * CBT assessment, Teacher Portal, and Printable reports.
+ * 💡 LIVE SETTINGS SYNCHRONIZATION:
+ * Any edit made in the Admin Portal "Settings" tab is saved to
+ * localStorage ("BURSARIQ_SCHOOL_CONFIG" and "richvine_bursar_db_v6.config")
+ * and instantly propagates across all pages: Landing page (index.html),
+ * Admin Dashboard, Teacher Portal, Student CBT, Login portals, and
+ * printable reports/receipts.
  * ===================================================================
  */
 
 (function () {
-  // Check for admin-saved configuration overrides in localStorage first
-  let savedConfig = {};
-  try {
-    const raw = localStorage.getItem("BURSARIQ_SCHOOL_CONFIG");
-    if (raw) savedConfig = JSON.parse(raw);
-  } catch (e) {
-    console.warn("Could not parse saved school config from localStorage:", e);
+  function getStoredConfig() {
+    let saved = {};
+    try {
+      const raw = localStorage.getItem("BURSARIQ_SCHOOL_CONFIG");
+      if (raw) saved = JSON.parse(raw);
+    } catch (e) {}
+
+    try {
+      const dbRaw = localStorage.getItem("richvine_bursar_db_v6");
+      if (dbRaw) {
+        const db = JSON.parse(dbRaw);
+        if (db && db.config) {
+          saved = Object.assign({}, db.config, saved);
+        }
+      }
+    } catch (e) {}
+
+    return saved;
   }
 
   const defaultConfig = {
@@ -28,14 +40,14 @@
     schoolShortName: "DE PORTAL",
     acronym: "DPS",
     motto: "Gateway to Academic Excellence & Moral Integrity",
-    logoText: "DPS", // Initials displayed on circular badges/crest
-    logoUrl: "assets/images/bursariq-logo.png", // Path to school badge or default
+    logoText: "DPS",
+    logoUrl: "assets/images/bursariq-logo.png",
     
     // ── 2. Contact & Physical Location ────────────────────────────────
     address: "5-7 Olukayode Street, Imoro, Ogijo, Ogun State, Nigeria",
-    phone: "08012345678",
-    adminContact: "08012345678",
-    contactEmail: "admin@deportalschools.edu.ng",
+    phone: "09053126809",
+    adminContact: "09053126809",
+    contactEmail: "deportalschools@gmail.com",
     websiteUrl: "https://deportalschools.edu.ng",
     
     // ── 3. Academic Calendar & Currency ───────────────────────────────
@@ -44,7 +56,7 @@
     currencySymbol: "₦",
     currencyCode: "NGN",
     
-    // ── 4. Official Banking Details (Printed on Invoices & Receipts) ──
+    // ── 4. Official Banking Details ───────────────────────────────────
     bankDetails: {
       bankName: "Zenith Bank Plc",
       accountName: "DE PORTAL SCHOOLS - BURSARY",
@@ -52,16 +64,7 @@
       tinNumber: "TIN-9876543210"
     },
     
-    // ── 5. System Administrator Credentials ───────────────────────────
-        adminCredentials: [
-      { username: "admin", password: "password123", role: "Super Administrator", name: "Principal Administrator" },
-      { username: "admin", password: "admin123", role: "Super Administrator", name: "Principal Administrator" },
-      { username: "admin", password: "deportal2026", role: "Super Administrator", name: "Principal Administrator" },
-      { username: "bursar", password: "bursar123", role: "Chief Bursary Officer", name: "Mrs. A. Adeleke (Chief Bursar)" },
-      { username: "records", password: "record123", role: "Records Officer", name: "Mr. D. Okon (Academic Secretary)" }
-    ],
-
-    // ── 6. Cloud Database Connection (Google Firebase) ────────────────
+    // ── 5. Cloud Database Connection (Google Firebase) ────────────────
     firebaseConfig: {
       apiKey: "AIzaSyDPR_ELiTuxM8jObdJeWSIzfqotWJXnf-c",
       authDomain: "bursariq.firebaseapp.com",
@@ -73,79 +76,109 @@
     }
   };
 
-  // Merge default config with any admin-saved overrides
-  // Sanitize legacy cache
-  if (savedConfig.schoolName && /richvine/i.test(savedConfig.schoolName)) {
-    savedConfig.schoolName = "DE PORTAL SCHOOLS";
-    savedConfig.schoolShortName = "DE PORTAL";
-    savedConfig.acronym = "DPS";
-  }
-  if (savedConfig.address && /lagos/i.test(savedConfig.address)) {
-    savedConfig.address = "5-7 Olukayode Street, Imoro, Ogijo, Ogun State, Nigeria";
-  }
-  const config = Object.assign({}, defaultConfig, savedConfig);
-  if (savedConfig.bankDetails) {
-    config.bankDetails = Object.assign({}, defaultConfig.bankDetails, savedConfig.bankDetails);
-  }
-  if (savedConfig.firebaseConfig) {
-    config.firebaseConfig = Object.assign({}, defaultConfig.firebaseConfig, savedConfig.firebaseConfig);
+  function buildMergedConfig() {
+    const saved = getStoredConfig();
+    const merged = Object.assign({}, defaultConfig, saved);
+    if (saved.bankDetails) {
+      merged.bankDetails = Object.assign({}, defaultConfig.bankDetails, saved.bankDetails);
+    }
+    if (saved.firebaseConfig) {
+      merged.firebaseConfig = Object.assign({}, defaultConfig.firebaseConfig, saved.firebaseConfig);
+    }
+    return merged;
   }
 
-  // Expose globally
+  let config = buildMergedConfig();
   window.BURSARIQ_CONFIG = config;
 
-  // Auto-apply branding to DOM once loaded
-  if (typeof document !== "undefined") {
-    function applyBranding() {
-      // 1. Clean and Update Document Title
-      if (document.title) {
-        document.title = document.title
-          .replace(/<[^>]*>?/gm, '')
-          .replace(/RichVine College|RICHVINE COLLEGE|EXCELLENCE MODEL COLLEGE|Excellence Model College/gi, config.schoolName);
-        if (!document.title.includes(config.schoolName) && !document.title.includes(config.schoolShortName)) {
-          document.title = config.schoolName + " - " + document.title;
-        }
+  // ── Universal DOM Branding Engine ─────────────────────────────────
+  function applyBranding() {
+    config = buildMergedConfig();
+    window.BURSARIQ_CONFIG = config;
+
+    if (typeof document === "undefined") return;
+
+    // 1. Dynamic Page Title
+    if (document.title) {
+      const baseTitle = document.title.split(" — ")[1] || document.title.split(" - ")[1] || document.title;
+      document.title = `${config.schoolName} — ${baseTitle.trim()}`;
+    }
+
+    // 2. Class-Based Replacements
+    document.querySelectorAll('.school-name-text').forEach(el => { el.textContent = config.schoolName; });
+    document.querySelectorAll('.school-short-name-text').forEach(el => { el.textContent = config.schoolShortName; });
+    document.querySelectorAll('.school-motto-text').forEach(el => { el.textContent = config.motto; });
+    document.querySelectorAll('.school-acronym-text').forEach(el => { el.textContent = config.acronym; });
+    document.querySelectorAll('.school-address-text').forEach(el => { el.textContent = config.address; });
+    document.querySelectorAll('.school-phone-text').forEach(el => { el.textContent = config.phone; });
+    document.querySelectorAll('.school-email-text').forEach(el => { el.textContent = config.contactEmail; });
+    document.querySelectorAll('.school-session-text').forEach(el => { el.textContent = config.currentSession; });
+    document.querySelectorAll('.school-term-text').forEach(el => { el.textContent = config.currentTerm; });
+    document.querySelectorAll('.school-currency-text').forEach(el => { el.textContent = config.currencySymbol; });
+
+    // 3. Data Attribute Replacements
+    document.querySelectorAll('[data-bursar-field]').forEach(el => {
+      const field = el.getAttribute('data-bursar-field');
+      if (field && config[field] !== undefined) {
+        el.textContent = config[field];
       }
+    });
 
-      // 2. Update all elements marked with data-bursar-field
-      document.querySelectorAll('[data-bursar-field]').forEach(el => {
-        const field = el.getAttribute('data-bursar-field');
-        if (field && config[field] !== undefined) {
-          el.textContent = config[field];
-        }
-      });
-
-      // 3. Comprehensive Class-Based Text Replacement
-      document.querySelectorAll('.school-name-text').forEach(el => { el.textContent = config.schoolName; });
-      document.querySelectorAll('.school-short-name-text').forEach(el => { el.textContent = config.schoolShortName; });
-      document.querySelectorAll('.school-motto-text').forEach(el => { el.textContent = config.motto; });
-      document.querySelectorAll('.school-acronym-text').forEach(el => { el.textContent = config.acronym; });
-      document.querySelectorAll('.school-address-text').forEach(el => { el.textContent = config.address; });
-      document.querySelectorAll('.school-phone-text').forEach(el => { el.textContent = config.phone; });
-      document.querySelectorAll('.school-email-text').forEach(el => { el.textContent = config.contactEmail; });
-      document.querySelectorAll('.school-session-text').forEach(el => { el.textContent = config.currentSession; });
-      document.querySelectorAll('.school-term-text').forEach(el => { el.textContent = config.currentTerm; });
-      document.querySelectorAll('.school-currency-text').forEach(el => { el.textContent = config.currencySymbol; });
-      document.querySelectorAll('.school-bank-text').forEach(el => {
-        if (config.bankDetails) {
-          el.textContent = config.bankDetails.bankName + " | " + config.bankDetails.accountNumber + " (" + config.bankDetails.accountName + ")";
+    // 4. Update Phone Links & Texts
+    if (config.phone) {
+      const cleanPhone = config.phone.replace(/[^0-9+]/g, '');
+      document.querySelectorAll('a[href^="tel:"]').forEach(a => {
+        a.setAttribute('href', `tel:${cleanPhone}`);
+        const span = a.querySelector('span');
+        if (span && !span.classList.contains('no-auto-phone')) {
+          span.textContent = config.phone;
         }
       });
     }
 
+    // 5. Update Email Links & Texts
+    if (config.contactEmail) {
+      document.querySelectorAll('a[href^="mailto:"]').forEach(a => {
+        a.setAttribute('href', `mailto:${config.contactEmail}`);
+        const span = a.querySelector('span');
+        if (span && !span.classList.contains('no-auto-email')) {
+          span.textContent = config.contactEmail;
+        }
+      });
+    }
+
+    // 6. Update Bank Details Elements
+    document.querySelectorAll('.school-bank-text').forEach(el => {
+      if (config.bankDetails) {
+        el.textContent = `${config.bankDetails.bankName} | ${config.bankDetails.accountNumber} (${config.bankDetails.accountName})`;
+      }
+    });
+  }
+
+  // Run on DOM ready
+  if (typeof document !== "undefined") {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', applyBranding);
     } else {
       applyBranding();
     }
 
-    // Listen for live config updates from the Settings panel
+    // Re-apply whenever images or components finish rendering
+    window.addEventListener('load', applyBranding);
+
+    // Listen for custom in-page event when settings form is submitted
     window.addEventListener('bursariq:configUpdated', function(e) {
-      if (e.detail) {
-        Object.assign(config, e.detail);
+      applyBranding();
+    });
+
+    // Cross-tab live sync: when Admin updates settings in one tab, all other tabs update instantly!
+    window.addEventListener('storage', function(e) {
+      if (e.key === 'BURSARIQ_SCHOOL_CONFIG' || e.key === 'richvine_bursar_db_v6') {
         applyBranding();
       }
     });
   }
-})();
 
+  // Export helper
+  window.BURSARIQ_APPLY_BRANDING = applyBranding;
+})();

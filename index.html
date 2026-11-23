@@ -2,6 +2,13 @@
 <html lang="en" class="scroll-smooth">
 <head>
   <script src="school.config.js"></script>
+  <!-- Three.js 3D Engine -->
+  <script src="js/three.min.js"></script>
+  <script>
+    if (typeof THREE === 'undefined') {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');
+    }
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
   <meta name="mobile-web-app-capable" content="yes">
@@ -132,17 +139,17 @@
       <div class="flex items-center space-x-5">
         <span class="flex items-center gap-1.5 text-slate-300 font-medium">
           <i class="fas fa-map-marker-alt text-sky-400"></i>
-          <span>5-7 Olukayode St, Imoro, Ogijo, Ogun State</span>
+          <span class="school-address-text">5-7 Olukayode St, Imoro, Ogijo, Ogun State</span>
         </span>
         <span class="text-slate-700">&bull;</span>
         <a href="tel:09053126809" class="flex items-center gap-1.5 hover:text-white transition">
           <i class="fas fa-phone-alt text-emerald-400"></i>
-          <span>09053126809</span>
+          <span class="school-phone-text">09053126809</span>
         </a>
         <span class="text-slate-700">&bull;</span>
         <span class="text-sky-300 font-semibold flex items-center gap-1.5">
           <i class="fas fa-graduation-cap text-sky-400"></i>
-          <span>2026/2027 Academic Session</span>
+          <span class="school-session-text">2026/2027 Academic Session</span>
         </span>
       </div>
 
@@ -282,7 +289,7 @@
     </div>
 
         <!-- Sophisticated Kinetic 3D Portal Canvas -->
-    <canvas id="hero-3d-canvas" class="absolute inset-0 z-[1] w-full h-full pointer-events-none opacity-60"></canvas>
+    <canvas id="hero-3d-bg-canvas" class="absolute inset-0 z-[1] w-full h-full pointer-events-none"></canvas>
     
     <!-- Ambient 3D Glowing Orbs -->
     <div class="glow-ring w-96 h-96 bg-sky-500 -top-20 -left-20 z-[2]"></div>
@@ -355,10 +362,30 @@
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
               <div>
                 <span class="text-[10px] font-black text-sky-400 uppercase tracking-widest">Citadel of Excellence</span>
-                <h2 class="text-lg font-bold text-white">De Portal Schools Advantage</h2>
+                <h2 class="text-lg font-bold text-white"><span class="school-short-name-text">De Portal Schools</span> Advantage</h2>
               </div>
               <div class="w-10 h-10 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center text-lg font-bold">
                 <i class="fas fa-award"></i>
+              </div>
+            </div>
+
+            <!-- 3D Interactive Citadel Sphere Showcase -->
+            <div class="relative w-full h-56 sm:h-64 rounded-2xl bg-gradient-to-b from-slate-950/90 via-slate-900/80 to-slate-950/95 border border-sky-500/30 shadow-2xl overflow-hidden group cursor-grab active:cursor-grabbing" id="hero-3d-stage">
+              <!-- Three.js WebGL Container -->
+              <div id="threejs-hero-container" class="w-full h-full"></div>
+              
+              <!-- Ambient Stage Highlights -->
+              <div class="absolute -top-10 -right-10 w-32 h-32 bg-sky-500/20 rounded-full blur-2xl pointer-events-none"></div>
+              <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-emerald-500/20 rounded-full blur-2xl pointer-events-none"></div>
+
+              <!-- Floating Interactive Badges -->
+              <div class="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-full bg-slate-950/80 border border-sky-400/30 text-[10px] text-sky-300 font-semibold flex items-center gap-1.5 backdrop-blur-md pointer-events-none shadow-sm">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>3D Citadel Gyroscope</span>
+              </div>
+              <div class="absolute bottom-2.5 right-2.5 px-2.5 py-1 rounded-full bg-slate-950/80 border border-slate-700/80 text-[10px] text-slate-300 font-medium flex items-center gap-1 backdrop-blur-md pointer-events-none shadow-sm">
+                <i class="fas fa-hand-pointer text-sky-400 text-[9px]"></i>
+                <span>Drag to Rotate</span>
               </div>
             </div>
 
@@ -412,7 +439,7 @@
               </div>
               <div>
                 <h3 class="text-xs sm:text-sm font-bold text-white">Ogijo Campus Location</h3>
-                <p class="text-[11px] text-slate-400 mt-0.5">5-7 Olukayode Street, Imoro, Ogijo. Safe, gated, and easily accessible along the Sagamu-Ikorodu corridor.</p>
+                <p class="text-[11px] text-slate-400 mt-0.5"><span class="school-address-text">5-7 Olukayode Street, Imoro, Ogijo</span>. Safe, gated, and easily accessible along the Sagamu-Ikorodu corridor.</p>
               </div>
             </div>
 
@@ -861,11 +888,11 @@
           <div class="space-y-2 text-xs text-slate-700 border-t border-slate-200 pt-3">
             <div class="flex items-start gap-2.5">
               <i class="fas fa-map-pin text-sky-600 mt-0.5"></i>
-              <span><strong>Address:</strong> 5-7 Olukayode Street, Imoro, Ogijo, Ogun State, Nigeria</span>
+              <span><strong>Address:</strong> <span class="school-address-text">5-7 Olukayode Street, Imoro, Ogijo, Ogun State, Nigeria</span></span>
             </div>
             <div class="flex items-center gap-2.5">
               <i class="fas fa-phone-alt text-emerald-600"></i>
-              <span><strong>Phone:</strong> 09053126809</span>
+              <span><strong>Phone:</strong> <span class="school-phone-text">09053126809</span></span>
             </div>
             <div class="flex items-center gap-2.5">
               <i class="fas fa-envelope text-indigo-600"></i>
@@ -927,7 +954,7 @@
             Gateway to Academic Excellence &amp; Moral Integrity
           </p>
           <div class="text-[11px] text-slate-400">
-            Campus: 5-7 Olukayode St, Imoro, Ogijo, Ogun State
+            Campus: <span class="school-address-text">5-7 Olukayode St, Imoro, Ogijo, Ogun State</span>
           </div>
         </div>
 
@@ -1246,196 +1273,435 @@
        ═══════════════════════════════════════════════════════════════ -->
   <script>
     (function() {
-      // 1. Kinetic 3D Canvas (Interconnected Portal Geometry)
-      const canvas = document.getElementById('hero-3d-canvas');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      let width, height, dpr;
-      let animFrameId;
-      let mouseX = 0, mouseY = 0, targetMouseX = 0, targetMouseY = 0;
-      let rotX = 0.2, rotY = 0, rotZ = 0;
+            // ══════════════════════════════════════════════════════════════════════════
+      // 1. FULL-HERO 3D CELESTIAL STARDUST & CONSTELLATION BACKGROUND
+      // ══════════════════════════════════════════════════════════════════════════
+      (function initHero3DBackground() {
+        const bgCanvas = document.getElementById('hero-3d-bg-canvas');
+        if (!bgCanvas) return;
+        const ctx = bgCanvas.getContext('2d');
+        let width, height, dpr;
+        let animId = null;
+        let isHeroInView = true;
 
-      function resize() {
-        dpr = Math.min(window.devicePixelRatio || 1, 2);
-        width = canvas.parentElement.offsetWidth;
-        height = canvas.parentElement.offsetHeight;
-        canvas.width = width * dpr;
-        canvas.height = height * dpr;
-        ctx.scale(dpr, dpr);
-        if (typeof rebuild3DGeometry === 'function') rebuild3DGeometry();
-      }
-      window.addEventListener('resize', resize, { passive: true });
-      resize();
+        function resizeBg() {
+          dpr = Math.min(window.devicePixelRatio || 1, 2);
+          width = bgCanvas.parentElement.offsetWidth;
+          height = bgCanvas.parentElement.offsetHeight;
+          bgCanvas.width = width * dpr;
+          bgCanvas.height = height * dpr;
+          ctx.scale(dpr, dpr);
+        }
+        window.addEventListener('resize', resizeBg, { passive: true });
+        resizeBg();
 
-      // Mouse / Touch Parallax
-      window.addEventListener('mousemove', (e) => {
-        targetMouseX = (e.clientX / window.innerWidth - 0.5) * 1.2;
-        targetMouseY = (e.clientY / window.innerHeight - 0.5) * 1.2;
-      }, { passive: true });
-
-      // Generate 3D Rings & Vertices (Dynamically scaled on resize / orientation change)
-      const NODES_COUNT = 36;
-      const INNER_COUNT = 24;
-      let nodes = [];
-      let innerNodes = [];
-
-      function rebuild3DGeometry() {
-        const baseRadius = Math.max(120, Math.min(width, height) * 0.32);
-        const innerRadius = baseRadius * 0.55;
-        nodes = [];
-        for (let i = 0; i < NODES_COUNT; i++) {
-          const theta = (i / NODES_COUNT) * Math.PI * 2;
-          nodes.push({
-            x0: Math.cos(theta) * baseRadius,
-            y0: Math.sin(theta) * baseRadius,
-            z0: Math.sin(theta * 3) * 45,
-            size: 2.5 + (i % 3 === 0 ? 1.5 : 0.5),
-            color: i % 3 === 0 ? '#38bdf8' : (i % 3 === 1 ? '#34d399' : '#fbbf24')
+        // 3D Particles Field
+        const PARTICLE_COUNT = Math.min(width > 768 ? 85 : 45, 90);
+        const particles = [];
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+          particles.push({
+            x: (Math.random() - 0.5) * width * 1.4,
+            y: (Math.random() - 0.5) * height * 1.4,
+            z: Math.random() * 800 + 100,
+            vx: (Math.random() - 0.5) * 0.4,
+            vy: (Math.random() - 0.5) * 0.4,
+            vz: (Math.random() - 0.5) * 0.5,
+            size: Math.random() * 2 + 1.2,
+            color: i % 4 === 0 ? '#38bdf8' : (i % 4 === 1 ? '#34d399' : (i % 4 === 2 ? '#fbbf24' : '#a78bfa'))
           });
         }
-        innerNodes = [];
-        for (let i = 0; i < INNER_COUNT; i++) {
-          const phi = (i / INNER_COUNT) * Math.PI * 2;
-          innerNodes.push({
-            x0: Math.cos(phi) * innerRadius,
-            y0: 0,
-            z0: Math.sin(phi) * innerRadius,
-            size: 2,
-            color: i % 2 === 0 ? '#38bdf8' : '#a7f3d0'
-          });
-        }
-      }
 
-      function project3D(x, y, z, cx, cy) {
-        const fov = 420;
-        const scale = fov / (fov + z);
-        return {
-          x: cx + x * scale,
-          y: cy + y * scale,
-          scale: scale,
-          visible: z > -fov
-        };
-      }
+        let mouseX = 0, mouseY = 0, targetX = 0, targetY = 0;
+        window.addEventListener('mousemove', (e) => {
+          targetX = (e.clientX / window.innerWidth - 0.5) * 60;
+          targetY = (e.clientY / window.innerHeight - 0.5) * 60;
+        }, { passive: true });
 
-      let isHeroVisible = true;
-      if ('IntersectionObserver' in window) {
-        const heroSection = document.getElementById('hero');
-        const observer = new IntersectionObserver((entries) => {
-          isHeroVisible = entries[0].isIntersecting;
-          if (isHeroVisible && !animFrameId) render();
-        }, { threshold: 0.05 });
-        if (heroSection) observer.observe(heroSection);
-      }
-
-      function render() {
-        if (!isHeroVisible) {
-          animFrameId = null;
-          return;
+        if ('IntersectionObserver' in window) {
+          const heroSec = document.getElementById('hero');
+          const obs = new IntersectionObserver(entries => {
+            isHeroInView = entries[0].isIntersecting;
+            if (isHeroInView && !animId) renderBg();
+          }, { threshold: 0.05 });
+          if (heroSec) obs.observe(heroSec);
         }
 
-        ctx.clearRect(0, 0, width, height);
+        function renderBg() {
+          if (!isHeroInView) {
+            animId = null;
+            return;
+          }
 
-        // Smooth mouse inertia
-        mouseX += (targetMouseX - mouseX) * 0.05;
-        mouseY += (targetMouseY - mouseY) * 0.05;
+          ctx.clearRect(0, 0, width, height);
+          mouseX += (targetX - mouseX) * 0.05;
+          mouseY += (targetY - mouseY) * 0.05;
 
-        // Rotation increments
-        rotY += 0.0035;
-        rotX = 0.25 + mouseY * 0.35;
-        rotZ = mouseX * 0.25;
+          const cx = width * 0.5 + mouseX;
+          const cy = height * 0.5 + mouseY;
+          const fov = 450;
 
-        const cx = width > 1024 ? width * 0.65 : width * 0.5;
-        const cy = height * 0.48;
+          // Update & project particles
+          const projected = [];
+          for (let i = 0; i < particles.length; i++) {
+            const p = particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.z += p.vz;
 
-        const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
-        const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
-        const cosZ = Math.cos(rotZ), sinZ = Math.sin(rotZ);
+            if (p.x < -width * 0.8) p.x = width * 0.8;
+            if (p.x > width * 0.8) p.x = -width * 0.8;
+            if (p.y < -height * 0.8) p.y = height * 0.8;
+            if (p.y > height * 0.8) p.y = -height * 0.8;
+            if (p.z < 50) p.z = 850;
+            if (p.z > 850) p.z = 50;
 
-        function transformPoint(p) {
-          // Y-axis rotation
-          let x1 = p.x0 * cosY - p.z0 * sinY;
-          let z1 = p.x0 * sinY + p.z0 * cosY;
-          let y1 = p.y0;
+            const scale = fov / (fov + p.z);
+            const sx = cx + p.x * scale;
+            const sy = cy + p.y * scale;
+            projected.push({ sx, sy, scale, color: p.color, z: p.z, size: p.size });
+          }
 
-          // X-axis rotation
-          let y2 = y1 * cosX - z1 * sinX;
-          let z2 = y1 * sinX + z1 * cosX;
-          let x2 = x1;
-
-          // Z-axis rotation
-          let x3 = x2 * cosZ - y2 * sinZ;
-          let y3 = x2 * sinZ + y2 * cosZ;
-          let z3 = z2;
-
-          return { x: x3, y: y3, z: z3 };
-        }
-
-        // Draw connections for primary ring
-        const projectedNodes = nodes.map(n => {
-          const t = transformPoint(n);
-          return { ...n, p: project3D(t.x, t.y, t.z, cx, cy), z: t.z };
-        });
-
-        // Soft connective lines
-        ctx.lineWidth = 1;
-        for (let i = 0; i < projectedNodes.length; i++) {
-          const a = projectedNodes[i];
-          const b = projectedNodes[(i + 1) % projectedNodes.length];
-          if (a.p.visible && b.p.visible) {
-            const alpha = Math.max(0.08, Math.min(0.45, (a.z + 120) / 240));
-            ctx.strokeStyle = `rgba(56, 189, 248, ${alpha})`;
-            ctx.beginPath();
-            ctx.moveTo(a.p.x, a.p.y);
-            ctx.lineTo(b.p.x, b.p.y);
-            ctx.stroke();
-
-            // Connect to cross-opposites for geometric lattice
-            if (i % 3 === 0) {
-              const cross = projectedNodes[(i + 12) % projectedNodes.length];
-              ctx.strokeStyle = `rgba(16, 185, 129, ${alpha * 0.6})`;
-              ctx.beginPath();
-              ctx.moveTo(a.p.x, a.p.y);
-              ctx.lineTo(cross.p.x, cross.p.y);
-              ctx.stroke();
+          // Draw subtle connective constellation threads
+          ctx.lineWidth = 0.8;
+          for (let i = 0; i < projected.length; i++) {
+            for (let j = i + 1; j < projected.length; j++) {
+              const a = projected[i], b = projected[j];
+              const dx = a.sx - b.sx;
+              const dy = a.sy - b.sy;
+              const dist = Math.sqrt(dx * dx + dy * dy);
+              if (dist < 110) {
+                const alpha = (1 - dist / 110) * 0.22 * Math.min(a.scale, b.scale);
+                ctx.strokeStyle = `rgba(56, 189, 248, ${alpha})`;
+                ctx.beginPath();
+                ctx.moveTo(a.sx, a.sy);
+                ctx.lineTo(b.sx, b.sy);
+                ctx.stroke();
+              }
             }
           }
-        }
 
-        // Draw Nodes
-        projectedNodes.forEach(n => {
-          if (!n.p.visible) return;
-          const alpha = Math.max(0.2, Math.min(0.9, (n.z + 120) / 240));
-          ctx.fillStyle = n.color;
-          ctx.globalAlpha = alpha;
-          ctx.beginPath();
-          ctx.arc(n.p.x, n.p.y, n.size * n.p.scale, 0, Math.PI * 2);
-          ctx.fill();
-        });
-
-        // Inner Gyroscope Ring
-        const projectedInner = innerNodes.map(n => {
-          const t = transformPoint(n);
-          return { ...n, p: project3D(t.x, t.y, t.z, cx, cy), z: t.z };
-        });
-
-        ctx.strokeStyle = 'rgba(245, 158, 11, 0.25)';
-        for (let i = 0; i < projectedInner.length; i++) {
-          const a = projectedInner[i];
-          const b = projectedInner[(i + 1) % projectedInner.length];
-          if (a.p.visible && b.p.visible) {
+          // Draw shimmering 3D stardust
+          for (let i = 0; i < projected.length; i++) {
+            const p = projected[i];
+            const alpha = Math.max(0.15, Math.min(0.85, (900 - p.z) / 800));
+            ctx.fillStyle = p.color;
+            ctx.globalAlpha = alpha;
             ctx.beginPath();
-            ctx.moveTo(a.p.x, a.p.y);
-            ctx.lineTo(b.p.x, b.p.y);
-            ctx.stroke();
+            ctx.arc(p.sx, p.sy, Math.max(1, p.size * p.scale), 0, Math.PI * 2);
+            ctx.fill();
           }
+          ctx.globalAlpha = 1.0;
+
+          animId = requestAnimationFrame(renderBg);
+        }
+        renderBg();
+      })();
+
+      // ══════════════════════════════════════════════════════════════════════════
+      // 2. INTERACTIVE 3D CITADEL GYROSCOPE (WebGL via Three.js with fallback)
+      // ══════════════════════════════════════════════════════════════════════════
+      (function init3DCitadelGyroscope() {
+        const container = document.getElementById('threejs-hero-container');
+        if (!container) return;
+
+        let width = container.clientWidth || 320;
+        let height = container.clientHeight || 240;
+        let isHeroInView = true;
+
+        if (typeof THREE !== 'undefined') {
+          // --- THREE.JS WEBGL RENDERER ---
+          const scene = new THREE.Scene();
+          const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
+          camera.position.z = 5.2;
+
+          let renderer;
+          try {
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+          } catch(e) {
+            console.warn('WebGL init error, falling back:', e);
+            runCanvasFallback();
+            return;
+          }
+
+          renderer.setSize(width, height);
+          renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+          renderer.toneMapping = THREE.ACESFilmicToneMapping;
+          renderer.toneMappingExposure = 1.2;
+          container.appendChild(renderer.domElement);
+
+          // Root pivot for interactive touch/mouse drag
+          const rootPivot = new THREE.Group();
+          scene.add(rootPivot);
+
+          // 1. Central Geodesic Icosahedron (Citadel Knowledge Core)
+          const coreGeo = new THREE.IcosahedronGeometry(1.05, 1);
+          const coreMat = new THREE.MeshPhongMaterial({
+            color: 0x0284c7,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.8,
+            emissive: 0x0369a1,
+            emissiveIntensity: 0.35
+          });
+          const coreMesh = new THREE.Mesh(coreGeo, coreMat);
+          rootPivot.add(coreMesh);
+
+          // Inner Glowing Nucleus
+          const nucGeo = new THREE.SphereGeometry(0.6, 24, 24);
+          const nucMat = new THREE.MeshBasicMaterial({
+            color: 0x38bdf8,
+            transparent: true,
+            opacity: 0.45
+          });
+          const nucMesh = new THREE.Mesh(nucGeo, nucMat);
+          rootPivot.add(nucMesh);
+
+          // 2. Three Celestial Orbital Rings (Gold, Emerald, Sky Blue)
+          // Ring 1: Celestial Equatorial Gold
+          const ringGeo1 = new THREE.TorusGeometry(1.65, 0.022, 16, 120);
+          const ringMat1 = new THREE.MeshStandardMaterial({
+            color: 0xfbbf24,
+            metalness: 0.9,
+            roughness: 0.2,
+            emissive: 0xd97706,
+            emissiveIntensity: 0.4
+          });
+          const ring1 = new THREE.Mesh(ringGeo1, ringMat1);
+          ring1.rotation.x = Math.PI * 0.35;
+          rootPivot.add(ring1);
+
+          // Ring 2: Academic Horizon Emerald
+          const ringGeo2 = new THREE.TorusGeometry(1.95, 0.02, 16, 120);
+          const ringMat2 = new THREE.MeshStandardMaterial({
+            color: 0x34d399,
+            metalness: 0.9,
+            roughness: 0.2,
+            emissive: 0x059669,
+            emissiveIntensity: 0.45
+          });
+          const ring2 = new THREE.Mesh(ringGeo2, ringMat2);
+          ring2.rotation.y = Math.PI * 0.25;
+          ring2.rotation.z = Math.PI * 0.15;
+          rootPivot.add(ring2);
+
+          // Ring 3: Global Citadel Sky Blue
+          const ringGeo3 = new THREE.TorusGeometry(2.25, 0.018, 16, 120);
+          const ringMat3 = new THREE.MeshStandardMaterial({
+            color: 0x38bdf8,
+            metalness: 0.85,
+            roughness: 0.25,
+            emissive: 0x0284c7,
+            emissiveIntensity: 0.4
+          });
+          const ring3 = new THREE.Mesh(ringGeo3, ringMat3);
+          ring3.rotation.x = Math.PI * 0.75;
+          rootPivot.add(ring3);
+
+          // 3. Orbiting Satellite Beacons (3 DPS Knowledge Spheres)
+          const satGeo = new THREE.SphereGeometry(0.09, 16, 16);
+          const sat1 = new THREE.Mesh(satGeo, new THREE.MeshBasicMaterial({ color: 0xfbbf24 }));
+          const sat2 = new THREE.Mesh(satGeo, new THREE.MeshBasicMaterial({ color: 0x34d399 }));
+          const sat3 = new THREE.Mesh(satGeo, new THREE.MeshBasicMaterial({ color: 0x38bdf8 }));
+          rootPivot.add(sat1);
+          rootPivot.add(sat2);
+          rootPivot.add(sat3);
+
+          // 4. Floating 3D Depth Stars
+          const starCount = 140;
+          const starGeo = new THREE.BufferGeometry();
+          const starPos = new Float32Array(starCount * 3);
+          for (let i = 0; i < starCount * 3; i += 3) {
+            starPos[i] = (Math.random() - 0.5) * 8;
+            starPos[i+1] = (Math.random() - 0.5) * 8;
+            starPos[i+2] = (Math.random() - 0.5) * 6;
+          }
+          starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+          const starMat = new THREE.PointsMaterial({
+            color: 0xbae6fd,
+            size: 0.045,
+            transparent: true,
+            opacity: 0.75
+          });
+          const stars = new THREE.Points(starGeo, starMat);
+          rootPivot.add(stars);
+
+          // 5. Lights
+          const ambLight = new THREE.AmbientLight(0xffffff, 0.9);
+          scene.add(ambLight);
+
+          const light1 = new THREE.PointLight(0x38bdf8, 3, 20);
+          light1.position.set(4, 3, 5);
+          scene.add(light1);
+
+          const light2 = new THREE.PointLight(0x34d399, 2.5, 20);
+          light2.position.set(-4, -3, 3);
+          scene.add(light2);
+
+          // 6. Interactive Drag / Touch Controls with Inertia
+          let isDragging = false;
+          let prevPointerX = 0, prevPointerY = 0;
+          let velocityX = 0, velocityY = 0;
+          let targetRotX = 0.2, targetRotY = 0;
+
+          const stage = document.getElementById('hero-3d-stage');
+          const eventTarget = stage || container;
+
+          function onPointerDown(e) {
+            isDragging = true;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            prevPointerX = clientX;
+            prevPointerY = clientY;
+            velocityX = 0;
+            velocityY = 0;
+            if (stage) stage.style.cursor = 'grabbing';
+          }
+
+          function onPointerMove(e) {
+            if (!isDragging) return;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            const deltaX = clientX - prevPointerX;
+            const deltaY = clientY - prevPointerY;
+            prevPointerX = clientX;
+            prevPointerY = clientY;
+
+            velocityX = deltaX * 0.006;
+            velocityY = deltaY * 0.006;
+            targetRotY += velocityX;
+            targetRotX += velocityY;
+          }
+
+          function onPointerUp() {
+            isDragging = false;
+            if (stage) stage.style.cursor = 'grab';
+          }
+
+          eventTarget.addEventListener('mousedown', onPointerDown, { passive: true });
+          window.addEventListener('mousemove', onPointerMove, { passive: true });
+          window.addEventListener('mouseup', onPointerUp, { passive: true });
+
+          eventTarget.addEventListener('touchstart', onPointerDown, { passive: true });
+          window.addEventListener('touchmove', onPointerMove, { passive: true });
+          window.addEventListener('touchend', onPointerUp, { passive: true });
+
+          // Window Resize
+          function onStageResize() {
+            width = container.clientWidth || 320;
+            height = container.clientHeight || 240;
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+          }
+          window.addEventListener('resize', onStageResize, { passive: true });
+
+          // Performance Observer
+          if ('IntersectionObserver' in window) {
+            const heroSec = document.getElementById('hero');
+            const obs = new IntersectionObserver(entries => {
+              isHeroInView = entries[0].isIntersecting;
+              if (isHeroInView && !threeAnimId) animateThree();
+            }, { threshold: 0.05 });
+            if (heroSec) obs.observe(heroSec);
+          }
+
+          // Animation Loop
+          let threeAnimId = null;
+          let orbitAngle = 0;
+
+          function animateThree() {
+            if (!isHeroInView) {
+              threeAnimId = null;
+              return;
+            }
+
+            // Serene continuous rotation
+            if (!isDragging) {
+              velocityX *= 0.94;
+              velocityY *= 0.94;
+              targetRotY += 0.004 + velocityX;
+              targetRotX += velocityY;
+            }
+
+            // Soft inertia damping
+            rootPivot.rotation.y += (targetRotY - rootPivot.rotation.y) * 0.12;
+            rootPivot.rotation.x += (targetRotX - rootPivot.rotation.x) * 0.12;
+
+            // Animate internal rings at different harmonic speeds
+            coreMesh.rotation.y -= 0.008;
+            coreMesh.rotation.z += 0.004;
+            ring1.rotation.z += 0.005;
+            ring2.rotation.z -= 0.004;
+            ring3.rotation.z += 0.003;
+
+            // Animate orbital satellites
+            orbitAngle += 0.02;
+            sat1.position.set(Math.cos(orbitAngle) * 1.65, Math.sin(orbitAngle) * 0.4, Math.sin(orbitAngle) * 1.65);
+            sat2.position.set(Math.cos(orbitAngle * 0.8 + 1) * 1.95, Math.sin(orbitAngle * 0.8 + 1) * 1.95 * 0.5, Math.sin(orbitAngle * 0.8 + 1) * 1.95);
+            sat3.position.set(Math.sin(orbitAngle * 0.6 + 2) * 2.25, Math.cos(orbitAngle * 0.6 + 2) * 2.25 * 0.7, Math.cos(orbitAngle * 0.6 + 2) * 2.25);
+
+            renderer.render(scene, camera);
+            threeAnimId = requestAnimationFrame(animateThree);
+          }
+          animateThree();
+
+        } else {
+          runCanvasFallback();
         }
 
-        ctx.globalAlpha = 1.0;
-        animFrameId = requestAnimationFrame(render);
-      }
-      render();
+        // Fallback: Pure Canvas 2D Gyroscope (if Three.js is blocked)
+        function runCanvasFallback() {
+          const cvs = document.createElement('canvas');
+          cvs.width = width * 2;
+          cvs.height = height * 2;
+          cvs.style.width = '100%';
+          cvs.style.height = '100%';
+          container.appendChild(cvs);
+          const c2d = cvs.getContext('2d');
+          c2d.scale(2, 2);
 
-      // 2. Interactive 3D Card Tilt Engine
+          let rot = 0;
+          function draw2DFallback() {
+            c2d.clearRect(0, 0, width, height);
+            rot += 0.015;
+            const cx = width / 2;
+            const cy = height / 2;
+            const r = Math.min(width, height) * 0.38;
+
+            // Draw 3D-like ellipse rings
+            c2d.strokeStyle = '#38bdf8';
+            c2d.lineWidth = 2;
+            c2d.beginPath();
+            c2d.ellipse(cx, cy, r, r * Math.abs(Math.cos(rot)), rot * 0.5, 0, Math.PI * 2);
+            c2d.stroke();
+
+            c2d.strokeStyle = '#34d399';
+            c2d.lineWidth = 1.8;
+            c2d.beginPath();
+            c2d.ellipse(cx, cy, r * 1.15, r * 1.15 * Math.abs(Math.sin(rot * 0.8)), rot * 0.8, 0, Math.PI * 2);
+            c2d.stroke();
+
+            c2d.strokeStyle = '#fbbf24';
+            c2d.lineWidth = 1.5;
+            c2d.beginPath();
+            c2d.ellipse(cx, cy, r * 1.3, r * 1.3 * Math.abs(Math.cos(rot * 0.6)), -rot * 0.4, 0, Math.PI * 2);
+            c2d.stroke();
+
+            // Center core
+            c2d.fillStyle = '#0284c7';
+            c2d.beginPath();
+            c2d.arc(cx, cy, 22, 0, Math.PI * 2);
+            c2d.fill();
+
+            requestAnimationFrame(draw2DFallback);
+          }
+          draw2DFallback();
+        }
+      })();
+
+      // ══════════════════════════════════════════════════════════════════════════
+      // 3. INTERACTIVE 3D CARD TILT ENGINE
+      // ══════════════════════════════════════════════════════════════════════════
       const tiltCard = document.getElementById('hero-tilt-card');
       if (tiltCard && window.matchMedia('(hover: hover)').matches) {
         tiltCard.addEventListener('mousemove', (e) => {
@@ -1444,9 +1710,9 @@
           const y = e.clientY - rect.top;
           const centerX = rect.width / 2;
           const centerY = rect.height / 2;
-          const rotateX = ((y - centerY) / centerY) * -9;
-          const rotateY = ((x - centerX) / centerX) * 9;
-          tiltCard.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(1.02, 1.02, 1.02)`;
+          const rotateX = ((y - centerY) / centerY) * -7;
+          const rotateY = ((x - centerX) / centerX) * 7;
+          tiltCard.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(1.015, 1.015, 1.015)`;
         });
 
         tiltCard.addEventListener('mouseleave', () => {
