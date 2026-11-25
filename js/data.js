@@ -745,6 +745,22 @@ class RichVineDB {
     };
   }
 
+  static getDebtors(filter = {}) {
+    const students = this.getStudents(filter);
+    return students.map(s => {
+      const bal = this.getStudentBalance(s.id);
+      return { student: s, balance: bal };
+    }).filter(item => item.balance && item.balance.totalOutstanding > 0);
+  }
+
+  static getClearedStudents(filter = {}) {
+    const students = this.getStudents(filter);
+    return students.map(s => {
+      const bal = this.getStudentBalance(s.id);
+      return { student: s, balance: bal };
+    }).filter(item => item.balance && item.balance.totalOutstanding <= 0);
+  }
+
   // ── Automatic Deduplication & Balance Reconciliation ────────────────────
   static _cleanAndRebalance(db) {
     if (!db || !Array.isArray(db.payments)) return;
@@ -1016,6 +1032,9 @@ class RichVineDB {
     delete student.initialPaid; // Do not store transient enrollment field on student doc
     delete student.initialPaymentDate;
     student.enrolledDate = student.enrolledDate || new Date().toISOString().split("T")[0];
+    student.name = student.name || `${student.firstName || ''} ${student.lastName || ''}`.trim();
+    student.fullName = student.fullName || student.name;
+    student.class = student.class || student.currentClass;
 
     student._pendingUpload = true;
     db.students.unshift(student);

@@ -1162,7 +1162,7 @@
       const student = students.find(s => {
         const sId = (s.id || '').toLowerCase();
         const sReg = (s.regNo || '').toLowerCase();
-        const sName = (s.name || '').toLowerCase();
+        const sName = (s.fullName || s.name || `${s.firstName || ''} ${s.lastName || ''}`).toLowerCase();
         return sId === cleanQuery || sReg === cleanQuery || sName.includes(cleanQuery);
       });
 
@@ -1180,13 +1180,15 @@
 
       const bal = window.RichVineDB.getStudentBalance(student.id);
       const isCleared = bal && bal.totalOutstanding <= 0;
+      const studentDisplayName = student.fullName || student.name || `${student.firstName || ''} ${student.lastName || ''}`.trim() || 'Candidate';
+      const studentClass = student.currentClass || student.class || 'Learner';
 
       content.innerHTML = `
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-4 mb-4">
           <div>
             <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Official Candidate Clearance Verification</span>
-            <h3 class="text-lg font-black text-white mt-0.5">${student.name}</h3>
-            <div class="text-xs text-sky-400 font-mono mt-0.5">Reg No: ${student.regNo || student.id} &bull; Class: ${student.class || student.currentClass}</div>
+            <h3 class="text-lg font-black text-white mt-0.5">${studentDisplayName}</h3>
+            <div class="text-xs text-sky-400 font-mono mt-0.5">Reg No: ${student.regNo || student.id} &bull; Class: ${studentClass}</div>
           </div>
           <div>
             ${isCleared ? `

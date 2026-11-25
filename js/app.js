@@ -6,6 +6,7 @@
  */
 const RichVineApp = (() => {
   let currentTab = "dashboard";
+  let currentDetailClass = null;
 
   // ── Currency Helpers ──────────────────────────────────────────────────────
   // Parses a raw input like "150,000", "150,000.50", or 150000 into a clean float
@@ -426,7 +427,10 @@ const RichVineApp = (() => {
   }
 
   function openClassDetail(className) {
-    RichVineApp.currentDetailClass = className;
+    currentDetailClass = className;
+    if (typeof window !== "undefined" && window.RichVineApp) {
+      window.RichVineApp.currentDetailClass = className;
+    }
     const students  = RichVineDB.getStudents({ class: className });
     const payments  = RichVineDB.getPayments({ class: className });
     const collected = payments.reduce((s, p) => s + Number(p.amount), 0);
@@ -3206,8 +3210,8 @@ const RichVineApp = (() => {
     if (!el) return;
     el.classList.remove("hidden");
     // Only lock body the first time a modal opens (avoid double-locking)
-    if (!document.body.classList.contains("modal-open")) {
-      _modalScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+    if (document.body && document.body.classList && !document.body.classList.contains("modal-open")) {
+      _modalScrollY = window.scrollY || (document.documentElement ? document.documentElement.scrollTop : 0) || window.pageYOffset || 0;
       document.body.classList.add("modal-open");
       document.body.style.top = `-${_modalScrollY}px`;
       document.body.style.position = "fixed";
@@ -6585,7 +6589,7 @@ const RichVineApp = (() => {
     
     // Populate report card student selector
     const rcStudent = document.getElementById("er-rc-student");
-    if (rcStudent && rcStudent.options.length === 0) {
+    if (rcStudent && (!rcStudent.options || rcStudent.options.length === 0)) {
       rcStudent.innerHTML = students.map(s => `
         <option value="${s.id}">${s.name || s.fullName} (${s.class || 'No Class'})</option>
       `).join("");
@@ -6593,7 +6597,7 @@ const RichVineApp = (() => {
 
     // Populate score entry student selector
     const scoreStudent = document.getElementById("score-form-student");
-    if (scoreStudent && scoreStudent.options.length === 0) {
+    if (scoreStudent && (!scoreStudent.options || scoreStudent.options.length === 0)) {
       scoreStudent.innerHTML = students.map(s => `
         <option value="${s.id}">${s.name || s.fullName} - ${s.class || ''} (${s.regNo || s.id})</option>
       `).join("");
@@ -7409,6 +7413,9 @@ const RichVineApp = (() => {
     openEditScoreModal,
     calcScoreModalTotal,
     saveScoreModal,
+    openModal,
+    get currentDetailClass() { return currentDetailClass; },
+    set currentDetailClass(val) { currentDetailClass = val; },
   };
 })();
 
