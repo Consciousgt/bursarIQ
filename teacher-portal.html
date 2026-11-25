@@ -103,6 +103,14 @@
           <span id="headerTodayDate">--</span>
         </div>
         <button 
+          onclick="openChangePasswordModal()"
+          class="text-xs font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 transition flex items-center gap-1.5"
+          title="Change My Account Password"
+        >
+          <i class="fas fa-key"></i>
+          <span class="hidden sm:inline">Password</span>
+        </button>
+        <button 
           id="logoutBtn"
           class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 transition flex items-center gap-1.5"
         >
@@ -115,6 +123,43 @@
 
   <!-- Notification Toast -->
   <div id="toastNotification" class="fixed top-4 right-4 z-50 transform transition-all duration-300 translate-y-[-100px] opacity-0 pointer-events-none"></div>
+
+  <!-- Modal: Change Teacher Password -->
+  <div id="modalChangePassword" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm hidden">
+    <div class="relative w-full max-w-md bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-700/80 pb-3">
+        <h3 class="font-bold text-white text-base flex items-center gap-2">
+          <i class="fas fa-key text-emerald-400"></i> Change Staff Password
+        </h3>
+        <button onclick="closeChangePasswordModal()" class="text-slate-400 hover:text-white text-sm p-1">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div id="changePasswordAlert" class="hidden p-3 rounded-xl text-xs font-medium"></div>
+
+      <form id="changePasswordForm" class="space-y-3.5" onsubmit="handleTeacherPasswordSubmit(event)">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1" for="oldPasswordInput">Current Password</label>
+          <input type="password" id="oldPasswordInput" required placeholder="Enter current password" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-white text-xs focus:outline-none focus:border-emerald-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1" for="newPasswordInput">New Password (Min 6 Characters)</label>
+          <input type="password" id="newPasswordInput" required minlength="6" placeholder="Enter new secret password" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-white text-xs focus:outline-none focus:border-emerald-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1" for="confirmPasswordInput">Confirm New Password</label>
+          <input type="password" id="confirmPasswordInput" required minlength="6" placeholder="Re-enter new secret password" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-white text-xs focus:outline-none focus:border-emerald-500">
+        </div>
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-700/80">
+          <button type="button" onclick="closeChangePasswordModal()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-700 hover:bg-slate-600 text-white transition">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition flex items-center gap-1.5">
+            <i class="fas fa-save"></i> Update Password
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <!-- Main Container -->
   <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6">
@@ -338,6 +383,21 @@
               <option value="12">Week 12 (Revisions)</option>
             </select>
           </div>
+
+          <!-- Term Selector -->
+          <div class="flex items-center gap-1.5 bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-700">
+            <label class="text-xs text-slate-400 font-semibold" for="weeklyTermSelect">Term:</label>
+            <select id="weeklyTermSelect" onchange="onWeeklyFilterChange()" class="bg-transparent text-emerald-300 text-xs font-bold focus:outline-none cursor-pointer">
+              <option value="1st Term">1st Term</option>
+              <option value="2nd Term">2nd Term</option>
+              <option value="3rd Term">3rd Term</option>
+            </select>
+          </div>
+
+          <!-- Print Weekly Ledger -->
+          <button onclick="printWeeklyLedger()" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 transition flex items-center gap-1.5" title="Print Official Weekly Ledger">
+            <i class="fas fa-print"></i> Print Ledger
+          </button>
         </div>
       </div>
 
@@ -472,6 +532,16 @@
               <option value="3rd Term">3rd Term</option>
             </select>
           </div>
+
+          <!-- Sync CBT Scores Button -->
+          <button onclick="syncCbtToCurrentSubject()" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/30 transition flex items-center gap-1.5" title="Pull Exam Scores from Student CBT Assessments">
+            <i class="fas fa-sync-alt"></i> Sync CBT
+          </button>
+
+          <!-- Print Score Sheet Button -->
+          <button onclick="printSubjectBroadsheet()" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/30 transition flex items-center gap-1.5" title="Print Continuous Assessment & Exam Broadsheet">
+            <i class="fas fa-print"></i> Print Sheet
+          </button>
         </div>
       </div>
 
@@ -548,9 +618,16 @@
           </h3>
           <p class="text-xs text-slate-400">Official log of morning and afternoon roll calls for this class</p>
         </div>
-        <button onclick="printTeacherAttendanceLog()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-xs font-semibold transition flex items-center gap-2">
-          <i class="fas fa-print"></i> Print Official Log
-        </button>
+        <div class="flex items-center gap-2 flex-wrap">
+          <div class="flex items-center gap-1.5 bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-700">
+            <label for="historyClassSelect" class="text-xs text-slate-400 font-semibold">Class:</label>
+            <select id="historyClassSelect" onchange="loadHistoryTable()" class="bg-transparent text-white text-xs font-semibold focus:outline-none cursor-pointer">
+            </select>
+          </div>
+          <button onclick="printTeacherAttendanceLog()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-xs font-semibold transition flex items-center gap-2">
+            <i class="fas fa-print"></i> Print Official Log
+          </button>
+        </div>
       </div>
 
       <div class="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden shadow-xl">
@@ -559,17 +636,19 @@
             <thead>
               <tr class="bg-slate-900/60 text-slate-400 border-b border-slate-700 text-[11px] uppercase tracking-wider">
                 <th class="py-3 px-4 font-semibold">Date</th>
+                <th class="py-3 px-4 font-semibold">Class</th>
                 <th class="py-3 px-4 font-semibold">Session</th>
                 <th class="py-3 px-4 font-semibold text-center">Present</th>
                 <th class="py-3 px-4 font-semibold text-center">Absent</th>
                 <th class="py-3 px-4 font-semibold text-center">Late</th>
                 <th class="py-3 px-4 font-semibold text-center">Attendance %</th>
                 <th class="py-3 px-4 font-semibold">Marked By</th>
+                <th class="py-3 px-4 font-semibold text-center">Action</th>
               </tr>
             </thead>
             <tbody id="historyTableBody" class="divide-y divide-slate-700/50">
               <tr>
-                <td colspan="7" class="py-8 text-center text-slate-400">No attendance history logged yet.</td>
+                <td colspan="9" class="py-8 text-center text-slate-400">No attendance history logged yet.</td>
               </tr>
             </tbody>
           </table>
@@ -583,7 +662,7 @@
   <script src="js/dps-students.js?v=20261122"></script>
   <script src="js/data.js"></script>
   <script src="js/reports.js"></script>
-  <script src="js/firebase-config.js"></script>
+  <script type="module" src="js/firebase-config.js"></script>
 
   <script>
     // ═══════════════════════════════════════════════════════════════
@@ -652,6 +731,55 @@
       window.location.href = 'teacher-login.html';
     });
 
+    // Change Password Modal Controls
+    function openChangePasswordModal() {
+      const modal = document.getElementById('modalChangePassword');
+      const alertBox = document.getElementById('changePasswordAlert');
+      if (alertBox) alertBox.className = 'hidden';
+      document.getElementById('changePasswordForm').reset();
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeChangePasswordModal() {
+      const modal = document.getElementById('modalChangePassword');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function handleTeacherPasswordSubmit(e) {
+      e.preventDefault();
+      const alertBox = document.getElementById('changePasswordAlert');
+      const oldPass = document.getElementById('oldPasswordInput').value;
+      const newPass = document.getElementById('newPasswordInput').value;
+      const confPass = document.getElementById('confirmPasswordInput').value;
+
+      if (newPass !== confPass) {
+        alertBox.className = 'p-3 rounded-xl text-xs font-medium bg-red-950/80 border border-red-500/50 text-red-200 block';
+        alertBox.textContent = 'New passwords do not match. Please re-enter.';
+        return;
+      }
+
+      if (!window.RichVineDB || !window.RichVineDB.updateTeacherPassword) {
+        alertBox.className = 'p-3 rounded-xl text-xs font-medium bg-red-950/80 border border-red-500/50 text-red-200 block';
+        alertBox.textContent = 'System database not initialized.';
+        return;
+      }
+
+      const res = window.RichVineDB.updateTeacherPassword(currentTeacher.id, oldPass, newPass);
+      if (res && res.success) {
+        currentTeacher.password = newPass;
+        sessionStorage.setItem('bursariq_teacher_session', JSON.stringify(currentTeacher));
+        alertBox.className = 'p-3 rounded-xl text-xs font-medium bg-emerald-950/80 border border-emerald-500/50 text-emerald-200 block';
+        alertBox.textContent = 'Password changed successfully!';
+        showToast('✅ Staff password updated successfully!', 'success');
+        setTimeout(() => {
+          closeChangePasswordModal();
+        }, 1200);
+      } else {
+        alertBox.className = 'p-3 rounded-xl text-xs font-medium bg-red-950/80 border border-red-500/50 text-red-200 block';
+        alertBox.textContent = (res && res.message) || 'Error updating password.';
+      }
+    }
+
     // ═══════════════════════════════════════════════════════════════
     // 2. Master Navigation & Role-Aware Tab Visibility
     // ═══════════════════════════════════════════════════════════════
@@ -669,32 +797,33 @@
       const secExams = document.getElementById('sectionExams');
       const secHistory = document.getElementById('sectionHistory');
 
-      // Reset button styles
+      // Reset button styles (retain flex-shrink-0 for mobile stability)
       [tabBtnAttendance, tabBtnWeekly, tabBtnExams, tabBtnHistory].forEach(b => {
-        b.className = 'px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700';
+        if (!b) return;
+        b.className = 'flex-shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700';
       });
 
       // Hide all sections
-      secAttendance.classList.add('hidden');
-      secWeekly.classList.add('hidden');
-      secExams.classList.add('hidden');
-      secHistory.classList.add('hidden');
+      if (secAttendance) secAttendance.classList.add('hidden');
+      if (secWeekly) secWeekly.classList.add('hidden');
+      if (secExams) secExams.classList.add('hidden');
+      if (secHistory) secHistory.classList.add('hidden');
 
       if (tab === 'attendance') {
-        tabBtnAttendance.className = 'px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-emerald-600 text-white shadow-lg shadow-emerald-600/30';
-        secAttendance.classList.remove('hidden');
+        if (tabBtnAttendance) tabBtnAttendance.className = 'flex-shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-emerald-600 text-white shadow-lg shadow-emerald-600/30';
+        if (secAttendance) secAttendance.classList.remove('hidden');
         loadAttendanceRoster();
       } else if (tab === 'weekly') {
-        tabBtnWeekly.className = 'px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-amber-600 text-white shadow-lg shadow-amber-600/30';
-        secWeekly.classList.remove('hidden');
+        if (tabBtnWeekly) tabBtnWeekly.className = 'flex-shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-amber-600 text-white shadow-lg shadow-amber-600/30';
+        if (secWeekly) secWeekly.classList.remove('hidden');
         loadWeeklyPerformanceRoster();
       } else if (tab === 'exams') {
-        tabBtnExams.className = 'px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-purple-600 text-white shadow-lg shadow-purple-600/30';
-        secExams.classList.remove('hidden');
+        if (tabBtnExams) tabBtnExams.className = 'flex-shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-purple-600 text-white shadow-lg shadow-purple-600/30';
+        if (secExams) secExams.classList.remove('hidden');
         loadExamScoresRoster();
       } else if (tab === 'history') {
-        tabBtnHistory.className = 'px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-sky-600 text-white shadow-lg shadow-sky-600/30';
-        secHistory.classList.remove('hidden');
+        if (tabBtnHistory) tabBtnHistory.className = 'flex-shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-sky-600 text-white shadow-lg shadow-sky-600/30';
+        if (secHistory) secHistory.classList.remove('hidden');
         loadHistoryTable();
       }
     }
@@ -716,21 +845,25 @@
       const saveText = document.getElementById('saveBtnText');
 
       if (session === 'Morning') {
-        btnM.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition bg-emerald-600 text-white shadow';
-        btnA.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white';
-        icon.className = 'w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center text-lg';
-        icon.innerHTML = '<i class="fas fa-sun"></i>';
-        title.textContent = 'Morning Attendance (Arrival Roll Call)';
-        subtitle.textContent = 'Mark arrival and early morning presence of students';
-        saveText.textContent = 'Save & Submit Morning Roll Call';
+        if (btnM) btnM.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition bg-emerald-600 text-white shadow';
+        if (btnA) btnA.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white';
+        if (icon) {
+          icon.className = 'w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center text-lg';
+          icon.innerHTML = '<i class="fas fa-sun"></i>';
+        }
+        if (title) title.textContent = 'Morning Attendance (Arrival Roll Call)';
+        if (subtitle) subtitle.textContent = 'Mark arrival and early morning presence of students';
+        if (saveText) saveText.textContent = 'Save & Submit Morning Roll Call';
       } else {
-        btnA.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition bg-sky-600 text-white shadow';
-        btnM.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white';
-        icon.className = 'w-10 h-10 rounded-xl bg-sky-500/20 text-sky-400 border border-sky-500/30 flex items-center justify-center text-lg';
-        icon.innerHTML = '<i class="fas fa-cloud-sun"></i>';
-        title.textContent = 'Afternoon Attendance (Departure Roll Call)';
-        subtitle.textContent = 'Verify student presence before dismissal or afternoon session';
-        saveText.textContent = 'Save & Submit Afternoon Roll Call';
+        if (btnA) btnA.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition bg-sky-600 text-white shadow';
+        if (btnM) btnM.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white';
+        if (icon) {
+          icon.className = 'w-10 h-10 rounded-xl bg-sky-500/20 text-sky-400 border border-sky-500/30 flex items-center justify-center text-lg';
+          icon.innerHTML = '<i class="fas fa-cloud-sun"></i>';
+        }
+        if (title) title.textContent = 'Afternoon Attendance (Departure Roll Call)';
+        if (subtitle) subtitle.textContent = 'Verify student presence before dismissal or afternoon session';
+        if (saveText) saveText.textContent = 'Save & Submit Afternoon Roll Call';
       }
       loadAttendanceRoster();
     }
@@ -738,7 +871,9 @@
     function loadAttendanceRoster() {
       const selectedDate = document.getElementById('attendanceDate').value;
       const classSel = document.getElementById('attendanceClassSelect');
-      const targetClass = (classSel && classSel.value) ? classSel.value : currentTeacher.assignedClass;
+      const targetClass = (classSel && classSel.value && classSel.value !== 'None' && classSel.value !== 'Unassigned') 
+        ? classSel.value 
+        : currentTeacher.assignedClass;
 
       let students = [];
       if (window.RichVineDB && window.RichVineDB.getStudents) {
@@ -757,7 +892,7 @@
       document.getElementById('attendanceRosterCount').textContent = '(' + attendanceStudents.length + ' learners enrolled)';
       document.getElementById('statEnrolled').textContent = attendanceStudents.length;
 
-      // Check existing record
+      // Check existing record for this class, date and session
       let existingRecord = null;
       if (window.RichVineDB && window.RichVineDB.getDailyAttendance) {
         existingRecord = window.RichVineDB.getDailyAttendance(targetClass, selectedDate, currentAttendanceSession);
@@ -783,20 +918,24 @@
 
     function renderAttendanceTable() {
       const tbody = document.getElementById('studentAttendanceTableBody');
+      const classSel = document.getElementById('attendanceClassSelect');
+      const targetClass = (classSel && classSel.value) ? classSel.value : currentTeacher.assignedClass;
+
       if (attendanceStudents.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="py-8 text-center text-slate-400">No students registered in ' + (currentTeacher.assignedClass || 'this class') + '.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="py-8 text-center text-slate-400">No students registered in ' + (targetClass || 'this class') + '.</td></tr>';
         return;
       }
 
       tbody.innerHTML = attendanceStudents.map((st, idx) => {
         const entry = attendanceMap[st.id] || { status: 'Present', remark: '' };
         const status = entry.status;
+        const sName = st.fullName || st.name || ((st.firstName || '') + ' ' + (st.lastName || '')).trim() || 'Student';
 
         return `
           <tr class="hover:bg-slate-700/30 transition">
             <td class="py-3 px-4 text-center font-mono text-slate-500">${idx + 1}</td>
             <td class="py-3 px-4">
-              <div class="font-bold text-white text-sm">${st.fullName || st.name || ((st.firstName || '') + ' ' + (st.lastName || '')).trim() || 'Student'}</div>
+              <div class="font-bold text-white text-sm">${sName}</div>
               <div class="text-[11px] font-mono text-emerald-400">${st.regNo || st.id}</div>
             </td>
             <td class="py-3 px-4 text-center">
@@ -871,13 +1010,17 @@
 
     function saveCurrentAttendance() {
       const selectedDate = document.getElementById('attendanceDate').value;
-      const targetClass = currentTeacher.assignedClass;
+      const classSel = document.getElementById('attendanceClassSelect');
+      const targetClass = (classSel && classSel.value && classSel.value !== 'None' && classSel.value !== 'Unassigned') 
+        ? classSel.value 
+        : currentTeacher.assignedClass;
 
       const records = attendanceStudents.map(st => {
         const entry = attendanceMap[st.id] || { status: 'Present', remark: '' };
+        const sName = st.fullName || st.name || ((st.firstName || '') + ' ' + (st.lastName || '')).trim() || 'Student';
         return {
           studentId: st.id,
-          studentName: st.name || 'Student',
+          studentName: sName,
           regNo: st.regNo || st.id,
           status: entry.status,
           remark: entry.remark
@@ -905,7 +1048,7 @@
     // 4. Tab 2: Weekly Performance Tracker Controller (Subject Teacher)
     // ═══════════════════════════════════════════════════════════════
     let weeklyStudents = [];
-    let weeklyPerformanceMap = {}; // studentId -> { notes, behaviour, attentiveness, testScore, remark }
+    let weeklyPerformanceMap = {}; // studentId -> { notes, behaviour, attentiveness, testScore, teacherRemark }
 
     function initSubjectAndClassSelectors() {
       // 1. Populate Subjects Dropdown
@@ -943,18 +1086,28 @@
 
       // 3. Populate Attendance Class Selector for Class Teachers
       const attClassSel = document.getElementById('attendanceClassSelect');
+      const attClassesSet = new Set();
+      if (currentTeacher.assignedClass && currentTeacher.assignedClass !== 'None' && currentTeacher.assignedClass !== 'Unassigned') {
+        attClassesSet.add(currentTeacher.assignedClass);
+      }
+      if (Array.isArray(currentTeacher.assignedClasses)) {
+        currentTeacher.assignedClasses.forEach(c => {
+          if (c && c !== 'None' && c !== 'Unassigned') attClassesSet.add(c);
+        });
+      }
+      if (attClassesSet.size === 0) {
+        availableClasses.forEach(c => attClassesSet.add(c));
+      }
+
       if (attClassSel) {
-        const attClassesSet = new Set();
-        if (currentTeacher.assignedClass && currentTeacher.assignedClass !== 'None' && currentTeacher.assignedClass !== 'Unassigned') {
-          attClassesSet.add(currentTeacher.assignedClass);
-        }
-        if (Array.isArray(currentTeacher.assignedClasses)) {
-          currentTeacher.assignedClasses.forEach(c => attClassesSet.add(c));
-        }
-        if (attClassesSet.size === 0) {
-          attClassesSet.add(currentTeacher.assignedClass || "Unassigned");
-        }
         attClassSel.innerHTML = Array.from(attClassesSet).map(c => '<option value="' + c + '">' + c + '</option>').join('');
+      }
+
+      // 4. Populate Attendance History Class Selector
+      const histClassSel = document.getElementById('historyClassSelect');
+      if (histClassSel) {
+        const histOptions = ['All', ...Array.from(attClassesSet)];
+        histClassSel.innerHTML = histOptions.map(c => '<option value="' + c + '">' + (c === 'All' ? 'All Classes' : c) + '</option>').join('');
       }
     }
 
@@ -966,10 +1119,11 @@
       const subject = document.getElementById('weeklySubjectSelect').value;
       const className = document.getElementById('weeklyClassSelect').value;
       const week = document.getElementById('weeklyWeekSelect').value;
+      const term = document.getElementById('weeklyTermSelect')?.value || '1st Term';
 
       document.getElementById('weeklyTableHeading').textContent = subject + ' — ' + className + ' (Week ' + week + ')';
-      document.getElementById('weeklyTableSubheading').textContent = 'Weekly performance tracker for students offering ' + subject;
-      document.getElementById('weeklyCurrentTag').textContent = subject + ' • ' + className + ' • Week ' + week;
+      document.getElementById('weeklyTableSubheading').textContent = 'Weekly performance tracker for students offering ' + subject + ' (' + term + ')';
+      document.getElementById('weeklyCurrentTag').textContent = subject + ' • ' + className + ' • Week ' + week + ' • ' + term;
 
       // Fetch students in chosen class
       let students = [];
@@ -993,7 +1147,7 @@
           className: className,
           subject: subject,
           week: week,
-          term: '1st Term',
+          term: term,
           session: '2026/2027'
         });
       }
@@ -1026,12 +1180,13 @@
 
       tbody.innerHTML = weeklyStudents.map((st, idx) => {
         const val = weeklyPerformanceMap[st.id] || { notes: 'Submitted', behaviour: 'Good', attentiveness: 'High', testScore: 15, teacherRemark: '' };
+        const sName = st.fullName || st.name || ((st.firstName || '') + ' ' + (st.lastName || '')).trim() || 'Student';
 
         return `
           <tr class="hover:bg-slate-700/30 transition">
             <td class="py-3 px-3 text-center font-mono text-slate-500">${idx + 1}</td>
             <td class="py-3 px-4">
-              <div class="font-bold text-white text-sm">${st.fullName || st.name || ((st.firstName || '') + ' ' + (st.lastName || '')).trim() || 'Student'}</div>
+              <div class="font-bold text-white text-sm">${sName}</div>
               <div class="text-[11px] font-mono text-emerald-400">${st.regNo || st.id} &bull; <span class="text-slate-400">${st.gender || 'M'}</span></div>
             </td>
             <td class="py-3 px-3 text-center">
@@ -1159,18 +1314,20 @@
       const subject = document.getElementById('weeklySubjectSelect').value;
       const className = document.getElementById('weeklyClassSelect').value;
       const week = document.getElementById('weeklyWeekSelect').value;
+      const term = document.getElementById('weeklyTermSelect')?.value || '1st Term';
 
       let savedCount = 0;
       weeklyStudents.forEach(st => {
         const val = weeklyPerformanceMap[st.id] || {};
+        const sName = st.fullName || st.name || ((st.firstName || '') + ' ' + (st.lastName || '')).trim() || 'Student';
         const payload = {
           studentId: st.id,
-          studentName: st.name || 'Student',
+          studentName: sName,
           regNo: st.regNo || st.id,
           className: className,
           subject: subject,
           week: week,
-          term: '1st Term',
+          term: term,
           session: '2026/2027',
           notes: val.notes || 'Submitted',
           behaviour: val.behaviour || 'Good',
@@ -1191,11 +1348,97 @@
       showToast('✅ Saved Week ' + week + ' performance for ' + savedCount + ' students in ' + subject + ' (' + className + ')!', 'success');
     }
 
+    function printWeeklyLedger() {
+      const subject = document.getElementById('weeklySubjectSelect').value;
+      const className = document.getElementById('weeklyClassSelect').value;
+      const week = document.getElementById('weeklyWeekSelect').value;
+      const term = document.getElementById('weeklyTermSelect')?.value || '1st Term';
+      const cfg = (typeof RichVineDB !== 'undefined' && RichVineDB.getConfig ? RichVineDB.getConfig() : {}) || {};
+      const schoolName = cfg.schoolName || (window.BURSARIQ_CONFIG && window.BURSARIQ_CONFIG.schoolName) || "DE PORTAL SCHOOLS";
+      const teacherName = currentTeacher ? currentTeacher.name : "Academic Staff";
+
+      const rowsHtml = weeklyStudents.map((st, idx) => {
+        const val = weeklyPerformanceMap[st.id] || { notes: 'Submitted', behaviour: 'Good', attentiveness: 'High', testScore: 15, teacherRemark: '' };
+        const sName = st.fullName || st.name || ((st.firstName || '') + ' ' + (st.lastName || '')).trim() || 'Student';
+        return `
+          <tr>
+            <td style="text-align:center">${idx + 1}</td>
+            <td><strong>${sName}</strong></td>
+            <td style="font-family:monospace;font-size:10px">${st.regNo || st.id}</td>
+            <td style="text-align:center">${val.notes}</td>
+            <td style="text-align:center">${val.behaviour}</td>
+            <td style="text-align:center">${val.attentiveness}</td>
+            <td style="text-align:center;font-weight:bold">${val.testScore !== '' ? val.testScore + ' / 20' : '-'}</td>
+            <td>${val.teacherRemark || '-'}</td>
+          </tr>
+        `;
+      }).join('');
+
+      const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>${subject} — Weekly Performance Ledger (Week ${week})</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Segoe UI', Arial, sans-serif; background:#fff; color:#0f172a; padding:18px; }
+    .header { text-align:center; border-bottom:3px double #d97706; padding-bottom:12px; margin-bottom:14px; }
+    .header h1 { font-size:22px; color:#b45309; font-weight:900; margin:0; }
+    .meta-bar { display:flex; justify-content:space-between; flex-wrap:wrap; background:#fffbeb; border:1px solid #fde68a; padding:8px 14px; border-radius:6px; margin-bottom:14px; font-size:12px; font-weight:700; color:#92400e; }
+    table { width:100%; border-collapse:collapse; font-size:11px; }
+    th, td { border:1px solid #cbd5e1; padding:6px 8px; }
+    th { background:#f1f5f9; color:#0f172a; font-weight:800; }
+    .footer { margin-top:28px; display:flex; justify-content:space-between; font-size:12px; color:#475569; padding-top:14px; }
+    @media print { body { padding:8px; } }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>${schoolName}</h1>
+    <div style="font-size:13px;font-weight:800;color:#0f172a;margin-top:4px;text-transform:uppercase;letter-spacing:0.5px">Weekly Student Academic &amp; Conduct Ledger</div>
+  </div>
+  <div class="meta-bar">
+    <div>Subject: <strong>${subject}</strong></div>
+    <div>Class Arm: <strong>${className}</strong></div>
+    <div>Period: <strong>${term} &bull; Week ${week} (2026/2027)</strong></div>
+    <div>Instructor: <strong>${teacherName}</strong></div>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:30px">#</th>
+        <th>Learner Name</th>
+        <th style="width:90px">Reg No</th>
+        <th style="width:90px">Class Notes</th>
+        <th style="width:80px">Conduct</th>
+        <th style="width:90px">Focus</th>
+        <th style="width:70px">Test Score</th>
+        <th>Teacher Remark</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rowsHtml || '<tr><td colspan="8" style="text-align:center">No student records found</td></tr>'}
+    </tbody>
+  </table>
+  <div class="footer">
+    <div>Instructor Signature: ______________________</div>
+    <div>Academic Coordinator Stamp: ______________________</div>
+  </div>
+</body>
+</html>`;
+
+      if (typeof RichVineReports !== 'undefined' && RichVineReports.printHtmlDocument) {
+        RichVineReports.printHtmlDocument(html, `Weekly_Ledger_${subject}_Week${week}`);
+      } else {
+        window.print();
+      }
+    }
+
     // ═══════════════════════════════════════════════════════════════
     // 5. Tab 3: Midterm (CA) & Terminal Exam Scores Controller
     // ═══════════════════════════════════════════════════════════════
     let examStudents = [];
-    let examScoresMap = {}; // studentId -> { ca1, ca2, exam, total, grade, remark }
+    let examScoresMap = {}; // studentId -> { ca1, ca2, exam, total, grade, remark, hasExisting }
 
     function onExamFilterChange() {
       loadExamScoresRoster();
@@ -1238,19 +1481,28 @@
       examScoresMap = {};
       examStudents.forEach(st => {
         const found = existingList.find(r => r.studentId === st.id);
-        const ca1 = found ? (found.ca1 || 0) : 0;
-        const ca2 = found ? (found.ca2 || 0) : 0;
-        const exam = found ? (found.exam || 0) : 0;
+        const ca1 = found ? (found.ca1 !== undefined ? found.ca1 : 0) : 0;
+        const ca2 = found ? (found.ca2 !== undefined ? found.ca2 : 0) : 0;
+        const exam = found ? (found.exam !== undefined ? found.exam : 0) : 0;
         const total = ca1 + ca2 + exam;
-        const gradeInfo = window.RichVineDB && window.RichVineDB.calculateGrade ? window.RichVineDB.calculateGrade(total) : { grade: 'A1', remark: 'Excellent' };
+        const hasExisting = Boolean(found);
+
+        let grade = '-';
+        let remark = 'Pending';
+        if (hasExisting && total > 0) {
+          const gradeInfo = window.RichVineDB && window.RichVineDB.calculateGrade ? window.RichVineDB.calculateGrade(total) : { grade: 'A1', remark: 'Excellent' };
+          grade = gradeInfo.grade;
+          remark = gradeInfo.remark;
+        }
 
         examScoresMap[st.id] = {
           ca1: ca1,
           ca2: ca2,
           exam: exam,
           total: total,
-          grade: gradeInfo.grade,
-          remark: gradeInfo.remark
+          grade: grade,
+          remark: remark,
+          hasExisting: hasExisting
         };
       });
 
@@ -1267,13 +1519,18 @@
       }
 
       tbody.innerHTML = examStudents.map((st, idx) => {
-        const val = examScoresMap[st.id] || { ca1: 0, ca2: 0, exam: 0, total: 0, grade: 'F9', remark: 'Fail' };
+        const val = examScoresMap[st.id] || { ca1: 0, ca2: 0, exam: 0, total: 0, grade: '-', remark: 'Pending', hasExisting: false };
+        const sName = st.fullName || st.name || ((st.firstName || '') + ' ' + (st.lastName || '')).trim() || 'Student';
+
+        const gradeClass = val.grade === '-'
+          ? 'bg-slate-700/40 text-slate-400 border border-slate-600'
+          : (val.total >= 60 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : (val.total >= 45 ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-red-500/20 text-red-300 border border-red-500/30'));
 
         return `
           <tr class="hover:bg-slate-700/30 transition">
             <td class="py-3 px-3 text-center font-mono text-slate-500">${idx + 1}</td>
             <td class="py-3 px-4">
-              <div class="font-bold text-white text-sm">${st.fullName || st.name || ((st.firstName || '') + ' ' + (st.lastName || '')).trim() || 'Student'}</div>
+              <div class="font-bold text-white text-sm">${sName}</div>
               <div class="text-[11px] font-mono text-emerald-400">${st.regNo || st.id}</div>
             </td>
             <td class="py-3 px-3 text-center">
@@ -1281,7 +1538,8 @@
                 type="number" 
                 min="0" 
                 max="20" 
-                value="${val.ca1}" 
+                value="${val.hasExisting ? val.ca1 : (val.ca1 || '')}" 
+                placeholder="0"
                 oninput="onExamScoreInput('${st.id}', 'ca1', this.value)" 
                 class="w-16 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-center font-bold text-white text-xs focus:outline-none focus:border-purple-500"
               >
@@ -1291,7 +1549,8 @@
                 type="number" 
                 min="0" 
                 max="20" 
-                value="${val.ca2}" 
+                value="${val.hasExisting ? val.ca2 : (val.ca2 || '')}" 
+                placeholder="0"
                 oninput="onExamScoreInput('${st.id}', 'ca2', this.value)" 
                 class="w-16 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-center font-bold text-white text-xs focus:outline-none focus:border-purple-500"
               >
@@ -1301,7 +1560,8 @@
                 type="number" 
                 min="0" 
                 max="60" 
-                value="${val.exam}" 
+                value="${val.hasExisting ? val.exam : (val.exam || '')}" 
+                placeholder="0"
                 oninput="onExamScoreInput('${st.id}', 'exam', this.value)" 
                 class="w-20 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-center font-bold text-white text-xs focus:outline-none focus:border-purple-500"
               >
@@ -1310,7 +1570,7 @@
               ${val.total}
             </td>
             <td class="py-3 px-3 text-center font-black text-xs" id="gradeBadge-${st.id}">
-              <span class="px-2 py-0.5 rounded ${val.total >= 60 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : (val.total >= 45 ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-red-500/20 text-red-300 border border-red-500/30')}">
+              <span class="px-2 py-0.5 rounded ${gradeClass}">
                 ${val.grade}
               </span>
             </td>
@@ -1324,7 +1584,7 @@
 
     function onExamScoreInput(studentId, field, rawValue) {
       if (!examScoresMap[studentId]) {
-        examScoresMap[studentId] = { ca1: 0, ca2: 0, exam: 0, total: 0, grade: 'F9', remark: 'Fail' };
+        examScoresMap[studentId] = { ca1: 0, ca2: 0, exam: 0, total: 0, grade: '-', remark: 'Pending', hasExisting: true };
       }
 
       let num = parseFloat(rawValue);
@@ -1336,6 +1596,7 @@
       if (field === 'exam') num = Math.min(60, Math.max(0, num));
 
       examScoresMap[studentId][field] = num;
+      examScoresMap[studentId].hasExisting = true;
 
       // Re-calculate Total & Grade
       const total = (examScoresMap[studentId].ca1 || 0) + (examScoresMap[studentId].ca2 || 0) + (examScoresMap[studentId].exam || 0);
@@ -1362,6 +1623,42 @@
       if (remarkEl) remarkEl.textContent = gradeInfo.remark;
     }
 
+    function syncCbtToCurrentSubject() {
+      const subject = document.getElementById('examSubjectSelect').value;
+      const className = document.getElementById('examClassSelect').value;
+      const term = document.getElementById('examTermSelect').value;
+
+      if (!window.RichVineDB || !window.RichVineDB.get) {
+        showToast('Database not ready', 'error');
+        return;
+      }
+      const data = window.RichVineDB.get();
+      const cbtResults = data.cbtResults || [];
+
+      let syncedCount = 0;
+      examStudents.forEach(st => {
+        // Find matching CBT result for this student, subject, and class
+        const cbt = cbtResults.find(r => 
+          r.studentId === st.id && 
+          (r.subject || '').toLowerCase().trim() === subject.toLowerCase().trim() &&
+          (r.className === className || (window.isClassMatch && window.isClassMatch(r.className, className)))
+        );
+
+        if (cbt && cbt.total > 0) {
+          const scaledScore = Math.round((Number(cbt.score || 0) / Number(cbt.total)) * 60);
+          onExamScoreInput(st.id, 'exam', scaledScore);
+          syncedCount++;
+        }
+      });
+
+      if (syncedCount > 0) {
+        renderExamScoresTable();
+        showToast(`✅ Synced ${syncedCount} CBT scores for ${subject}! Click Save to publish.`, 'success');
+      } else {
+        showToast(`No CBT Assessment attempts found for ${subject} in ${className}.`, 'info');
+      }
+    }
+
     function saveCurrentExamScores() {
       const subject = document.getElementById('examSubjectSelect').value;
       const className = document.getElementById('examClassSelect').value;
@@ -1370,9 +1667,10 @@
       let savedCount = 0;
       examStudents.forEach(st => {
         const val = examScoresMap[st.id] || { ca1: 0, ca2: 0, exam: 0, total: 0 };
+        const sName = st.fullName || st.name || ((st.firstName || '') + ' ' + (st.lastName || '')).trim() || 'Student';
         const payload = {
           studentId: st.id,
-          studentName: st.name || 'Student',
+          studentName: sName,
           regNo: st.regNo || st.id,
           className: className,
           subject: subject,
@@ -1393,12 +1691,100 @@
       showToast('✅ Published ' + savedCount + ' student broadsheet scores for ' + subject + ' (' + className + ')!', 'success');
     }
 
+    function printSubjectBroadsheet() {
+      const subject = document.getElementById('examSubjectSelect').value;
+      const className = document.getElementById('examClassSelect').value;
+      const term = document.getElementById('examTermSelect').value;
+      const cfg = (typeof RichVineDB !== 'undefined' && RichVineDB.getConfig ? RichVineDB.getConfig() : {}) || {};
+      const schoolName = cfg.schoolName || (window.BURSARIQ_CONFIG && window.BURSARIQ_CONFIG.schoolName) || "DE PORTAL SCHOOLS";
+      const teacherName = currentTeacher ? currentTeacher.name : "Subject Teacher";
+
+      const rowsHtml = examStudents.map((st, idx) => {
+        const val = examScoresMap[st.id] || { ca1: 0, ca2: 0, exam: 0, total: 0, grade: '-', remark: 'Pending' };
+        const sName = st.fullName || st.name || ((st.firstName || '') + ' ' + (st.lastName || '')).trim() || 'Student';
+        return `
+          <tr>
+            <td style="text-align:center">${idx + 1}</td>
+            <td><strong>${sName}</strong></td>
+            <td style="font-family:monospace;font-size:10px">${st.regNo || st.id}</td>
+            <td style="text-align:center">${val.ca1}</td>
+            <td style="text-align:center">${val.ca2}</td>
+            <td style="text-align:center">${val.exam}</td>
+            <td style="text-align:center;font-weight:bold">${val.total}</td>
+            <td style="text-align:center;font-weight:bold">${val.grade}</td>
+            <td>${val.remark}</td>
+          </tr>
+        `;
+      }).join('');
+
+      const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>${subject} — Continuous Assessment & Broadsheet Score Ledger</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Segoe UI', Arial, sans-serif; background:#fff; color:#0f172a; padding:18px; }
+    .header { text-align:center; border-bottom:3px double #7c3aed; padding-bottom:12px; margin-bottom:14px; }
+    .header h1 { font-size:22px; color:#6d28d9; font-weight:900; margin:0; }
+    .meta-bar { display:flex; justify-content:space-between; flex-wrap:wrap; background:#f5f3ff; border:1px solid #ddd6fe; padding:8px 14px; border-radius:6px; margin-bottom:14px; font-size:12px; font-weight:700; color:#5b21b6; }
+    table { width:100%; border-collapse:collapse; font-size:11px; }
+    th, td { border:1px solid #cbd5e1; padding:6px 8px; }
+    th { background:#f1f5f9; color:#0f172a; font-weight:800; }
+    .footer { margin-top:28px; display:flex; justify-content:space-between; font-size:12px; color:#475569; padding-top:14px; }
+    @media print { body { padding:8px; } }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>${schoolName}</h1>
+    <div style="font-size:13px;font-weight:800;color:#0f172a;margin-top:4px;text-transform:uppercase;letter-spacing:0.5px">Subject Broadsheet & Continuous Assessment Ledger</div>
+  </div>
+  <div class="meta-bar">
+    <div>Subject: <strong>${subject}</strong></div>
+    <div>Class Arm: <strong>${className}</strong></div>
+    <div>Term: <strong>${term} (2026/2027)</strong></div>
+    <div>Subject Teacher: <strong>${teacherName}</strong></div>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:30px">#</th>
+        <th>Student Name</th>
+        <th style="width:90px">Reg No</th>
+        <th style="width:65px">CA 1 (/20)</th>
+        <th style="width:65px">CA 2 (/20)</th>
+        <th style="width:65px">Exam (/60)</th>
+        <th style="width:65px">Total (/100)</th>
+        <th style="width:50px">Grade</th>
+        <th>Remark</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rowsHtml || '<tr><td colspan="9" style="text-align:center">No student records found</td></tr>'}
+    </tbody>
+  </table>
+  <div class="footer">
+    <div>Subject Teacher Signature: ______________________</div>
+    <div>Principal Stamp &amp; Date: ______________________</div>
+  </div>
+</body>
+</html>`;
+
+      if (typeof RichVineReports !== 'undefined' && RichVineReports.printHtmlDocument) {
+        RichVineReports.printHtmlDocument(html, `Broadsheet_${subject}_${className.replace(/\s+/g, '_')}`);
+      } else {
+        window.print();
+      }
+    }
+
     // ═══════════════════════════════════════════════════════════════
-    // 6. Tab 4: Attendance History Log
+    // 6. Tab 4: Attendance Records Log & Interactive Review/Edit
     // ═══════════════════════════════════════════════════════════════
-        function printTeacherAttendanceLog() {
+    function printTeacherAttendanceLog() {
       const tbody = document.getElementById("historyTableBody");
-      const cls = currentTeacher ? currentTeacher.assignedClass : "My Class";
+      const histClassSel = document.getElementById("historyClassSelect");
+      const cls = (histClassSel && histClassSel.value && histClassSel.value !== 'All') ? histClassSel.value : (currentTeacher.assignedClass || "All Classes");
       const cfg = (typeof RichVineDB !== 'undefined' && RichVineDB.getConfig ? RichVineDB.getConfig() : {}) || {};
       const schoolName = cfg.schoolName || (window.BURSARIQ_CONFIG && window.BURSARIQ_CONFIG.schoolName) || "DE PORTAL SCHOOLS";
       const teacherName = currentTeacher ? currentTeacher.name : "Class Teacher";
@@ -1439,6 +1825,7 @@
     <thead>
       <tr>
         <th>Date</th>
+        <th>Class</th>
         <th>Session</th>
         <th>Present</th>
         <th>Absent</th>
@@ -1448,14 +1835,13 @@
       </tr>
     </thead>
     <tbody>
-      ${tbody ? tbody.innerHTML : '<tr><td colspan="7">No records</td></tr>'}
+      ${tbody ? tbody.innerHTML : '<tr><td colspan="8">No records</td></tr>'}
     </tbody>
   </table>
   <div class="footer">
     <div>Class Teacher Signature: ______________________</div>
     <div>Principal Stamp &amp; Date: ______________________</div>
   </div>
-  <script src="js/ambient-particles.js"></script>
 </body>
 </html>`;
 
@@ -1466,17 +1852,42 @@
       }
     }
 
+    function editHistoricalAttendance(date, session, className) {
+      const dateInput = document.getElementById('attendanceDate');
+      if (dateInput) dateInput.value = date;
+      const classSel = document.getElementById('attendanceClassSelect');
+      if (classSel) {
+        let optExists = Array.from(classSel.options).some(o => o.value === className);
+        if (!optExists) {
+          const opt = document.createElement('option');
+          opt.value = className;
+          opt.textContent = className;
+          classSel.appendChild(opt);
+        }
+        classSel.value = className;
+      }
+      setAttendanceSession(session);
+      switchMasterTab('attendance');
+      showToast('Loaded ' + session + ' roll call for ' + className + ' (' + date + ')', 'success');
+    }
+
     function loadHistoryTable() {
       const tbody = document.getElementById('historyTableBody');
-      const targetClass = currentTeacher.assignedClass;
+      const histClassSel = document.getElementById('historyClassSelect');
+      let targetClass = histClassSel ? histClassSel.value : 'All';
+      if (!targetClass || targetClass === 'None' || targetClass === 'Unassigned') {
+        const attClassSel = document.getElementById('attendanceClassSelect');
+        targetClass = (attClassSel && attClassSel.value && attClassSel.value !== 'None') ? attClassSel.value : (currentTeacher.assignedClass || 'All');
+      }
+      if (targetClass === 'All') targetClass = '';
 
       let history = [];
       if (window.RichVineDB && window.RichVineDB.getAttendanceHistory) {
-        history = window.RichVineDB.getAttendanceHistory(targetClass, 60);
+        history = window.RichVineDB.getAttendanceHistory(targetClass, 90);
       }
 
       if (history.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="py-8 text-center text-slate-400">No attendance history found for ' + (targetClass || 'this class') + '.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" class="py-8 text-center text-slate-400">No attendance history found for ' + (targetClass || 'selected classes') + '.</td></tr>';
         return;
       }
 
@@ -1490,6 +1901,11 @@
         return `
           <tr class="hover:bg-slate-700/30 transition">
             <td class="py-3 px-4 font-semibold text-white">${rec.date}</td>
+            <td class="py-3 px-4">
+              <span class="px-2 py-0.5 rounded text-xs font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+                ${rec.className}
+              </span>
+            </td>
             <td class="py-3 px-4">
               <span class="px-2 py-0.5 rounded text-xs font-semibold ${rec.session === 'Morning' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-sky-500/20 text-sky-300 border border-sky-500/30'}">
                 ${rec.session}
@@ -1507,6 +1923,11 @@
               </div>
             </td>
             <td class="py-3 px-4 text-slate-400 text-xs">${rec.markedBy || 'Teacher'}</td>
+            <td class="py-3 px-4 text-center">
+              <button onclick="editHistoricalAttendance('${rec.date}', '${rec.session}', '${rec.className}')" class="px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-xs font-semibold transition flex items-center justify-center gap-1 mx-auto" title="Load into Daily Register to Review / Edit">
+                <i class="fas fa-edit"></i> Edit
+              </button>
+            </td>
           </tr>
         `;
       }).join('');
@@ -1517,8 +1938,9 @@
     // ═══════════════════════════════════════════════════════════════
     function showToast(message, type) {
       const toast = document.getElementById('toastNotification');
-      toast.className = 'fixed top-4 right-4 z-50 p-4 rounded-xl shadow-2xl text-xs font-bold flex items-center gap-2 border transition-all duration-300 pointer-events-auto ' + (type === 'success' ? 'bg-emerald-900 border-emerald-500 text-emerald-200' : 'bg-red-900 border-red-500 text-red-200');
-      toast.innerHTML = '<i class="fas ' + (type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle') + '"></i> <span>' + message + '</span>';
+      if (!toast) return;
+      toast.className = 'fixed top-4 right-4 z-50 p-4 rounded-xl shadow-2xl text-xs font-bold flex items-center gap-2 border transition-all duration-300 pointer-events-auto ' + (type === 'success' ? 'bg-emerald-900 border-emerald-500 text-emerald-200' : (type === 'info' ? 'bg-sky-900 border-sky-500 text-sky-200' : 'bg-red-900 border-red-500 text-red-200'));
+      toast.innerHTML = '<i class="fas ' + (type === 'success' ? 'fa-check-circle' : (type === 'info' ? 'fa-info-circle' : 'fa-exclamation-circle')) + '"></i> <span>' + message + '</span>';
       toast.style.opacity = '1';
       toast.style.transform = 'translateY(0)';
       setTimeout(() => {

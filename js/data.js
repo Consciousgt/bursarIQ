@@ -3199,23 +3199,29 @@ RichVineDB.getTeacherByPhone = function(phone) {
 RichVineDB.saveTeacher = function(teacherData) {
   const data = RichVineDB.get();
   if (!data.teachers) data.teachers = [];
+  let savedTeacher;
   if (teacherData.id) {
     const idx = data.teachers.findIndex(t => t.id === teacherData.id);
     if (idx !== -1) {
-      data.teachers[idx] = { ...data.teachers[idx], ...teacherData, updatedAt: new Date().toISOString() };
+      savedTeacher = { ...data.teachers[idx], ...teacherData, updatedAt: new Date().toISOString() };
+      data.teachers[idx] = savedTeacher;
     } else {
-      data.teachers.push({ ...teacherData, createdAt: new Date().toISOString() });
+      savedTeacher = { ...teacherData, createdAt: new Date().toISOString() };
+      data.teachers.push(savedTeacher);
     }
   } else {
-    const newTeacher = {
+    savedTeacher = {
       id: 'TCH-' + Date.now(),
       ...teacherData,
       status: teacherData.status || 'active',
       createdAt: new Date().toISOString()
     };
-    data.teachers.push(newTeacher);
+    data.teachers.push(savedTeacher);
   }
   RichVineDB.save(data);
+  if (typeof window !== "undefined" && window.RichVineFirebase && window.RichVineFirebase.saveTeacher) {
+    window.RichVineFirebase.saveTeacher(savedTeacher);
+  }
   return true;
 };
 
@@ -3235,11 +3241,35 @@ RichVineDB.authenticateTeacher = function(phone, password) {
   return { success: true, teacher };
 };
 
+RichVineDB.updateTeacherPassword = function(phoneOrId, oldPassword, newPassword) {
+  const data = RichVineDB.get();
+  if (!data.teachers) data.teachers = [];
+  const teacher = data.teachers.find(t => t.id === phoneOrId || t.phone === String(phoneOrId).trim());
+  if (!teacher) return { success: false, message: 'Teacher account not found.' };
+  if (teacher.password !== String(oldPassword).trim()) {
+    return { success: false, message: 'Current password is incorrect.' };
+  }
+  if (!newPassword || String(newPassword).trim().length < 6) {
+    return { success: false, message: 'New password must be at least 6 characters.' };
+  }
+  teacher.password = String(newPassword).trim();
+  teacher.updatedAt = new Date().toISOString();
+  RichVineDB.save(data);
+  if (typeof window !== "undefined" && window.RichVineFirebase && window.RichVineFirebase.saveTeacher) {
+    window.RichVineFirebase.saveTeacher(teacher);
+  }
+  return { success: true, message: 'Password updated successfully.', teacher };
+};
+
 // ── Attendance Methods ─────────────────────────────────────────────────────────
 RichVineDB.getDailyAttendance = function(className, date, session) {
   const data = RichVineDB.get();
   const att = data.attendance || [];
-  return att.find(a => a.className === className && a.date === date && a.session === session) || null;
+  return att.find(a => {
+    const matchClass = !className || className === 'All' || a.className === className || 
+      (typeof isClassMatch === "function" && (isClassMatch(a.className, className) || isClassMatch(className, a.className)));
+    return matchClass && a.date === date && (!session || a.session === session);
+  }) || null;
 };
 
 RichVineDB.saveDailyAttendance = function(record) {
@@ -3248,12 +3278,18 @@ RichVineDB.saveDailyAttendance = function(record) {
   const idx = data.attendance.findIndex(
     a => a.className === record.className && a.date === record.date && a.session === record.session
   );
+  let savedRecord;
   if (idx !== -1) {
-    data.attendance[idx] = { ...data.attendance[idx], ...record, updatedAt: new Date().toISOString() };
+    savedRecord = { ...data.attendance[idx], ...record, updatedAt: new Date().toISOString() };
+    data.attendance[idx] = savedRecord;
   } else {
-    data.attendance.push({ ...record, id: 'ATT-' + Date.now(), createdAt: new Date().toISOString() });
+    savedRecord = { ...record, id: record.id || ('ATT-' + Date.now()), createdAt: new Date().toISOString() };
+    data.attendance.push(savedRecord);
   }
   RichVineDB.save(data);
+  if (typeof window !== "undefined" && window.RichVineFirebase && window.RichVineFirebase.saveDailyAttendance) {
+    window.RichVineFirebase.saveDailyAttendance(savedRecord);
+  }
   return true;
 };
 
@@ -3261,9 +3297,10 @@ RichVineDB.getAttendanceHistory = function(className, days) {
   const data = RichVineDB.get();
   const att = data.attendance || [];
   const cutoff = new Date();
-  cutoff.setDate(cutoff.getDate() - (days || 30));
+  cutoff.setDate(cutoff.getDate() - (days || 60));
   return att.filter(a => {
-    const matchClass = !className || className === 'All' || a.className === className;
+    const matchClass = !className || className === 'All' || a.className === className ||
+      (typeof isClassMatch === "function" && (isClassMatch(a.className, className) || isClassMatch(className, a.className)));
     const matchDate = new Date(a.date) >= cutoff;
     return matchClass && matchDate;
   }).sort((a, b) => b.date.localeCompare(a.date));
@@ -3376,13 +3413,23 @@ RichVineDB.getClassesForTeacher = function(teacher) {
     classesSet.add(teacher.assignedClass);
   }
   if (Array.isArray(teacher.assignedClasses)) {
-    teacher.assignedClasses.forEach(c => classesSet.add(c));
+    teacher.assignedClasses.forEach(c => {
+      if (c && c !== 'None' && c !== 'Unassigned') classesSet.add(c);
+    });
   }
-  // If teacher has subjects but no classes assigned, allow all school classes
-  if (classesSet.size === 0 && teacher.subjects && teacher.subjects.length > 0) {
-    if (typeof ALL_CLASSES !== "undefined") {
-      ALL_CLASSES.forEach(c => classesSet.add(c));
-    }
+  // If teacher has subjects or has no specific class, include all official school classes
+  if (classesSet.size === 0 || (teacher.subjects && teacher.subjects.length > 0)) {
+    const defaultAll = (typeof ALL_CLASSES !== "undefined" && Array.isArray(ALL_CLASSES))
+      ? ALL_CLASSES
+      : [
+          "Creche / Preparatory I", "Preparatory II", "Nursery I", "Nursery II",
+          "Primary 1", "Primary 2", "Primary 3", "Primary 4", "Primary 5",
+          "JSS 1", "JSS 2", "JSS 3",
+          "SS 1 (Art, Commercial, Science)", "SSS 1 Science", "SSS 1 Art", "SSS 1 Commercial",
+          "SS 2 (Art, Commercial, Science)", "SSS 2 Science", "SSS 2 Art", "SSS 2 Commercial",
+          "SS 3 (Art, Commercial, Science)", "SSS 3 Science", "SSS 3 Art", "SSS 3 Commercial"
+        ];
+    defaultAll.forEach(c => classesSet.add(c));
   }
   return Array.from(classesSet);
 };
@@ -3392,11 +3439,26 @@ RichVineDB.getExamRecords = function(filters) {
   const data = RichVineDB.get();
   let records = data.examRecords || [];
   if (filters) {
-    if (filters.className) records = records.filter(r => r.className === filters.className);
-    if (filters.term) records = records.filter(r => r.term === filters.term);
-    if (filters.session) records = records.filter(r => r.session === filters.session);
-    if (filters.studentId) records = records.filter(r => r.studentId === filters.studentId);
-    if (filters.subject) records = records.filter(r => r.subject === filters.subject);
+    if (filters.className) {
+      records = records.filter(r => {
+        if (!r.className) return false;
+        if (r.className.toLowerCase().trim() === filters.className.toLowerCase().trim()) return true;
+        if (typeof isClassMatch === "function") return isClassMatch(r.className, filters.className) || isClassMatch(filters.className, r.className);
+        return false;
+      });
+    }
+    if (filters.term) {
+      records = records.filter(r => (r.term || '').toLowerCase().trim() === filters.term.toLowerCase().trim());
+    }
+    if (filters.session) {
+      records = records.filter(r => (r.session || '').toLowerCase().trim() === filters.session.toLowerCase().trim());
+    }
+    if (filters.studentId) {
+      records = records.filter(r => r.studentId === filters.studentId);
+    }
+    if (filters.subject) {
+      records = records.filter(r => (r.subject || '').toLowerCase().trim() === (filters.subject || '').toLowerCase().trim());
+    }
   }
   return records;
 };
@@ -3416,22 +3478,64 @@ RichVineDB.calculateGrade = function(total) {
 RichVineDB.saveExamRecord = function(record) {
   const data = RichVineDB.get();
   if (!data.examRecords) data.examRecords = [];
-  record.total = (record.ca1 || 0) + (record.ca2 || 0) + (record.exam || 0);
-  const gradeInfo = RichVineDB.calculateGrade(record.total);
-  record.grade = gradeInfo.grade;
-  record.remark = gradeInfo.remark;
+
+  const subject = record.subject || '';
+  const term = record.term || '1st Term';
+  const session = record.session || data.config?.currentSession || '2026/2027';
+
   const idx = data.examRecords.findIndex(
-    r => r.studentId === record.studentId && r.subject === record.subject &&
-         r.term === record.term && r.session === record.session
+    r => r.studentId === record.studentId &&
+         (r.subject || '').toLowerCase().trim() === subject.toLowerCase().trim() &&
+         (r.term || '').toLowerCase().trim() === term.toLowerCase().trim() &&
+         (r.session || '').toLowerCase().trim() === session.toLowerCase().trim()
   );
+
+  let savedRecord;
   if (idx !== -1) {
-    data.examRecords[idx] = { ...data.examRecords[idx], ...record, updatedAt: new Date().toISOString() };
+    const existing = data.examRecords[idx];
+    const ca1 = record.ca1 !== undefined ? Number(record.ca1) : (existing.ca1 || 0);
+    const ca2 = record.ca2 !== undefined ? Number(record.ca2) : (existing.ca2 || 0);
+    const exam = record.exam !== undefined ? Number(record.exam) : (existing.exam || 0);
+    const total = ca1 + ca2 + exam;
+    const gradeInfo = RichVineDB.calculateGrade(total);
+
+    savedRecord = {
+      ...existing,
+      ...record,
+      id: existing.id || ('ER-' + Date.now() + '-' + Math.floor(Math.random() * 10000)),
+      ca1,
+      ca2,
+      exam,
+      total,
+      grade: gradeInfo.grade,
+      remark: gradeInfo.remark,
+      updatedAt: new Date().toISOString()
+    };
+    data.examRecords[idx] = savedRecord;
   } else {
-    data.examRecords.push({ ...record, id: 'ER-' + Date.now(), createdAt: new Date().toISOString() });
+    const ca1 = Number(record.ca1 || 0);
+    const ca2 = Number(record.ca2 || 0);
+    const exam = Number(record.exam || 0);
+    const total = ca1 + ca2 + exam;
+    const gradeInfo = RichVineDB.calculateGrade(total);
+
+    savedRecord = {
+      ...record,
+      id: record.id || ('ER-' + Date.now() + '-' + Math.floor(Math.random() * 10000)),
+      ca1,
+      ca2,
+      exam,
+      total,
+      grade: gradeInfo.grade,
+      remark: gradeInfo.remark,
+      createdAt: new Date().toISOString()
+    };
+    data.examRecords.push(savedRecord);
   }
+
   RichVineDB.save(data);
   if (typeof window !== "undefined" && window.RichVineFirebase && window.RichVineFirebase.saveExamRecord) {
-    window.RichVineFirebase.saveExamRecord(record);
+    window.RichVineFirebase.saveExamRecord(savedRecord);
   }
   return true;
 };
@@ -3439,18 +3543,18 @@ RichVineDB.saveExamRecord = function(record) {
 RichVineDB.syncScoresFromCbt = function() {
   const data = RichVineDB.get();
   const cbtResults = data.cbtResults || [];
+  const currentSession = data.config?.currentSession || '2026/2027';
   let synced = 0;
   cbtResults.forEach(result => {
     if (!result.studentId || !result.subject || !result.className) return;
-    const scaledExamScore = Math.round((result.score / result.total) * 60);
+    const scaledExamScore = Math.round((Number(result.score || 0) / Number(result.total || 1)) * 60);
     RichVineDB.saveExamRecord({
       studentId: result.studentId,
       studentName: result.studentName || '',
       className: result.className,
       subject: result.subject,
       term: result.term || '1st Term',
-      session: result.session || '2025/2026',
-      ca1: 0, ca2: 0,
+      session: result.session || currentSession,
       exam: scaledExamScore
     });
     synced++;

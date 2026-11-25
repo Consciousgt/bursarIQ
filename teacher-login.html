@@ -159,42 +159,14 @@
           <i class="fas fa-arrow-right text-xs"></i>
         </button>
 
-        <!-- Interactive Quick Pre-fill Credentials -->
+        <!-- Authorized Staff Notice -->
         <div class="mt-4 p-3 bg-slate-900/60 rounded-xl border border-slate-700/60 text-xs text-slate-400">
-          <div class="font-semibold text-slate-300 mb-2 flex items-center justify-between">
-            <span class="flex items-center gap-1.5"><i class="fas fa-info-circle text-emerald-400"></i> Sample Teacher Accounts:</span>
-            <span class="text-[10px] text-emerald-400 font-normal">Click to prefill</span>
+          <div class="font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
+            <i class="fas fa-user-shield text-emerald-400"></i> Authorized Staff Access Only
           </div>
-          <div class="grid grid-cols-1 gap-1.5 text-[11px]">
-            <button type="button" onclick="document.getElementById('teacherPhone').value='08012345678';document.getElementById('teacherPassword').value='password123';" class="p-2 bg-slate-800/80 hover:bg-slate-800 rounded-lg border border-slate-700 hover:border-emerald-500 text-left transition flex items-center justify-between cursor-pointer">
-              <div>
-                <span class="font-bold text-emerald-400">Mr. Emmanuel Adebayo</span>
-                <span class="text-slate-400 block text-[10px]">SSS 1 Science &bull; 08012345678</span>
-              </div>
-              <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono">password123</span>
-            </button>
-            <button type="button" onclick="document.getElementById('teacherPhone').value='08023456789';document.getElementById('teacherPassword').value='password123';" class="p-2 bg-slate-800/80 hover:bg-slate-800 rounded-lg border border-slate-700 hover:border-emerald-500 text-left transition flex items-center justify-between cursor-pointer">
-              <div>
-                <span class="font-bold text-emerald-400">Mrs. Funmilayo Adeleke</span>
-                <span class="text-slate-400 block text-[10px]">JSS 2B &bull; 08023456789</span>
-              </div>
-              <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono">password123</span>
-            </button>
-            <button type="button" onclick="document.getElementById('teacherPhone').value='08034567890';document.getElementById('teacherPassword').value='password123';" class="p-2 bg-slate-800/80 hover:bg-slate-800 rounded-lg border border-slate-700 hover:border-emerald-500 text-left transition flex items-center justify-between cursor-pointer">
-              <div>
-                <span class="font-bold text-emerald-400">Mr. Chukwudi Okafor</span>
-                <span class="text-slate-400 block text-[10px]">SSS 2 Commercial &bull; 08034567890</span>
-              </div>
-              <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono">password123</span>
-            </button>
-            <button type="button" onclick="document.getElementById('teacherPhone').value='08045678901';document.getElementById('teacherPassword').value='password123';" class="p-2 bg-slate-800/80 hover:bg-slate-800 rounded-lg border border-slate-700 hover:border-emerald-500 text-left transition flex items-center justify-between cursor-pointer">
-              <div>
-                <span class="font-bold text-emerald-400">Dr. (Mrs) Ngozi Eze</span>
-                <span class="text-slate-400 block text-[10px]">Subject Teacher (Biology/Chemistry) &bull; 08045678901</span>
-              </div>
-              <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono">password123</span>
-            </button>
-          </div>
+          <p class="text-[11px] text-slate-400 leading-relaxed">
+            Please enter your registered 11-digit phone number and secret password assigned by the administrative office. If you need your credentials reset, please contact the Principal Administrator.
+          </p>
         </div>
       </form>
 
@@ -210,6 +182,8 @@
   <!-- Scripts -->
   <script src="js/dps-students.js?v=20261122"></script>
   <script src="js/data.js"></script>
+  <script type="module" src="js/firebase-config.js"></script>
+  <script src="js/ambient-particles.js"></script>
   <script>
     // Eye toggle
     const toggleBtn = document.getElementById('togglePasswordBtn');

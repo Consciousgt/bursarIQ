@@ -1319,6 +1319,12 @@ if (typeof window !== "undefined") {
         window.RichVineFirebase.syncWithCloud(false);
       }
     }, 800);
+  } else if (path.includes("teacher-portal")) {
+    setTimeout(() => {
+      if (window.RichVineFirebase && window.RichVineFirebase.syncWithCloud) {
+        window.RichVineFirebase.syncWithCloud(false);
+      }
+    }, 800);
   } else if (path.includes("cbt")) {
     setTimeout(() => {
       if (window.RichVineFirebase && window.RichVineFirebase.syncStudentsOnly) {
