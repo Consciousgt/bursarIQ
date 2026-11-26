@@ -261,6 +261,7 @@ const DEFAULT_DATA = {
   stockSales: [],
   stockRestocks: [],
   cbtSubmissions: [],
+  cbtAssessments: [],
   staff: [],
   salaries: [],
   staffLoans: [],
@@ -391,6 +392,7 @@ class RichVineDB {
       if (!data.stockSales) data.stockSales = [];
       if (!data.stockRestocks) data.stockRestocks = [];
       if (!data.cbtSubmissions) data.cbtSubmissions = [];
+      if (!data.cbtAssessments) data.cbtAssessments = [];
       if (!data.staff) data.staff = [];
       if (!data.salaries) data.salaries = [];
       if (!data.staffLoans) data.staffLoans = [];
@@ -2517,7 +2519,9 @@ class RichVineDB {
     const db = this.get();
     let list = Array.isArray(db.cbtSubmissions) ? [...db.cbtSubmissions] : [];
     if (filter.class && filter.class !== "All") {
-      list = list.filter(s => s.studentClass === filter.class);
+      list = list.filter(s => (typeof window !== "undefined" && window.isClassMatch)
+        ? window.isClassMatch(s.studentClass, filter.class)
+        : s.studentClass === filter.class);
     }
     if (filter.baseClass && filter.baseClass !== "All") {
       list = list.filter(s => s.baseClass === filter.baseClass);
@@ -2525,10 +2529,16 @@ class RichVineDB {
     if (filter.studentId) {
       list = list.filter(s => s.studentId === filter.studentId);
     }
+    if (filter.assessmentId) {
+      list = list.filter(s => s.assessmentId === filter.assessmentId);
+    }
+    if (filter.subject && filter.subject !== "All") {
+      list = list.filter(s => (s.subject || "").toLowerCase() === filter.subject.toLowerCase());
+    }
     return list.sort((a, b) => (Number(b.timestamp) || 0) - (Number(a.timestamp) || 0));
   }
 
-  static getCbtSubmissionByStudent(identifier) {
+  static getCbtSubmissionByStudent(identifier, assessmentOrSubject = null) {
     if (!identifier) return null;
     const cleanId = String(identifier).trim().toLowerCase();
     const cleanAlphanum = cleanId.replace(/[^A-Za-z0-9]/g, "");
@@ -2538,7 +2548,14 @@ class RichVineDB {
       const sId = (s.studentId || "").toLowerCase();
       const sReg = (s.regNo || "").toLowerCase();
       const sRegAlpha = sReg.replace(/[^A-Za-z0-9]/g, "");
-      return sId === cleanId || sReg === cleanId || (cleanAlphanum && sRegAlpha === cleanAlphanum);
+      const idMatch = sId === cleanId || sReg === cleanId || (cleanAlphanum && sRegAlpha === cleanAlphanum);
+      if (!idMatch) return false;
+      if (assessmentOrSubject) {
+        if (s.assessmentId && s.assessmentId === assessmentOrSubject) return true;
+        if ((s.subject || "").toLowerCase() === String(assessmentOrSubject).toLowerCase() && !s.assessmentId) return true;
+        return false;
+      }
+      return true;
     }) || null;
   }
 
@@ -2547,14 +2564,17 @@ class RichVineDB {
     const db = this.get();
     if (!db.cbtSubmissions) db.cbtSubmissions = [];
 
-    // Enforce single attempt rule: check if student has already submitted
-    const existing = this.getCbtSubmissionByStudent(submission.studentId) || (submission.regNo ? this.getCbtSubmissionByStudent(submission.regNo) : null);
+    // Enforce single attempt rule scoped to assessmentId (or subject if legacy)
+    const scopeKey = submission.assessmentId || submission.subject || null;
+    const existing = this.getCbtSubmissionByStudent(submission.studentId, scopeKey) ||
+      (submission.regNo ? this.getCbtSubmissionByStudent(submission.regNo, scopeKey) : null);
     if (existing && existing.id !== submission.id) {
-      return { success: false, error: "Student has already completed this examination", submission: existing };
+      return { success: false, error: "Student has already completed this assessment", submission: existing };
     }
 
     if (!submission.id) {
-      submission.id = `CBT-${submission.studentId.replace(/[^A-Za-z0-9]/g, "")}-${Date.now()}`;
+      const asmSuffix = submission.assessmentId ? `-${submission.assessmentId.replace(/[^A-Za-z0-9]/g, "").slice(-6)}` : "";
+      submission.id = `CBT-${submission.studentId.replace(/[^A-Za-z0-9]/g, "")}${asmSuffix}-${Date.now()}`;
     }
     submission.timestamp = submission.timestamp || Date.now();
     submission.submittedAt = submission.submittedAt || new Date().toISOString();
@@ -2562,13 +2582,13 @@ class RichVineDB {
 
     const idx = db.cbtSubmissions.findIndex(s => s.id === submission.id);
     if (idx !== -1) {
-      db.cbtSubmissions[idx] = submission;
+      db.cbtSubmissions[idx] = { ...db.cbtSubmissions[idx], ...submission };
     } else {
       db.cbtSubmissions.unshift(submission);
     }
 
     const log = this._buildLog("CBT_EXAM_SUBMITTED",
-      `CBT Submission: ${submission.studentName} (${submission.studentClass}) scored ${submission.score}/${submission.totalQuestions} (${submission.percentage}%) - Grade: ${submission.grade}`
+      `CBT Submission: ${submission.studentName} (${submission.studentClass}) - ${submission.subject || 'General'} scored ${submission.score}/${submission.totalQuestions} (${submission.percentage}%) - Grade: ${submission.grade}`
     );
     if (!db.auditLogs) db.auditLogs = [];
     db.auditLogs.unshift(log);
@@ -2606,6 +2626,294 @@ class RichVineDB {
       if (window.RichVineFirebase.saveLog) window.RichVineFirebase.saveLog(log);
     }
     return true;
+  }
+
+  // ── CBT Assessments (Assignments, Tests & Exams Manager) ─────────────────
+  static getAssessmentEffectiveStatus(asm) {
+    if (!asm) return "Closed";
+    if (asm.status === "Closed") return "Closed";
+    if (asm.deadline) {
+      const now = Date.now();
+      const exp = new Date(asm.deadline).getTime();
+      if (!isNaN(exp) && now > exp) return "Expired";
+    }
+    return asm.status || "Active";
+  }
+
+  static getAssessments(filter = {}) {
+    const db = this.get();
+    let list = Array.isArray(db.cbtAssessments) ? db.cbtAssessments.map(a => ({
+      ...a,
+      effectiveStatus: this.getAssessmentEffectiveStatus(a)
+    })) : [];
+
+    if (filter.class && filter.class !== "All") {
+      list = list.filter(a => {
+        if (!a.targetClass || a.targetClass === "All") return true;
+        if (typeof window !== "undefined" && window.isClassMatch) {
+          return window.isClassMatch(filter.class, a.targetClass) || window.isClassMatch(a.targetClass, filter.class);
+        }
+        return a.targetClass.toLowerCase() === filter.class.toLowerCase();
+      });
+    }
+    if (filter.subject && filter.subject !== "All") {
+      list = list.filter(a => (a.subject || "").toLowerCase() === filter.subject.toLowerCase());
+    }
+    if (filter.teacherId) {
+      list = list.filter(a => a.teacherId === filter.teacherId);
+    }
+    if (filter.teacherPhone) {
+      list = list.filter(a => (a.teacherPhone || "").replace(/\D/g, "") === String(filter.teacherPhone).replace(/\D/g, ""));
+    }
+    if (filter.status && filter.status !== "All") {
+      list = list.filter(a => a.effectiveStatus === filter.status);
+    }
+    return list.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+  }
+
+  static getAssessmentById(id) {
+    if (!id) return null;
+    const db = this.get();
+    const asm = (db.cbtAssessments || []).find(a => a.id === id);
+    if (!asm) return null;
+    return { ...asm, effectiveStatus: this.getAssessmentEffectiveStatus(asm) };
+  }
+
+  static saveAssessment(assessmentData) {
+    if (!assessmentData || !assessmentData.title || !assessmentData.subject) {
+      return { success: false, error: "Title and Subject are required" };
+    }
+    const db = this.get();
+    if (!db.cbtAssessments) db.cbtAssessments = [];
+
+    const nowIso = new Date().toISOString();
+    const questions = Array.isArray(assessmentData.questions) ? assessmentData.questions : [];
+    const objQuestions = questions.filter(q => (q.type || "objective") === "objective");
+    const theoryQuestions = questions.filter(q => q.type === "theory");
+
+    const shuffleCount = Number(assessmentData.shuffleCount || 0);
+    const activeObjCount = (shuffleCount > 0 && shuffleCount < objQuestions.length) ? shuffleCount : objQuestions.length;
+    const objMarksPerQ = Number(assessmentData.objectiveMarksPerQuestion || 1);
+    const objectiveTotalMarks = assessmentData.objectiveTotalMarks !== undefined
+      ? Number(assessmentData.objectiveTotalMarks)
+      : objQuestions.slice(0, activeObjCount).reduce((sum, q) => sum + (Number(q.marks) || objMarksPerQ), 0);
+    const theoryTotalMarks = assessmentData.theoryTotalMarks !== undefined
+      ? Number(assessmentData.theoryTotalMarks)
+      : theoryQuestions.reduce((sum, q) => sum + (Number(q.maxMarks || q.marks) || 10), 0);
+
+    const existingIdx = assessmentData.id ? db.cbtAssessments.findIndex(a => a.id === assessmentData.id) : -1;
+    const existing = existingIdx !== -1 ? db.cbtAssessments[existingIdx] : null;
+
+    const record = {
+      ...(existing || {}),
+      ...assessmentData,
+      id: assessmentData.id || `ASM-${Date.now()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`,
+      status: assessmentData.status || (existing ? existing.status : "Active"),
+      objectiveCount: objQuestions.length,
+      theoryCount: theoryQuestions.length,
+      activeObjectiveCount: activeObjCount,
+      objectiveTotalMarks,
+      theoryTotalMarks,
+      totalMarks: objectiveTotalMarks + theoryTotalMarks,
+      createdAt: existing ? existing.createdAt : nowIso,
+      updatedAt: nowIso
+    };
+
+    if (existingIdx !== -1) {
+      db.cbtAssessments[existingIdx] = record;
+    } else {
+      db.cbtAssessments.unshift(record);
+    }
+
+    const log = this._buildLog("CBT_ASSESSMENT_SAVED",
+      `${existing ? "Updated" : "Created"} CBT ${record.type || "Assessment"}: "${record.title}" (${record.subject} - ${record.targetClass})`
+    );
+    if (!db.auditLogs) db.auditLogs = [];
+    db.auditLogs.unshift(log);
+
+    this.save(db);
+    if (window.RichVineFirebase && window.RichVineFirebase.saveCbtAssessment) {
+      window.RichVineFirebase.saveCbtAssessment(record);
+      if (window.RichVineFirebase.saveLog) window.RichVineFirebase.saveLog(log);
+    }
+    return { success: true, assessment: { ...record, effectiveStatus: this.getAssessmentEffectiveStatus(record) } };
+  }
+
+  static updateAssessmentDeadline(id, newDeadline, status = "Active") {
+    const db = this.get();
+    if (!db.cbtAssessments) return { success: false, error: "Assessment not found" };
+    const idx = db.cbtAssessments.findIndex(a => a.id === id);
+    if (idx === -1) return { success: false, error: "Assessment not found" };
+
+    db.cbtAssessments[idx].deadline = newDeadline;
+    db.cbtAssessments[idx].status = status;
+    db.cbtAssessments[idx].updatedAt = new Date().toISOString();
+
+    const record = db.cbtAssessments[idx];
+    const log = this._buildLog("CBT_ASSESSMENT_EXTENDED",
+      `Extended/Reopened "${record.title}" (${record.subject}) until ${newDeadline}`
+    );
+    if (!db.auditLogs) db.auditLogs = [];
+    db.auditLogs.unshift(log);
+
+    this.save(db);
+    if (window.RichVineFirebase && window.RichVineFirebase.saveCbtAssessment) {
+      window.RichVineFirebase.saveCbtAssessment(record);
+      if (window.RichVineFirebase.saveLog) window.RichVineFirebase.saveLog(log);
+    }
+    return { success: true, assessment: { ...record, effectiveStatus: this.getAssessmentEffectiveStatus(record) } };
+  }
+
+  static deleteAssessment(id) {
+    const db = this.get();
+    if (!db.cbtAssessments) return false;
+    const item = db.cbtAssessments.find(a => a.id === id);
+    if (!item) return false;
+
+    db.cbtAssessments = db.cbtAssessments.filter(a => a.id !== id);
+    if (!db._pendingDeletes) db._pendingDeletes = [];
+    db._pendingDeletes.push({ col: "cbtAssessments", id });
+
+    const log = this._buildLog("CBT_ASSESSMENT_DELETED",
+      `Deleted CBT Assessment: "${item.title}" (${item.subject} - ${item.targetClass})`
+    );
+    if (!db.auditLogs) db.auditLogs = [];
+    db.auditLogs.unshift(log);
+
+    this.save(db);
+    if (window.RichVineFirebase) {
+      if (window.RichVineFirebase.deleteCbtAssessment) window.RichVineFirebase.deleteCbtAssessment(id);
+      if (window.RichVineFirebase.saveLog) window.RichVineFirebase.saveLog(log);
+    }
+    return true;
+  }
+
+  static saveTheoryScore(assessmentId, studentId, theoryScore, remark = "") {
+    const asm = this.getAssessmentById(assessmentId);
+    if (!asm) return { success: false, error: "Assessment not found" };
+
+    const db = this.get();
+    if (!db.cbtSubmissions) db.cbtSubmissions = [];
+    const students = Array.isArray(db.students) ? db.students : [];
+    const student = students.find(s => s.id === studentId || s.regNo === studentId);
+    if (!student) return { success: false, error: "Student not found" };
+
+    const maxTheory = Number(asm.theoryTotalMarks || 0);
+    const validTheory = Math.max(0, Math.min(maxTheory, Number(theoryScore) || 0));
+
+    let subIdx = db.cbtSubmissions.findIndex(s => s.assessmentId === assessmentId && s.studentId === student.id);
+    let sub;
+    if (subIdx !== -1) {
+      sub = { ...db.cbtSubmissions[subIdx] };
+    } else {
+      sub = {
+        id: `CBT-${student.id.replace(/[^A-Za-z0-9]/g, "")}-${assessmentId.replace(/[^A-Za-z0-9]/g, "").slice(-6)}-${Date.now()}`,
+        assessmentId: asm.id,
+        assessmentTitle: asm.title,
+        studentId: student.id,
+        regNo: student.regNo || student.id,
+        studentName: student.fullName || `${student.firstName || ""} ${student.lastName || ""}`.trim(),
+        studentClass: student.currentClass || student.class || asm.targetClass,
+        subject: asm.subject,
+        term: asm.term || "1st Term",
+        session: asm.session || "2026/2027",
+        targetCategory: asm.targetCategory || "ca1",
+        format: asm.format || "theory",
+        objectiveScore: 0,
+        objectiveTotal: Number(asm.objectiveTotalMarks || 0),
+        totalQuestions: Number(asm.objectiveCount || 0),
+        timestamp: Date.now(),
+        submittedAt: new Date().toISOString()
+      };
+    }
+
+    const objScore = Number(sub.objectiveScore !== undefined ? sub.objectiveScore : (sub.score || 0));
+    const totalPossible = Number(asm.totalMarks || ((Number(asm.objectiveTotalMarks || 0)) + maxTheory)) || 100;
+    const totalScore = objScore + validTheory;
+    const percentage = totalPossible > 0 ? Math.round((totalScore / totalPossible) * 100) : 0;
+    const gradeInfo = this.calculateGrade(percentage);
+
+    sub.objectiveScore = objScore;
+    sub.theoryScore = validTheory;
+    sub.theoryMaxScore = maxTheory;
+    sub.theoryGraded = true;
+    sub.theoryRemark = remark || sub.theoryRemark || gradeInfo.remark;
+    sub.totalScore = totalScore;
+    sub.totalPossible = totalPossible;
+    sub.percentage = percentage;
+    sub.grade = gradeInfo.grade;
+    sub.status = "Fully Graded";
+    sub.updatedAt = new Date().toISOString();
+
+    if (subIdx !== -1) {
+      db.cbtSubmissions[subIdx] = sub;
+    } else {
+      db.cbtSubmissions.unshift(sub);
+    }
+
+    this.save(db);
+    if (window.RichVineFirebase && window.RichVineFirebase.saveCbtSubmission) {
+      window.RichVineFirebase.saveCbtSubmission(sub);
+    }
+    return { success: true, submission: sub };
+  }
+
+  static commitAssessmentScoresToBroadsheet(assessmentId) {
+    const asm = this.getAssessmentById(assessmentId);
+    if (!asm) return { success: false, error: "Assessment not found", count: 0 };
+
+    const db = this.get();
+    const submissions = (db.cbtSubmissions || []).filter(s => s.assessmentId === assessmentId);
+    if (submissions.length === 0) return { success: false, error: "No submissions found for this assessment", count: 0 };
+
+    const targetCategory = asm.targetCategory || "ca1";
+    const categoryMax = targetCategory === "exam" ? 60 : 20;
+    const totalPossible = Number(asm.totalMarks || 100) || 100;
+    let count = 0;
+
+    submissions.forEach(sub => {
+      const rawTotal = sub.totalScore !== undefined
+        ? Number(sub.totalScore)
+        : (Number(sub.objectiveScore !== undefined ? sub.objectiveScore : (sub.score || 0)) + Number(sub.theoryScore || 0));
+      const scaled = Math.min(categoryMax, Math.max(0, Math.round((rawTotal / totalPossible) * categoryMax)));
+
+      const payload = {
+        studentId: sub.studentId,
+        studentName: sub.studentName,
+        className: sub.studentClass,
+        subject: asm.subject,
+        term: asm.term || "1st Term",
+        session: asm.session || (db.config?.currentSession || "2026/2027")
+      };
+      payload[targetCategory] = scaled;
+
+      if (this.saveExamRecord(payload)) {
+        sub.scaledScore = scaled;
+        sub.syncedToBroadsheet = true;
+        count++;
+      }
+    });
+
+    // Re-read fresh DB after saveExamRecord calls and update submission sync flags
+    const freshDb = this.get();
+    (freshDb.cbtSubmissions || []).forEach(s => {
+      const matched = submissions.find(x => x.id === s.id);
+      if (matched) {
+        s.scaledScore = matched.scaledScore;
+        s.syncedToBroadsheet = true;
+      }
+    });
+    const log = this._buildLog("CBT_BROADSHEET_SYNC",
+      `Committed ${count} scores from "${asm.title}" (${asm.subject}) to ${targetCategory.toUpperCase()} broadsheet & report cards`
+    );
+    if (!freshDb.auditLogs) freshDb.auditLogs = [];
+    freshDb.auditLogs.unshift(log);
+    this.save(freshDb);
+
+    if (window.RichVineFirebase && window.RichVineFirebase.saveLog) {
+      window.RichVineFirebase.saveLog(log);
+    }
+    return { success: true, count };
   }
 
 
@@ -3018,6 +3326,7 @@ class RichVineDB {
     clean.stockSales = [];
     clean.stockRestocks = [];
     clean.cbtSubmissions = [];
+    clean.cbtAssessments = [];
     clean.staff = [];
     clean.salaries = [];
     clean.staffLoans = [];
@@ -3542,21 +3851,30 @@ RichVineDB.saveExamRecord = function(record) {
 
 RichVineDB.syncScoresFromCbt = function() {
   const data = RichVineDB.get();
-  const cbtResults = data.cbtResults || [];
+  const cbtSubmissions = data.cbtSubmissions || [];
   const currentSession = data.config?.currentSession || '2026/2027';
   let synced = 0;
-  cbtResults.forEach(result => {
-    if (!result.studentId || !result.subject || !result.className) return;
-    const scaledExamScore = Math.round((Number(result.score || 0) / Number(result.total || 1)) * 60);
-    RichVineDB.saveExamRecord({
+  cbtSubmissions.forEach(result => {
+    const className = result.studentClass || result.className;
+    if (!result.studentId || !result.subject || !className) return;
+
+    const category = result.targetCategory || 'exam';
+    const catMax = category === 'exam' ? 60 : 20;
+    const rawScore = result.totalScore !== undefined ? Number(result.totalScore) : Number(result.score || 0);
+    const totalPossible = Number(result.totalPossible || result.totalQuestions || result.total || 1);
+    const scaledScore = Math.min(catMax, Math.max(0, Math.round((rawScore / (totalPossible || 1)) * catMax)));
+
+    const payload = {
       studentId: result.studentId,
       studentName: result.studentName || '',
-      className: result.className,
+      className: className,
       subject: result.subject,
       term: result.term || '1st Term',
-      session: result.session || currentSession,
-      exam: scaledExamScore
-    });
+      session: result.session || currentSession
+    };
+    payload[category] = scaledScore;
+
+    RichVineDB.saveExamRecord(payload);
     synced++;
   });
   return synced;

@@ -5,15 +5,17 @@ rules_version = '2';
 // Firebase Project: bursariq
 // Institution: DE PORTAL SCHOOLS, OGIJO
 // Academic Session: 2026/2027
-// Last Updated: 2026-11-22
+// Last Updated: 2026-11-26
 // Changelog v6:
+//   - Added collection 19: cbtAssessments (CBT assessment definitions, question banks & schedules)
+//   - Enabled updates on cbtSubmissions for theory grading & broadsheet sync; updated CBT submission validator for theory-only tests and Primary/JSS/SSS classes
 //   - Added comprehensive schema validator and routing for collection 17: weeklyPerformance (Subject Teacher continuous assessments)
 //   - Added routing and access controls for collection 18: schoolSettings (Institutional configuration & credentials)
 //   - Fixed validator field checks (data.keys().hasAll) and optional field constraints
 //   - Fully compatible with Firebase Spark Free Tier and Offline-First IndexedDB caching
 // ===============================================================
 //
-// Collections Covered (18 Collections):
+// Collections Covered (19 Collections):
 // 1. `students`: Learners across Primary, Junior College, Senior College. Arrears & clearance attributes.
 // 2. `payments`: Fee transactions, multi-item receipts, arrears deduction tracking.
 // 3. `expenses`: School expenditure logs categorized across periods and payment methods.
@@ -32,6 +34,7 @@ rules_version = '2';
 // 16. `examRecords`: Termly continuous assessments (ca1, ca2), exam marks, total score, letter grade, and remark.
 // 17. `weeklyPerformance`: Subject teacher weekly performance tracking (notes, behaviour, attentiveness, test scores).
 // 18. `schoolSettings`: Institutional branding, address, bank details, and configuration.
+// 19. `cbtAssessments`: CBT assessment definitions, objective/theory question banks, schedules, and grading settings.
 // ===============================================================
 
 service cloud.firestore {
@@ -327,14 +330,25 @@ service cloud.firestore {
         ]) &&
         data.id == submissionId &&
         validStringLength('id', 3, 100) &&
+        validOptionalString('assessmentId', 0, 100) &&
+        validOptionalString('assessmentTitle', 0, 200) &&
+        validOptionalString('targetCategory', 0, 50) &&
+        validOptionalString('format', 0, 30) &&
         validStringLength('studentId', 3, 100) &&
         validStringLength('regNo', 3, 100) &&
         validStringLength('studentName', 1, 120) &&
         validStringLength('studentClass', 1, 60) &&
-        (data.baseClass in ['SSS 1', 'SSS 2', 'SSS 3']) &&
+        validStringLength('baseClass', 1, 60) &&
         validStringLength('subject', 1, 60) &&
-        (data.totalQuestions is number && data.totalQuestions > 0 && data.totalQuestions <= 100) &&
-        (data.score is number && data.score >= 0 && data.score <= (('totalQuestions' in data) ? data.totalQuestions : 40)) &&
+        (data.totalQuestions is number && data.totalQuestions >= 0 && data.totalQuestions <= 200) &&
+        (data.score is number && data.score >= 0 && data.score <= data.totalQuestions) &&
+        (!('objectiveScore' in data) || data.objectiveScore == null || (data.objectiveScore is number && data.objectiveScore >= 0)) &&
+        (!('objectiveTotal' in data) || data.objectiveTotal == null || (data.objectiveTotal is number && data.objectiveTotal >= 0)) &&
+        (!('theoryScore' in data) || data.theoryScore == null || (data.theoryScore is number && data.theoryScore >= 0)) &&
+        (!('theoryMaxScore' in data) || data.theoryMaxScore == null || (data.theoryMaxScore is number && data.theoryMaxScore >= 0)) &&
+        (!('theoryGraded' in data) || data.theoryGraded is bool) &&
+        (!('totalScore' in data) || data.totalScore == null || (data.totalScore is number && data.totalScore >= 0)) &&
+        (!('totalPossible' in data) || data.totalPossible == null || (data.totalPossible is number && data.totalPossible >= 0)) &&
         (data.percentage is number && data.percentage >= 0 && data.percentage <= 100) &&
         validStringLength('grade', 1, 30) &&
         (data.timeSpentSeconds is number && data.timeSpentSeconds >= 0) &&
@@ -347,7 +361,10 @@ service cloud.firestore {
         validOptionalString('gradeLabel', 0, 60) &&
         validOptionalString('submissionReason', 0, 60) &&
         validOptionalString('updatedAt', 0, 50) &&
-        (!('details' in data) || (data.details is list && data.details.size() <= 50));
+        validOptionalString('gradedBy', 0, 100) &&
+        validOptionalString('gradedAt', 0, 60) &&
+        (!('syncedToBroadsheet' in data) || data.syncedToBroadsheet is bool) &&
+        (!('details' in data) || (data.details is list && data.details.size() <= 200));
     }
 
     // 10. TEACHERS DIRECTORY & CREDENTIALS
@@ -531,7 +548,7 @@ service cloud.firestore {
     match /cbtSubmissions/{submissionId} {
       allow read: if canReadData();
       allow create: if canWriteData() && isValidCbtSubmission(submissionId);
-      allow update: if false; // Immutability of submitted exam scores
+      allow update: if canWriteData(); // Teachers/admins update theory grading and broadsheet sync fields
       allow delete: if canWriteData(); // Admins can clear/reset an attempt if requested
     }
 
@@ -606,6 +623,12 @@ service cloud.firestore {
       allow read: if canReadData();
       allow create, update: if canWriteData();
       allow delete: if canWriteData();
+    }
+
+    // 19. CBT ASSESSMENTS
+    match /cbtAssessments/{assessmentId} {
+      allow read: if canReadData();
+      allow create, update, delete: if canWriteData();
     }
 
     // Default Deny

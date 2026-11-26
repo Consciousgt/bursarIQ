@@ -158,7 +158,7 @@ window.RichVineFirebase = {
     }
 
     // 2. Process pending offline uploads across all collections
-    const collections = ["students", "payments", "expenses", "stocks", "stockSales", "stockRestocks", "cbtSubmissions", "staff", "salaries", "staffLoans", "clearance", "teachers", "attendance", "examRecords", "weeklyPerformance"];
+    const collections = ["students", "payments", "expenses", "stocks", "stockSales", "stockRestocks", "cbtSubmissions", "cbtAssessments", "staff", "salaries", "staffLoans", "clearance", "teachers", "attendance", "examRecords", "weeklyPerformance"];
     for (const colName of collections) {
       const list = Array.isArray(localDb[colName]) ? localDb[colName] : [];
       for (const item of list) {
@@ -220,7 +220,7 @@ window.RichVineFirebase = {
     this._setSyncStatus("syncing", "Syncing Cloud...");
 
     try {
-      const collections = ["students", "payments", "expenses", "stocks", "stockSales", "stockRestocks", "cbtSubmissions", "staff", "salaries", "staffLoans", "clearance", "teachers", "attendance", "examRecords", "weeklyPerformance"];
+      const collections = ["students", "payments", "expenses", "stocks", "stockSales", "stockRestocks", "cbtSubmissions", "cbtAssessments", "staff", "salaries", "staffLoans", "clearance", "teachers", "attendance", "examRecords", "weeklyPerformance"];
       const localDb = window.RichVineDB ? window.RichVineDB.get() : {};
       let changed = false;
 
@@ -656,6 +656,33 @@ window.RichVineFirebase = {
   },
 
   // ── Audit Logs (Local Storage Managed - Zero Quota Overhead) ────────────
+  // ── CBT Assessments (Assignments, Tests & Exams) ────────────────────────
+  async saveCbtAssessment(assessment) {
+    try {
+      if (!assessment || !assessment.id) return;
+      const clean = this._sanitize(assessment);
+      clean.updatedAt = new Date().toISOString();
+      await setDoc(doc(db, "cbtAssessments", assessment.id), clean, { merge: true });
+      this._setSyncStatus("synced", "Cloud Synced");
+      console.log("[Firebase] CBT assessment synced to cloud:", assessment.id);
+    } catch (e) {
+      console.warn("[Firebase] saveCbtAssessment failed:", e.message);
+    }
+  },
+
+  async deleteCbtAssessment(id) {
+    try {
+      await deleteDoc(doc(db, "cbtAssessments", id));
+      await this.recordCloudDeletion("cbtAssessments", id);
+      console.log("[Firebase] CBT assessment deleted from cloud:", id);
+    } catch (e) {
+      console.warn("[Firebase] deleteCbtAssessment failed/offline:", e.message);
+      const localDb = window.RichVineDB ? window.RichVineDB.get() : {};
+      if (!localDb._pendingDeletes) localDb._pendingDeletes = [];
+      localDb._pendingDeletes.push({ col: "cbtAssessments", id });
+      if (window.RichVineDB) window.RichVineDB.save(localDb);
+    }
+  },
   async saveTeacher(teacher) {
     if (!db || !teacher?.id) return;
     try {
@@ -1090,6 +1117,42 @@ window.RichVineFirebase = {
       }
       this._setSyncStatus("synced", "Cloud Synced");
     }, e => console.warn("[Realtime] cbtSubmissions sync warning:", e.message));
+
+    // 7b. Listen for CBT Assessments
+    onSnapshot(collection(db, "cbtAssessments"), snap => {
+      const localDb = window.RichVineDB ? window.RichVineDB.get() : null;
+      if (!localDb) return;
+      if (!localDb.cbtAssessments) localDb.cbtAssessments = [];
+      let changed = false;
+      const tombstones = localDb._tombstones || {};
+
+      snap.docChanges().forEach(change => {
+        const data = { id: change.doc.id, ...change.doc.data() };
+        if (tombstones[data.id]) return;
+
+        if (change.type === "added" || change.type === "modified") {
+          const idx = localDb.cbtAssessments.findIndex(a => a.id === data.id);
+          if (idx === -1) {
+            localDb.cbtAssessments.unshift(data);
+            changed = true;
+          } else {
+            localDb.cbtAssessments[idx] = { ...localDb.cbtAssessments[idx], ...data };
+            changed = true;
+          }
+        } else if (change.type === "removed") {
+          localDb.cbtAssessments = localDb.cbtAssessments.filter(a => a.id !== data.id);
+          changed = true;
+        }
+      });
+
+      if (changed && window.RichVineDB) {
+        window.RichVineDB.save(localDb);
+        this._scheduleRefresh(() => {
+          if (callbacks.onCbtAssessmentsChange) callbacks.onCbtAssessmentsChange(localDb.cbtAssessments);
+        });
+      }
+      this._setSyncStatus("synced", "Cloud Synced");
+    }, e => console.warn("[Realtime] cbtAssessments sync warning:", e.message));
 
     // 8. Listen for Staff
     onSnapshot(collection(db, "staff"), snap => {

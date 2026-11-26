@@ -203,6 +203,9 @@
         <button onclick="switchMasterTab('exams')" id="tabBtnExams" class="flex-shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">
           <i class="fas fa-file-signature text-purple-400"></i> Midterm & Exams
         </button>
+        <button onclick="switchMasterTab('cbt')" id="tabBtnCbt" class="flex-shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">
+          <i class="fas fa-laptop-code text-rose-400"></i> CBT & Assignments
+        </button>
         <button onclick="switchMasterTab('history')" id="tabBtnHistory" class="flex-shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">
           <i class="fas fa-history text-sky-400"></i> Attendance Logs
         </button>
@@ -656,7 +659,356 @@
       </div>
     </div>
 
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- TAB 5: CBT ASSESSMENTS, ASSIGNMENTS & THEORY GRADING            -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div id="sectionCbt" class="space-y-4 hidden">
+      <!-- Header & Action Bar -->
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-md">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center justify-center text-lg">
+            <i class="fas fa-laptop-code"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-white text-base">CBT Assignments, Tests &amp; Examinations</h3>
+            <p class="text-xs text-slate-400">Set objective/theory questions, shuffle pools, manage deadlines &amp; sync scores to report cards</p>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <select id="cbtFilterStatus" onchange="renderCbtAssessmentsList()" class="bg-slate-900 border border-slate-700 text-white text-xs font-semibold rounded-xl px-3 py-2 focus:outline-none">
+            <option value="All">All Statuses</option>
+            <option value="Active">🟢 Active Only</option>
+            <option value="Expired">🔴 Expired</option>
+            <option value="Closed">⚪ Closed</option>
+          </select>
+          <select id="cbtFilterSubject" onchange="renderCbtAssessmentsList()" class="bg-slate-900 border border-slate-700 text-white text-xs font-semibold rounded-xl px-3 py-2 focus:outline-none">
+            <option value="All">All Subjects</option>
+          </select>
+          <button onclick="openCbtAssessmentModal()" class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-rose-600/20 flex items-center gap-1.5">
+            <i class="fas fa-plus-circle"></i> Create CBT Assessment
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI Cards -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div class="bg-slate-800/80 border border-slate-700 rounded-xl p-3 text-center">
+          <div class="text-xs text-slate-400 font-medium">Total Assessments</div>
+          <div class="text-lg font-black text-white mt-0.5" id="cbtStatTotal">0</div>
+        </div>
+        <div class="bg-slate-800/80 border border-emerald-500/30 rounded-xl p-3 text-center">
+          <div class="text-xs text-emerald-400 font-medium">Active &amp; Open</div>
+          <div class="text-lg font-black text-emerald-300 mt-0.5" id="cbtStatActive">0</div>
+        </div>
+        <div class="bg-slate-800/80 border border-red-500/30 rounded-xl p-3 text-center">
+          <div class="text-xs text-red-400 font-medium">Expired / Closed</div>
+          <div class="text-lg font-black text-red-300 mt-0.5" id="cbtStatExpired">0</div>
+        </div>
+        <div class="bg-slate-800/80 border border-sky-500/30 rounded-xl p-3 text-center">
+          <div class="text-xs text-sky-400 font-medium">Student Submissions</div>
+          <div class="text-lg font-black text-sky-300 mt-0.5" id="cbtStatSubmissions">0</div>
+        </div>
+      </div>
+
+      <!-- Assessments Grid -->
+      <div id="cbtAssessmentsGrid" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="col-span-full bg-slate-800 border border-slate-700 rounded-2xl p-10 text-center text-slate-400 text-sm">
+          Loading CBT assessments...
+        </div>
+      </div>
+    </div>
+
   </main>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- MODAL: CREATE / EDIT CBT ASSESSMENT                            -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <div id="cbtAssessmentModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm overflow-y-auto p-3 sm:p-6">
+    <div class="max-w-4xl mx-auto bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden my-4">
+      <div class="px-5 py-4 bg-slate-800 border-b border-slate-700 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="w-8 h-8 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center"><i class="fas fa-laptop-code"></i></span>
+          <div>
+            <h3 class="text-sm sm:text-base font-bold text-white" id="cbtModalTitle">Create New CBT Assignment / Test</h3>
+            <p class="text-[11px] text-slate-400">Configure timing, deadline, question pool shuffle, objective &amp; theory sections</p>
+          </div>
+        </div>
+        <button onclick="closeCbtAssessmentModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-700 transition">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-5 max-h-[82vh] overflow-y-auto">
+        <input type="hidden" id="cbtAsmId" value="">
+
+        <!-- Section A: Core Configuration -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div class="sm:col-span-2">
+            <label class="block text-[11px] font-semibold text-slate-300 mb-1">Assessment Title *</label>
+            <input type="text" id="cbtAsmTitle" placeholder="e.g. Week 4 Quadratic Equations Test" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-rose-500">
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-300 mb-1">Assessment Type</label>
+            <select id="cbtAsmType" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
+              <option value="Assignment">Assignment</option>
+              <option value="Class Test">Class Test</option>
+              <option value="Midterm Test">Midterm Test</option>
+              <option value="Terminal Examination">Terminal Examination</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-300 mb-1">Subject *</label>
+            <select id="cbtAsmSubject" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none"></select>
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-300 mb-1">Target Class / Arm *</label>
+            <select id="cbtAsmClass" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none"></select>
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-300 mb-1">Term</label>
+            <select id="cbtAsmTerm" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
+              <option value="1st Term">1st Term</option>
+              <option value="2nd Term">2nd Term</option>
+              <option value="3rd Term">3rd Term</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-300 mb-1">Report Card / Broadsheet Target</label>
+            <select id="cbtAsmTargetCat" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
+              <option value="ca1">1st CA (Max 20 Marks)</option>
+              <option value="ca2">2nd CA / Midterm (Max 20 Marks)</option>
+              <option value="exam">Terminal Exam (Max 60 Marks)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-300 mb-1">Question Format</label>
+            <select id="cbtAsmFormat" onchange="onCbtFormatChange()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
+              <option value="objective">Objective Only (Auto-Graded)</option>
+              <option value="theory">Theory Only (Paper + Manual Grade)</option>
+              <option value="both">Both Objective &amp; Theory</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-300 mb-1">Duration (Minutes)</label>
+            <input type="number" id="cbtAsmDuration" value="30" min="5" max="240" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
+          </div>
+
+          <div class="sm:col-span-2">
+            <label class="block text-[11px] font-semibold text-slate-300 mb-1">Expiration Date &amp; Time (Stops accepting responses after this) *</label>
+            <input type="datetime-local" id="cbtAsmDeadline" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-300 mb-1">Shuffle Questions Per Learner</label>
+            <input type="number" id="cbtAsmShuffleCount" value="0" min="0" placeholder="0 = all questions" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
+            <p class="text-[10px] text-slate-400 mt-0.5">e.g. Set 50 questions, enter 20 to shuffle 20 per student (0 = all)</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-4 bg-slate-800/60 border border-slate-700/80 rounded-xl p-3">
+          <label class="inline-flex items-center gap-2 text-xs text-slate-200 cursor-pointer">
+            <input type="checkbox" id="cbtAsmShuffleOptions" checked class="rounded bg-slate-900 border-slate-600 text-rose-500">
+            Shuffle A/B/C/D options for each student
+          </label>
+          <div class="flex items-center gap-2 text-xs text-slate-300">
+            <span>Marks per Objective Q:</span>
+            <input type="number" id="cbtAsmObjMarksPerQ" value="1" min="0.5" step="0.5" class="w-16 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-xs text-white">
+          </div>
+        </div>
+
+        <div id="cbtTheoryInstrWrap" class="hidden">
+          <label class="block text-[11px] font-semibold text-amber-300 mb-1">Theory Section Instructions (Paper Examination)</label>
+          <input type="text" id="cbtAsmTheoryInstructions" value="Answer the Theory questions neatly on your school answer sheet and submit to your teacher for manual marking." class="w-full bg-slate-800 border border-amber-500/40 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
+        </div>
+
+        <!-- Section B: Question Builder & Bulk Upload -->
+        <div class="border border-slate-700 rounded-2xl overflow-hidden bg-slate-800/40">
+          <div class="px-4 py-2.5 bg-slate-800 border-b border-slate-700 flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="switchBuilderMode('single')" id="btnModeSingle" class="px-3 py-1 rounded-lg text-xs font-bold bg-rose-600 text-white">Add Single Question</button>
+              <button type="button" onclick="switchBuilderMode('bulk')" id="btnModeBulk" class="px-3 py-1 rounded-lg text-xs font-bold bg-slate-700 text-slate-300 hover:text-white">Bulk Paste / Upload File</button>
+            </div>
+            <div class="text-xs font-semibold text-slate-300" id="cbtPoolSummaryBadge">Pool: 0 Objective | 0 Theory</div>
+          </div>
+
+          <!-- Single Question Mode -->
+          <div id="builderSingleWrap" class="p-4 space-y-3">
+            <div class="flex flex-wrap items-center gap-3">
+              <label class="text-xs text-slate-300 font-semibold">Question Type:</label>
+              <select id="qInputType" onchange="toggleSingleQuestionFields()" class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-white">
+                <option value="objective">Objective (Multiple Choice)</option>
+                <option value="theory">Theory (Paper Answer)</option>
+              </select>
+              <div id="qTheoryMarksWrap" class="hidden flex items-center gap-1.5">
+                <span class="text-xs text-amber-300">Max Marks:</span>
+                <input type="number" id="qTheoryMarks" value="10" min="1" class="w-16 bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-xs text-white">
+              </div>
+            </div>
+
+            <div>
+              <textarea id="qInputText" rows="2" placeholder="Enter question prompt..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-rose-500"></textarea>
+            </div>
+
+            <div id="qObjFieldsWrap" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-slate-400 w-5">A.</span>
+                <input type="text" id="qOptA" placeholder="Option A" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white">
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-slate-400 w-5">B.</span>
+                <input type="text" id="qOptB" placeholder="Option B" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white">
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-slate-400 w-5">C.</span>
+                <input type="text" id="qOptC" placeholder="Option C" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white">
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-slate-400 w-5">D.</span>
+                <input type="text" id="qOptD" placeholder="Option D" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white">
+              </div>
+              <div class="sm:col-span-2 flex flex-wrap items-center gap-3 pt-1">
+                <label class="text-xs text-emerald-300 font-semibold">Correct Answer:</label>
+                <select id="qCorrectAns" class="bg-slate-900 border border-emerald-500/40 rounded-lg px-3 py-1 text-xs text-emerald-300 font-bold">
+                  <option value="0">Option A</option>
+                  <option value="1">Option B</option>
+                  <option value="2">Option C</option>
+                  <option value="3">Option D</option>
+                </select>
+                <input type="text" id="qExplanation" placeholder="Optional explanation (shown after grading)" class="flex-1 min-w-[200px] bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-white">
+              </div>
+            </div>
+
+            <div class="flex justify-end">
+              <button type="button" onclick="addSingleQuestionToPool()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5">
+                <i class="fas fa-plus"></i> Add Question to Pool
+              </button>
+            </div>
+          </div>
+
+          <!-- Bulk Paste / Upload Mode -->
+          <div id="builderBulkWrap" class="p-4 space-y-3 hidden">
+            <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-300">
+              <span>Paste formatted questions below OR upload a <code class="text-amber-300">.txt</code> file:</span>
+              <label class="px-3 py-1.5 bg-sky-600/20 hover:bg-sky-600/30 text-sky-300 border border-sky-500/30 rounded-lg cursor-pointer font-semibold transition">
+                <i class="fas fa-upload mr-1"></i> Upload .txt File
+                <input type="file" accept=".txt,.csv" onchange="handleBulkQuestionFile(event)" class="hidden">
+              </label>
+            </div>
+            <textarea id="bulkQuestionsText" rows="6" placeholder="1. What is 12 x 12?&#10;A. 124&#10;B. 144&#10;C. 132&#10;D. 156&#10;Answer: B&#10;&#10;2. Explain the stages of mitosis with diagrams.&#10;[Theory]&#10;Marks: 15" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs font-mono text-slate-200 focus:outline-none focus:border-sky-500"></textarea>
+            <div class="flex justify-end">
+              <button type="button" onclick="parseAndAddBulkQuestions()" class="px-4 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5">
+                <i class="fas fa-magic"></i> Parse &amp; Add Questions to Pool
+              </button>
+            </div>
+          </div>
+
+          <!-- Current Pool List -->
+          <div class="border-t border-slate-700 p-3 max-h-60 overflow-y-auto space-y-2" id="cbtQuestionPoolList">
+            <div class="text-center text-xs text-slate-500 py-4">No questions added yet. Use the form or bulk uploader above.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="px-5 py-3.5 bg-slate-800 border-t border-slate-700 flex items-center justify-end gap-2">
+        <button type="button" onclick="closeCbtAssessmentModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-xs font-semibold transition">Cancel</button>
+        <button type="button" onclick="saveCbtAssessmentFromModal()" class="px-5 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold transition shadow-lg">
+          <i class="fas fa-save mr-1"></i> Save &amp; Publish Assessment
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- MODAL: REOPEN / EXTEND EXPIRATION DEADLINE                     -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <div id="cbtExtendModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="max-w-md w-full bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden">
+      <div class="px-5 py-4 bg-slate-800 border-b border-slate-700 flex items-center justify-between">
+        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+          <i class="fas fa-clock text-amber-400"></i> Reopen / Extend Expiration Time
+        </h3>
+        <button onclick="document.getElementById('cbtExtendModal').classList.add('hidden')" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="p-5 space-y-4">
+        <input type="hidden" id="extendAsmId">
+        <div>
+          <div class="text-xs text-slate-400">Assessment</div>
+          <div class="text-sm font-bold text-white" id="extendAsmTitle">--</div>
+          <div class="text-[11px] text-rose-400 mt-0.5" id="extendCurrentDeadline">Current Deadline: --</div>
+        </div>
+        <div>
+          <div class="text-xs font-semibold text-slate-300 mb-2">Quick Extend from Now:</div>
+          <div class="flex flex-wrap gap-2">
+            <button type="button" onclick="quickSetExtendHours(1)" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs text-white rounded-lg font-semibold">+1 Hour</button>
+            <button type="button" onclick="quickSetExtendHours(6)" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs text-white rounded-lg font-semibold">+6 Hours</button>
+            <button type="button" onclick="quickSetExtendHours(24)" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs text-white rounded-lg font-semibold">+24 Hours</button>
+            <button type="button" onclick="quickSetExtendHours(72)" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs text-white rounded-lg font-semibold">+3 Days</button>
+            <button type="button" onclick="quickSetExtendHours(168)" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs text-white rounded-lg font-semibold">+1 Week</button>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">New Expiration Date &amp; Time</label>
+          <input type="datetime-local" id="extendNewDeadline" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+        </div>
+      </div>
+      <div class="px-5 py-3 bg-slate-800 border-t border-slate-700 flex justify-end gap-2">
+        <button type="button" onclick="document.getElementById('cbtExtendModal').classList.add('hidden')" class="px-4 py-2 bg-slate-700 text-white rounded-xl text-xs font-semibold">Cancel</button>
+        <button type="button" onclick="confirmExtendAssessment()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold">
+          <i class="fas fa-unlock mr-1"></i> Reopen &amp; Save
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- MODAL: SUBMISSIONS, MANUAL THEORY GRADING & BROADSHEET SYNC    -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <div id="cbtGradingModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm overflow-y-auto p-3 sm:p-6">
+    <div class="max-w-5xl mx-auto bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden my-4">
+      <div class="px-5 py-4 bg-slate-800 border-b border-slate-700 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h3 class="text-sm sm:text-base font-bold text-white" id="gradingModalTitle">Assessment Submissions &amp; Theory Grading</h3>
+          <p class="text-[11px] text-slate-400" id="gradingModalSubtitle">--</p>
+        </div>
+        <button onclick="document.getElementById('cbtGradingModal').classList.add('hidden')" class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-700"><i class="fas fa-times"></i></button>
+      </div>
+
+      <div class="p-4 max-h-[68vh] overflow-y-auto">
+        <input type="hidden" id="gradingAsmId">
+        <div class="overflow-x-auto table-wrap">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-800/80 text-slate-400 border-b border-slate-700 text-[11px] uppercase">
+                <th class="py-2.5 px-3">#</th>
+                <th class="py-2.5 px-3">Student</th>
+                <th class="py-2.5 px-3 text-center">CBT Status</th>
+                <th class="py-2.5 px-3 text-center">Objective (Auto)</th>
+                <th class="py-2.5 px-3 text-center">Theory (Manual Paper)</th>
+                <th class="py-2.5 px-3 text-center">Total Score</th>
+                <th class="py-2.5 px-3">Teacher Remark</th>
+              </tr>
+            </thead>
+            <tbody id="cbtGradingTableBody" class="divide-y divide-slate-800"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="px-5 py-3.5 bg-slate-800 border-t border-slate-700 flex flex-wrap items-center justify-between gap-3">
+        <div class="text-xs text-slate-400">
+          <i class="fas fa-info-circle text-sky-400 mr-1"></i> Committing sends combined scores directly to Admin Broadsheet &amp; Student Report Cards.
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="saveAllTheoryGrades()" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-bold transition">
+            <i class="fas fa-save mr-1"></i> Save Theory Scores
+          </button>
+          <button type="button" onclick="commitCbtGradesToBroadsheet()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition shadow-lg">
+            <i class="fas fa-cloud-upload-alt mr-1"></i> Commit to Broadsheet &amp; Report Cards
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Scripts -->
   <script src="js/dps-students.js?v=20261122"></script>
@@ -790,15 +1142,17 @@
       const tabBtnAttendance = document.getElementById('tabBtnAttendance');
       const tabBtnWeekly = document.getElementById('tabBtnWeekly');
       const tabBtnExams = document.getElementById('tabBtnExams');
+      const tabBtnCbt = document.getElementById('tabBtnCbt');
       const tabBtnHistory = document.getElementById('tabBtnHistory');
 
       const secAttendance = document.getElementById('sectionAttendance');
       const secWeekly = document.getElementById('sectionWeekly');
       const secExams = document.getElementById('sectionExams');
+      const secCbt = document.getElementById('sectionCbt');
       const secHistory = document.getElementById('sectionHistory');
 
       // Reset button styles (retain flex-shrink-0 for mobile stability)
-      [tabBtnAttendance, tabBtnWeekly, tabBtnExams, tabBtnHistory].forEach(b => {
+      [tabBtnAttendance, tabBtnWeekly, tabBtnExams, tabBtnCbt, tabBtnHistory].forEach(b => {
         if (!b) return;
         b.className = 'flex-shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700';
       });
@@ -807,6 +1161,7 @@
       if (secAttendance) secAttendance.classList.add('hidden');
       if (secWeekly) secWeekly.classList.add('hidden');
       if (secExams) secExams.classList.add('hidden');
+      if (secCbt) secCbt.classList.add('hidden');
       if (secHistory) secHistory.classList.add('hidden');
 
       if (tab === 'attendance') {
@@ -821,6 +1176,10 @@
         if (tabBtnExams) tabBtnExams.className = 'flex-shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-purple-600 text-white shadow-lg shadow-purple-600/30';
         if (secExams) secExams.classList.remove('hidden');
         loadExamScoresRoster();
+      } else if (tab === 'cbt') {
+        if (tabBtnCbt) tabBtnCbt.className = 'flex-shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-rose-600 text-white shadow-lg shadow-rose-600/30';
+        if (secCbt) secCbt.classList.remove('hidden');
+        loadCbtAssessmentsPanel();
       } else if (tab === 'history') {
         if (tabBtnHistory) tabBtnHistory.className = 'flex-shrink-0 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-sky-600 text-white shadow-lg shadow-sky-600/30';
         if (secHistory) secHistory.classList.remove('hidden');
@@ -1931,6 +2290,572 @@
           </tr>
         `;
       }).join('');
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // 6B. Tab 5: CBT Assessments, Question Builder & Theory Grading
+    // ═══════════════════════════════════════════════════════════════
+    let cbtWorkingPool = [];
+
+    function loadCbtAssessmentsPanel() {
+      const subjFilter = document.getElementById('cbtFilterSubject');
+      const modalSubj = document.getElementById('cbtAsmSubject');
+      const modalClass = document.getElementById('cbtAsmClass');
+
+      const subjList = teacherSubjects.length ? teacherSubjects : ['Mathematics', 'English Language', 'Basic Science', 'Civic Education', 'Biology', 'Chemistry', 'Physics', 'Economics', 'Computer Studies'];
+      if (subjFilter) {
+        const cur = subjFilter.value || 'All';
+        subjFilter.innerHTML = '<option value="All">All Subjects</option>' + subjList.map(s => `<option value="${s}">${s}</option>`).join('');
+        subjFilter.value = cur;
+      }
+      if (modalSubj) {
+        modalSubj.innerHTML = subjList.map(s => `<option value="${s}">${s}</option>`).join('');
+      }
+      if (modalClass) {
+        const clsList = getTeacherClassesList ? getTeacherClassesList() : (hasClassTeacherRole ? [currentTeacher.assignedClass] : ['SSS 1', 'SSS 2', 'SSS 3']);
+        const uniqueClasses = Array.from(new Set([...(clsList || []), 'All']));
+        modalClass.innerHTML = uniqueClasses.map(c => `<option value="${c}">${c === 'All' ? 'All Classes' : c}</option>`).join('');
+      }
+      renderCbtAssessmentsList();
+    }
+
+    function getTeacherClassesList() {
+      const set = new Set();
+      if (hasClassTeacherRole) set.add(currentTeacher.assignedClass);
+      if (Array.isArray(currentTeacher.assignedClasses)) currentTeacher.assignedClasses.forEach(c => set.add(c));
+      if (Array.isArray(currentTeacher.subjectClasses)) currentTeacher.subjectClasses.forEach(c => set.add(c));
+      if (set.size === 0 && window.RichVineDB && window.RichVineDB.getStudents) {
+        window.RichVineDB.getStudents().forEach(s => { if (s.currentClass) set.add(s.currentClass); });
+      }
+      return Array.from(set).filter(Boolean);
+    }
+
+    function renderCbtAssessmentsList() {
+      const grid = document.getElementById('cbtAssessmentsGrid');
+      if (!grid || !window.RichVineDB || !window.RichVineDB.getAssessments) return;
+
+      const statusFilter = document.getElementById('cbtFilterStatus')?.value || 'All';
+      const subjFilter = document.getElementById('cbtFilterSubject')?.value || 'All';
+
+      const allMine = window.RichVineDB.getAssessments({ teacherPhone: currentTeacher.phone });
+      const activeCount = allMine.filter(a => a.effectiveStatus === 'Active').length;
+      const expiredCount = allMine.filter(a => a.effectiveStatus === 'Expired' || a.effectiveStatus === 'Closed').length;
+      const allSubs = window.RichVineDB.getCbtSubmissions ? window.RichVineDB.getCbtSubmissions() : [];
+      const myAsmIds = new Set(allMine.map(a => a.id));
+      const mySubCount = allSubs.filter(s => myAsmIds.has(s.assessmentId)).length;
+
+      document.getElementById('cbtStatTotal').textContent = allMine.length;
+      document.getElementById('cbtStatActive').textContent = activeCount;
+      document.getElementById('cbtStatExpired').textContent = expiredCount;
+      document.getElementById('cbtStatSubmissions').textContent = mySubCount;
+
+      let filtered = allMine;
+      if (statusFilter !== 'All') filtered = filtered.filter(a => a.effectiveStatus === statusFilter);
+      if (subjFilter !== 'All') filtered = filtered.filter(a => (a.subject || '').toLowerCase() === subjFilter.toLowerCase());
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full bg-slate-800 border border-slate-700 rounded-2xl p-10 text-center space-y-2">
+            <div class="text-3xl text-slate-600"><i class="fas fa-laptop-code"></i></div>
+            <div class="text-sm font-bold text-white">No CBT Assessments Found</div>
+            <div class="text-xs text-slate-400">Click "Create CBT Assessment" to publish an assignment, test, or exam for your learners.</div>
+          </div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(a => {
+        const subs = allSubs.filter(s => s.assessmentId === a.id);
+        const eff = a.effectiveStatus || 'Active';
+        const statusBadge = eff === 'Active'
+          ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">🟢 Active</span>'
+          : (eff === 'Expired'
+            ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/20 text-red-300 border border-red-500/30">🔴 Expired</span>'
+            : '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-700 text-slate-300 border border-slate-600">⚪ Closed</span>');
+
+        const deadlineStr = a.deadline ? new Date(a.deadline).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : 'No Deadline';
+        const catLabel = a.targetCategory === 'exam' ? 'Exam (60)' : (a.targetCategory === 'ca2' ? '2nd CA (20)' : '1st CA (20)');
+        const shuffleLabel = (a.shuffleCount && a.shuffleCount > 0 && a.shuffleCount < a.objectiveCount)
+          ? `${a.objectiveCount} Pool → ${a.shuffleCount} Shuffled`
+          : `${a.objectiveCount || 0} Obj`;
+
+        return `
+          <div class="bg-slate-800 border ${eff === 'Expired' ? 'border-red-500/30' : 'border-slate-700'} rounded-2xl p-4 shadow-lg flex flex-col justify-between gap-3">
+            <div class="space-y-2">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex flex-wrap items-center gap-1.5 mb-1">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">${a.type || 'Assessment'}</span>
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">${catLabel}</span>
+                    ${statusBadge}
+                  </div>
+                  <h4 class="text-sm font-bold text-white">${a.title}</h4>
+                  <div class="text-xs text-sky-300 font-semibold">${a.subject} &bull; ${a.targetClass} &bull; ${a.term || '1st Term'}</div>
+                </div>
+                <div class="text-right text-[11px] text-slate-400">
+                  <div class="font-bold text-white">${subs.length}</div>
+                  <div>Submitted</div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-3 gap-2 bg-slate-900/70 rounded-xl p-2.5 text-[11px] text-slate-300">
+                <div><i class="fas fa-stopwatch text-amber-400 mr-1"></i> ${a.durationMinutes || 30} mins</div>
+                <div><i class="fas fa-random text-sky-400 mr-1"></i> ${shuffleLabel} | ${a.theoryCount || 0} Theory</div>
+                <div><i class="fas fa-award text-emerald-400 mr-1"></i> ${a.totalMarks || 0} Marks</div>
+              </div>
+              <div class="text-[11px] ${eff === 'Expired' ? 'text-red-300' : 'text-slate-400'}">
+                <i class="fas fa-calendar-times mr-1"></i> Closes: <strong>${deadlineStr}</strong>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-1.5 pt-2 border-t border-slate-700/70">
+              <button onclick="openCbtGradingModal('${a.id}')" class="flex-1 px-2.5 py-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 rounded-lg text-[11px] font-bold transition">
+                <i class="fas fa-clipboard-check mr-1"></i> Submissions &amp; Grade
+              </button>
+              <button onclick="openExtendCbtModal('${a.id}')" class="px-2.5 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 rounded-lg text-[11px] font-bold transition" title="Reopen or Extend Expiration">
+                <i class="fas fa-clock mr-1"></i> Reopen / Extend
+              </button>
+              <button onclick="editCbtAssessment('${a.id}')" class="px-2.5 py-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-[11px] font-semibold transition" title="Edit Assessment">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button onclick="deleteCbtAssessmentById('${a.id}')" class="px-2.5 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-lg text-[11px] font-semibold transition" title="Delete Assessment">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openCbtAssessmentModal(existing = null) {
+      document.getElementById('cbtAsmId').value = existing ? existing.id : '';
+      document.getElementById('cbtModalTitle').textContent = existing ? 'Edit CBT Assessment' : 'Create New CBT Assignment / Test';
+      document.getElementById('cbtAsmTitle').value = existing ? (existing.title || '') : '';
+      document.getElementById('cbtAsmType').value = existing ? (existing.type || 'Class Test') : 'Class Test';
+      if (existing && existing.subject) document.getElementById('cbtAsmSubject').value = existing.subject;
+      if (existing && existing.targetClass) document.getElementById('cbtAsmClass').value = existing.targetClass;
+      document.getElementById('cbtAsmTerm').value = existing ? (existing.term || '1st Term') : '1st Term';
+      document.getElementById('cbtAsmTargetCat').value = existing ? (existing.targetCategory || 'ca1') : 'ca1';
+      document.getElementById('cbtAsmFormat').value = existing ? (existing.format || 'objective') : 'objective';
+      document.getElementById('cbtAsmDuration').value = existing ? (existing.durationMinutes || 30) : 30;
+      document.getElementById('cbtAsmShuffleCount').value = existing ? (existing.shuffleCount || 0) : 0;
+      document.getElementById('cbtAsmShuffleOptions').checked = existing ? (existing.shuffleOptions !== false) : true;
+      document.getElementById('cbtAsmObjMarksPerQ').value = existing ? (existing.objectiveMarksPerQuestion || 1) : 1;
+      document.getElementById('cbtAsmTheoryInstructions').value = existing ? (existing.theoryInstructions || 'Answer the Theory questions neatly on your school answer sheet and submit to your teacher for manual marking.') : 'Answer the Theory questions neatly on your school answer sheet and submit to your teacher for manual marking.';
+
+      if (existing && existing.deadline) {
+        document.getElementById('cbtAsmDeadline').value = existing.deadline.slice(0, 16);
+      } else {
+        const d = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+        d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+        document.getElementById('cbtAsmDeadline').value = d.toISOString().slice(0, 16);
+      }
+
+      cbtWorkingPool = existing && Array.isArray(existing.questions) ? JSON.parse(JSON.stringify(existing.questions)) : [];
+      onCbtFormatChange();
+      renderWorkingPoolList();
+      document.getElementById('cbtAssessmentModal').classList.remove('hidden');
+    }
+
+    function closeCbtAssessmentModal() {
+      document.getElementById('cbtAssessmentModal').classList.add('hidden');
+    }
+
+    function editCbtAssessment(id) {
+      const asm = window.RichVineDB.getAssessmentById(id);
+      if (asm) openCbtAssessmentModal(asm);
+    }
+
+    function onCbtFormatChange() {
+      const fmt = document.getElementById('cbtAsmFormat').value;
+      const theoryWrap = document.getElementById('cbtTheoryInstrWrap');
+      if (fmt === 'theory' || fmt === 'both') {
+        theoryWrap.classList.remove('hidden');
+      } else {
+        theoryWrap.classList.add('hidden');
+      }
+      if (fmt === 'theory') {
+        document.getElementById('qInputType').value = 'theory';
+      } else if (fmt === 'objective') {
+        document.getElementById('qInputType').value = 'objective';
+      }
+      toggleSingleQuestionFields();
+    }
+
+    function switchBuilderMode(mode) {
+      const sWrap = document.getElementById('builderSingleWrap');
+      const bWrap = document.getElementById('builderBulkWrap');
+      const bSingle = document.getElementById('btnModeSingle');
+      const bBulk = document.getElementById('btnModeBulk');
+      if (mode === 'single') {
+        sWrap.classList.remove('hidden');
+        bWrap.classList.add('hidden');
+        bSingle.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-rose-600 text-white';
+        bBulk.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-slate-700 text-slate-300 hover:text-white';
+      } else {
+        sWrap.classList.add('hidden');
+        bWrap.classList.remove('hidden');
+        bBulk.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-sky-600 text-white';
+        bSingle.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-slate-700 text-slate-300 hover:text-white';
+      }
+    }
+
+    function toggleSingleQuestionFields() {
+      const qType = document.getElementById('qInputType').value;
+      if (qType === 'theory') {
+        document.getElementById('qObjFieldsWrap').classList.add('hidden');
+        document.getElementById('qTheoryMarksWrap').classList.remove('hidden');
+      } else {
+        document.getElementById('qObjFieldsWrap').classList.remove('hidden');
+        document.getElementById('qTheoryMarksWrap').classList.add('hidden');
+      }
+    }
+
+    function addSingleQuestionToPool() {
+      const qType = document.getElementById('qInputType').value;
+      const text = document.getElementById('qInputText').value.trim();
+      if (!text) {
+        showToast('Please enter the question prompt.', 'error');
+        return;
+      }
+
+      if (qType === 'theory') {
+        const marks = Number(document.getElementById('qTheoryMarks').value || 10);
+        cbtWorkingPool.push({
+          id: 'Q-' + Date.now() + '-' + Math.random().toString(36).slice(2, 5),
+          type: 'theory',
+          text,
+          maxMarks: marks
+        });
+      } else {
+        const a = document.getElementById('qOptA').value.trim();
+        const b = document.getElementById('qOptB').value.trim();
+        const c = document.getElementById('qOptC').value.trim();
+        const d = document.getElementById('qOptD').value.trim();
+        if (!a || !b) {
+          showToast('Objective questions require at least Options A and B.', 'error');
+          return;
+        }
+        const ans = Number(document.getElementById('qCorrectAns').value || 0);
+        const explanation = document.getElementById('qExplanation').value.trim();
+        const marks = Number(document.getElementById('cbtAsmObjMarksPerQ').value || 1);
+        cbtWorkingPool.push({
+          id: 'Q-' + Date.now() + '-' + Math.random().toString(36).slice(2, 5),
+          type: 'objective',
+          text,
+          options: [a, b, c || 'None of the above', d || 'All of the above'],
+          answer: ans,
+          explanation,
+          marks
+        });
+        document.getElementById('qOptA').value = '';
+        document.getElementById('qOptB').value = '';
+        document.getElementById('qOptC').value = '';
+        document.getElementById('qOptD').value = '';
+        document.getElementById('qExplanation').value = '';
+      }
+
+      document.getElementById('qInputText').value = '';
+      renderWorkingPoolList();
+      showToast('Question added to pool!', 'success');
+    }
+
+    function handleBulkQuestionFile(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        document.getElementById('bulkQuestionsText').value = ev.target.result || '';
+        showToast('File loaded! Click "Parse & Add Questions" to import.', 'info');
+      };
+      reader.readAsText(file);
+    }
+
+    function parseAndAddBulkQuestions() {
+      const raw = (document.getElementById('bulkQuestionsText').value || '').trim();
+      if (!raw) {
+        showToast('Paste or upload questions first.', 'error');
+        return;
+      }
+
+      const blocks = raw.split(/\n\s*\n/).map(b => b.trim()).filter(Boolean);
+      const defaultMarks = Number(document.getElementById('cbtAsmObjMarksPerQ').value || 1);
+      let added = 0;
+
+      blocks.forEach(block => {
+        const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+        if (lines.length === 0) return;
+
+        const isTheory = /\[theory\]/i.test(block);
+        const qText = lines[0].replace(/^\d+[\.\)]\s*/, '').replace(/\[theory\]/i, '').trim();
+
+        if (isTheory) {
+          const marksMatch = block.match(/marks\s*[:=]\s*(\d+)/i);
+          cbtWorkingPool.push({
+            id: 'Q-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+            type: 'theory',
+            text: qText,
+            maxMarks: marksMatch ? Number(marksMatch[1]) : 10
+          });
+          added++;
+          return;
+        }
+
+        const opts = [];
+        let ansIdx = 0;
+        lines.slice(1).forEach(line => {
+          const optMatch = line.match(/^([A-Da-d])[\.\)]\s*(.+)$/);
+          if (optMatch) {
+            opts.push(optMatch[2].trim());
+          } else {
+            const ansMatch = line.match(/^(?:answer|ans)\s*[:=]\s*([A-Da-d])/i);
+            if (ansMatch) {
+              ansIdx = ansMatch[1].toUpperCase().charCodeAt(0) - 65;
+            }
+          }
+        });
+
+        if (opts.length >= 2) {
+          cbtWorkingPool.push({
+            id: 'Q-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+            type: 'objective',
+            text: qText,
+            options: opts,
+            answer: Math.max(0, Math.min(opts.length - 1, ansIdx)),
+            marks: defaultMarks
+          });
+          added++;
+        }
+      });
+
+      if (added > 0) {
+        document.getElementById('bulkQuestionsText').value = '';
+        renderWorkingPoolList();
+        showToast(`Successfully parsed & added ${added} questions!`, 'success');
+      } else {
+        showToast('Could not parse questions. Check formatting (leave a blank line between questions).', 'error');
+      }
+    }
+
+    function removeQuestionFromPool(idx) {
+      cbtWorkingPool.splice(idx, 1);
+      renderWorkingPoolList();
+    }
+
+    function renderWorkingPoolList() {
+      const container = document.getElementById('cbtQuestionPoolList');
+      const badge = document.getElementById('cbtPoolSummaryBadge');
+      const objCount = cbtWorkingPool.filter(q => q.type !== 'theory').length;
+      const thyCount = cbtWorkingPool.filter(q => q.type === 'theory').length;
+      if (badge) badge.textContent = `Pool: ${objCount} Objective | ${thyCount} Theory`;
+
+      if (!container) return;
+      if (cbtWorkingPool.length === 0) {
+        container.innerHTML = '<div class="text-center text-xs text-slate-500 py-4">No questions added yet. Use the form or bulk uploader above.</div>';
+        return;
+      }
+
+      container.innerHTML = cbtWorkingPool.map((q, i) => {
+        const isTheory = q.type === 'theory';
+        const letters = ['A', 'B', 'C', 'D'];
+        return `
+          <div class="bg-slate-900 border border-slate-700/80 rounded-xl p-2.5 flex items-start justify-between gap-2 text-xs">
+            <div class="space-y-1 flex-1">
+              <div class="flex items-center gap-2">
+                <span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${isTheory ? 'bg-amber-500/20 text-amber-300' : 'bg-sky-500/20 text-sky-300'}">${isTheory ? 'THEORY (' + (q.maxMarks || 10) + 'm)' : 'OBJ'}</span>
+                <span class="font-semibold text-white">${i + 1}. ${q.text}</span>
+              </div>
+              ${!isTheory && q.options ? `<div class="text-[11px] text-slate-400 pl-2">${q.options.map((o, oi) => `<span class="${oi === q.answer ? 'text-emerald-400 font-bold' : ''}">${letters[oi]}. ${o}</span>`).join(' &nbsp;|&nbsp; ')}</div>` : ''}
+            </div>
+            <button type="button" onclick="removeQuestionFromPool(${i})" class="text-red-400 hover:text-red-300 p-1"><i class="fas fa-times-circle"></i></button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function saveCbtAssessmentFromModal() {
+      const title = document.getElementById('cbtAsmTitle').value.trim();
+      const subject = document.getElementById('cbtAsmSubject').value;
+      const targetClass = document.getElementById('cbtAsmClass').value;
+      const deadline = document.getElementById('cbtAsmDeadline').value;
+
+      if (!title || !subject || !deadline) {
+        showToast('Please enter Assessment Title, Subject, and Expiration Date/Time.', 'error');
+        return;
+      }
+      if (cbtWorkingPool.length === 0) {
+        showToast('Add at least one question to the pool before saving.', 'error');
+        return;
+      }
+
+      const data = {
+        id: document.getElementById('cbtAsmId').value || undefined,
+        title,
+        type: document.getElementById('cbtAsmType').value,
+        subject,
+        targetClass,
+        term: document.getElementById('cbtAsmTerm').value,
+        session: '2026/2027',
+        targetCategory: document.getElementById('cbtAsmTargetCat').value,
+        format: document.getElementById('cbtAsmFormat').value,
+        durationMinutes: Number(document.getElementById('cbtAsmDuration').value || 30),
+        deadline,
+        shuffleCount: Number(document.getElementById('cbtAsmShuffleCount').value || 0),
+        shuffleOptions: document.getElementById('cbtAsmShuffleOptions').checked,
+        objectiveMarksPerQuestion: Number(document.getElementById('cbtAsmObjMarksPerQ').value || 1),
+        theoryInstructions: document.getElementById('cbtAsmTheoryInstructions').value.trim(),
+        teacherId: currentTeacher.id || currentTeacher.phone,
+        teacherName: currentTeacher.name || currentTeacher.fullName || 'Teacher',
+        teacherPhone: currentTeacher.phone || '',
+        questions: cbtWorkingPool,
+        status: 'Active'
+      };
+
+      const res = window.RichVineDB.saveAssessment(data);
+      if (res && res.success) {
+        closeCbtAssessmentModal();
+        renderCbtAssessmentsList();
+        showToast('CBT Assessment published & synced to student CBT portal!', 'success');
+      } else {
+        showToast(res?.error || 'Could not save assessment.', 'error');
+      }
+    }
+
+    function openExtendCbtModal(id) {
+      const asm = window.RichVineDB.getAssessmentById(id);
+      if (!asm) return;
+      document.getElementById('extendAsmId').value = id;
+      document.getElementById('extendAsmTitle').textContent = `${asm.title} (${asm.subject})`;
+      document.getElementById('extendCurrentDeadline').textContent = 'Current Deadline: ' + (asm.deadline ? new Date(asm.deadline).toLocaleString() : 'None');
+      quickSetExtendHours(24);
+      document.getElementById('cbtExtendModal').classList.remove('hidden');
+    }
+
+    function quickSetExtendHours(hours) {
+      const d = new Date(Date.now() + hours * 60 * 60 * 1000);
+      d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+      document.getElementById('extendNewDeadline').value = d.toISOString().slice(0, 16);
+    }
+
+    function confirmExtendAssessment() {
+      const id = document.getElementById('extendAsmId').value;
+      const newDeadline = document.getElementById('extendNewDeadline').value;
+      if (!newDeadline) {
+        showToast('Please select a new expiration date/time.', 'error');
+        return;
+      }
+      const res = window.RichVineDB.updateAssessmentDeadline(id, newDeadline, 'Active');
+      if (res && res.success) {
+        document.getElementById('cbtExtendModal').classList.add('hidden');
+        renderCbtAssessmentsList();
+        showToast('Assessment reopened & expiration extended!', 'success');
+      } else {
+        showToast('Failed to extend deadline.', 'error');
+      }
+    }
+
+    function deleteCbtAssessmentById(id) {
+      if (!confirm('Are you sure you want to delete this CBT assessment?')) return;
+      if (window.RichVineDB.deleteAssessment(id)) {
+        renderCbtAssessmentsList();
+        showToast('Assessment deleted.', 'info');
+      }
+    }
+
+    function openCbtGradingModal(assessmentId) {
+      const asm = window.RichVineDB.getAssessmentById(assessmentId);
+      if (!asm) return;
+      document.getElementById('gradingAsmId').value = assessmentId;
+      document.getElementById('gradingModalTitle').textContent = `${asm.title} — Grading & Broadsheet Sync`;
+      document.getElementById('gradingModalSubtitle').textContent = `${asm.subject} (${asm.targetClass}) • Obj Max: ${asm.objectiveTotalMarks || 0} | Theory Max: ${asm.theoryTotalMarks || 0} | Total: ${asm.totalMarks || 0}`;
+
+      const subs = window.RichVineDB.getCbtSubmissions({ assessmentId });
+      let students = window.RichVineDB.getStudents ? window.RichVineDB.getStudents(asm.targetClass === 'All' ? {} : { class: asm.targetClass }) : [];
+      if (students.length === 0 && window.RichVineDB && window.RichVineDB.getStudents) {
+        students = window.RichVineDB.getStudents().filter(s => {
+          if (asm.targetClass === 'All') return true;
+          return window.isClassMatch ? window.isClassMatch(s.currentClass || s.class, asm.targetClass) : (s.currentClass === asm.targetClass);
+        });
+      }
+
+      const tbody = document.getElementById('cbtGradingTableBody');
+      const hasTheory = asm.format === 'theory' || asm.format === 'both' || (asm.theoryCount || 0) > 0;
+      const maxTheory = Number(asm.theoryTotalMarks || 0);
+
+      if (students.length === 0 && subs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="py-8 text-center text-slate-400">No students found in target class.</td></tr>';
+      } else {
+        const rows = students.length > 0 ? students : subs.map(s => ({ id: s.studentId, regNo: s.regNo, fullName: s.studentName }));
+        tbody.innerHTML = rows.map((st, idx) => {
+          const sub = subs.find(s => s.studentId === st.id || (st.regNo && s.regNo === st.regNo));
+          const sName = st.fullName || `${st.firstName || ''} ${st.lastName || ''}`.trim() || sub?.studentName || 'Student';
+          const objScore = sub ? Number(sub.objectiveScore !== undefined ? sub.objectiveScore : (sub.score || 0)) : 0;
+          const thyScore = sub && sub.theoryScore !== undefined && sub.theoryScore !== null ? Number(sub.theoryScore) : '';
+          const totalScore = objScore + (Number(thyScore) || 0);
+          const statusBadge = sub
+            ? (sub.syncedToBroadsheet ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300">Synced</span>' : '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-500/20 text-sky-300">Submitted</span>')
+            : '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-400">Pending</span>';
+
+          return `
+            <tr class="hover:bg-slate-800/50" data-student-id="${st.id}" data-obj-score="${objScore}">
+              <td class="py-2.5 px-3 font-mono text-slate-500">${idx + 1}</td>
+              <td class="py-2.5 px-3">
+                <div class="font-bold text-white">${sName}</div>
+                <div class="text-[10px] font-mono text-slate-400">${st.regNo || st.id}</div>
+              </td>
+              <td class="py-2.5 px-3 text-center">${statusBadge}</td>
+              <td class="py-2.5 px-3 text-center font-bold text-sky-300">${objScore} / ${asm.objectiveTotalMarks || 0}</td>
+              <td class="py-2.5 px-3 text-center">
+                ${hasTheory
+                  ? `<input type="number" min="0" max="${maxTheory}" value="${thyScore}" oninput="recalcGradingRow(this, ${objScore}, ${asm.totalMarks || 100})" class="theory-score-input w-20 bg-slate-800 border border-amber-500/40 rounded-lg px-2 py-1 text-center text-white font-bold" placeholder="0-${maxTheory}">`
+                  : '<span class="text-slate-500">N/A</span>'}
+              </td>
+              <td class="py-2.5 px-3 text-center font-black text-emerald-400 row-total-cell">${totalScore} / ${asm.totalMarks || 0}</td>
+              <td class="py-2.5 px-3">
+                <input type="text" value="${sub?.theoryRemark || ''}" placeholder="Remark..." class="theory-remark-input w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1 text-xs text-white">
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('cbtGradingModal').classList.remove('hidden');
+    }
+
+    function recalcGradingRow(input, objScore, totalMax) {
+      const tr = input.closest('tr');
+      const thy = Number(input.value || 0);
+      const cell = tr.querySelector('.row-total-cell');
+      if (cell) cell.textContent = `${objScore + thy} / ${totalMax}`;
+    }
+
+    function saveAllTheoryGrades() {
+      const asmId = document.getElementById('gradingAsmId').value;
+      const rows = document.querySelectorAll('#cbtGradingTableBody tr[data-student-id]');
+      let saved = 0;
+      rows.forEach(tr => {
+        const studentId = tr.getAttribute('data-student-id');
+        const thyInput = tr.querySelector('.theory-score-input');
+        const remInput = tr.querySelector('.theory-remark-input');
+        if (thyInput && thyInput.value !== '') {
+          window.RichVineDB.saveTheoryScore(asmId, studentId, Number(thyInput.value), remInput ? remInput.value.trim() : '');
+          saved++;
+        }
+      });
+      showToast(`Saved theory grades for ${saved} learners!`, 'success');
+      openCbtGradingModal(asmId);
+    }
+
+    function commitCbtGradesToBroadsheet() {
+      saveAllTheoryGrades();
+      const asmId = document.getElementById('gradingAsmId').value;
+      const res = window.RichVineDB.commitAssessmentScoresToBroadsheet(asmId);
+      if (res && res.success) {
+        showToast(`Committed ${res.count} learner scores to Admin Broadsheet & Report Cards!`, 'success');
+        openCbtGradingModal(asmId);
+        renderCbtAssessmentsList();
+      } else {
+        showToast(res?.error || 'Nothing to commit yet.', 'error');
+      }
     }
 
     // ═══════════════════════════════════════════════════════════════
