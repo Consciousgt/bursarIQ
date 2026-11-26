@@ -228,18 +228,39 @@ const DEFAULT_DATA = {
   classes: ALL_CLASSES,
 
   feeCategories: [
-    { id: "school_fees", name: "School Fees / Tuition", hasMeta: false },
-    { id: "daycare_fee", name: "Day Care / Creche Monthly Fee", hasMeta: true, metaType: "daycare", forClass: null, daycare: true },
-    { id: "uniform", name: "School Uniform", hasMeta: false },
-    { id: "sport", name: "Sport Wear", hasMeta: true, metaType: "sport" },
-    { id: "friday_wear", name: "Friday Wear", hasMeta: false },
-    { id: "exercise_books", name: "Exercise Books", hasMeta: true, metaType: "exercise_books" },
-    { id: "stationery", name: "Stationery (Pencil, Biro, Books, etc.)", hasMeta: true, metaType: "stationery" },
-    { id: "textbook", name: "Textbooks", hasMeta: true, metaType: "textbook" },
-    { id: "misc_1", name: "Miscellaneous 1 (Development / PTA)", hasMeta: false },
-    { id: "misc_2", name: "Miscellaneous 2 (ICT / Computer Lab)", hasMeta: false },
-    { id: "bece_fee", name: "BECE Examination Fee", hasMeta: false, forClass: "JSS 3" },
-    { id: "bece_lesson_fee", name: "BECE Lesson Fee", hasMeta: false, forClass: "JSS 3" },
+    // ── Core Learner Fees (New & Regular) ──
+    { id: "school_fees", name: "Tuition / School Fees", group: "core", hasMeta: false },
+    { id: "daycare_fee", name: "Day Care / Creche Monthly Fee", group: "core", hasMeta: true, metaType: "daycare", forClass: null, daycare: true },
+    { id: "admission_form", name: "Admission Form (New Learner)", group: "core", hasMeta: false },
+    { id: "entrance_exam_fee", name: "Exam Fee (New Learner)", group: "core", hasMeta: false },
+    { id: "lin_fee", name: "LIN (Learner ID Number) Fee", group: "core", hasMeta: false },
+    { id: "report_fee", name: "Report Fee (New Learner)", group: "core", hasMeta: false },
+    { id: "development_levy", name: "Development Levy (New Learner)", group: "core", hasMeta: false },
+    { id: "portal_fee", name: "Portal Fee", group: "core", hasMeta: false },
+    { id: "caution_fee", name: "Caution Fee", group: "core", hasMeta: false },
+
+    // ── Wears, Events, Books & General ──
+    { id: "tuesday_wear", name: "Tuesday Wear", group: "wear_event", hasMeta: false },
+    { id: "friday_wear", name: "Friday Wear", group: "wear_event", hasMeta: false },
+    { id: "uniform", name: "School Uniform", group: "wear_event", hasMeta: false },
+    { id: "sport", name: "Sport Wear", group: "wear_event", hasMeta: true, metaType: "sport" },
+    { id: "end_of_year_party", name: "End of Year Party", group: "wear_event", hasMeta: false },
+    { id: "exercise_books", name: "Exercise Books", group: "wear_event", hasMeta: true, metaType: "exercise_books" },
+    { id: "stationery", name: "Stationery (Pencil, Biro, Books, etc.)", group: "wear_event", hasMeta: true, metaType: "stationery" },
+    { id: "textbook", name: "Textbooks", group: "wear_event", hasMeta: true, metaType: "textbook" },
+    { id: "misc_1", name: "Miscellaneous (PTA / Other)", group: "wear_event", hasMeta: false },
+
+    // ── Primary 5 / 6 Common Entrance & Graduation ──
+    { id: "pry_common_entrance", name: "Primary Common Entrance Fee", hasMeta: false, forClass: "Primary 5_6" },
+    { id: "pry6_graduation", name: "Primary 6 Graduation Fee", hasMeta: false, forClass: "Primary 6" },
+
+    // ── JSS 3 BECE & Graduation ──
+    { id: "bece_fee", name: "JSS 3 BECE Examination Fee", hasMeta: false, forClass: "JSS 3" },
+    { id: "bece_lesson_fee", name: "JSS 3 BECE Lesson Fee", hasMeta: false, forClass: "JSS 3" },
+    { id: "jss3_graduation", name: "JSS 3 Graduation Fee", hasMeta: false, forClass: "JSS 3" },
+
+    // ── SSS 3 WAEC/NECO & Graduation ──
+    { id: "ss3_graduation", name: "SSS 3 Graduation Fee", hasMeta: false, forClass: "SSS 3" },
     { id: "waec_fee", name: "WAEC Examination Fee", defaultAmount: 65000, hasMeta: false, forClass: "SSS 3" },
     { id: "neco_fee", name: "NECO Examination Fee", defaultAmount: 60000, hasMeta: false, forClass: "SSS 3" },
     { id: "waec_logistics", name: "WAEC Logistics Fee", defaultAmount: 20000, hasMeta: false, forClass: "SSS 3" },
@@ -486,7 +507,7 @@ class RichVineDB {
       }
       data.config.adminContact = "09053126809";
 
-      if (!data.feeCategories || !data.feeCategories.some(c => c.id === "stationery")) {
+      if (!data.feeCategories || !data.feeCategories.some(c => c.id === "tuesday_wear") || !data.feeCategories.some(c => c.id === "caution_fee")) {
         data.feeCategories = DEFAULT_DATA.feeCategories;
       }
 
@@ -544,12 +565,16 @@ class RichVineDB {
   static getFeeCategories(className = "") {
     const all = this.get().feeCategories;
     if (!className) return all;
-    const isSS3 = className.includes("SSS 3");
-    const isJSS3 = className.includes("JSS 3");
+    const isSS3 = /sss\s*3|ss\s*3/i.test(className);
+    const isJSS3 = /jss\s*3/i.test(className);
+    const isPry5or6 = /primary\s*[56]|pry\s*[56]/i.test(className);
+    const isPry6 = /primary\s*6|pry\s*6/i.test(className);
     return all.filter(c => {
       if (!c.forClass) return true;
       if (c.forClass === "SSS 3") return isSS3;
       if (c.forClass === "JSS 3") return isJSS3;
+      if (c.forClass === "Primary 5_6") return isPry5or6;
+      if (c.forClass === "Primary 6") return isPry6;
       return false;
     });
   }

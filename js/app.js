@@ -1961,9 +1961,10 @@ const RichVineApp = (() => {
     if (profileScheduleEl) {
       const isSS3 = /sss\s*3|ss\s*3/i.test(student.currentClass);
       const isJSS3 = /jss\s*3/i.test(student.currentClass);
+      const isPry5or6 = /primary\s*[56]|pry\s*[56]/i.test(student.currentClass);
       const specialCats = RichVineDB.getFeeCategories(student.currentClass).filter(c => c.forClass);
 
-      if (isSS3 || isJSS3) {
+      if (isSS3 || isJSS3 || isPry5or6) {
         let scheduleItems = specialCats.map(cat => {
           const totalPaidForCat = RichVineDB.getStudentCatPaidTotal(payments, cat);
           const isPaid = totalPaidForCat > 0;
@@ -2256,22 +2257,38 @@ const RichVineApp = (() => {
   function _buildCategorySelectOptions(studentClass, selectedCatId = "") {
     const cats = RichVineDB.getFeeCategories(studentClass);
     let html = `<option value="">— Select Fee Category —</option>`;
-    const generalCats = cats.filter(c => !c.forClass);
-    const jss3Cats    = cats.filter(c => c.forClass === "JSS 3");
-    const ss3Cats     = cats.filter(c => c.forClass === "SSS 3");
+    const coreCats      = cats.filter(c => !c.forClass && c.group === "core");
+    const wearEventCats = cats.filter(c => !c.forClass && c.group !== "core");
+    const pryCats       = cats.filter(c => c.forClass === "Primary 5_6" || c.forClass === "Primary 6");
+    const jss3Cats      = cats.filter(c => c.forClass === "JSS 3");
+    const ss3Cats       = cats.filter(c => c.forClass === "SSS 3");
 
-    html += `<optgroup label="Standard School Fees">` +
-      generalCats.map(c => `<option value="${c.id}" data-meta="${c.metaType || ''}" ${c.id === selectedCatId ? 'selected' : ''}>${c.name}</option>`).join("") +
-      `</optgroup>`;
+    if (coreCats.length > 0) {
+      html += `<optgroup label="Core School Fees (New &amp; Regular Learners)">` +
+        coreCats.map(c => `<option value="${c.id}" data-meta="${c.metaType || ''}" ${c.id === selectedCatId ? 'selected' : ''}>${c.name}</option>`).join("") +
+        `</optgroup>`;
+    }
+
+    if (wearEventCats.length > 0) {
+      html += `<optgroup label="Wears, Events, Books &amp; General">` +
+        wearEventCats.map(c => `<option value="${c.id}" data-meta="${c.metaType || ''}" ${c.id === selectedCatId ? 'selected' : ''}>${c.name}</option>`).join("") +
+        `</optgroup>`;
+    }
+
+    if (pryCats.length > 0) {
+      html += `<optgroup label="Primary 5/6 Common Entrance &amp; Graduation">` +
+        pryCats.map(c => `<option value="${c.id}" data-meta="${c.metaType || ''}" ${c.id === selectedCatId ? 'selected' : ''}>🎓 ${c.name}</option>`).join("") +
+        `</optgroup>`;
+    }
 
     if (jss3Cats.length > 0) {
-      html += `<optgroup label="JSS 3 Examination &amp; Lesson Fees">` +
+      html += `<optgroup label="JSS 3 BECE &amp; Graduation">` +
         jss3Cats.map(c => `<option value="${c.id}" data-meta="${c.metaType || ''}" ${c.id === selectedCatId ? 'selected' : ''}>📘 ${c.name}</option>`).join("") +
         `</optgroup>`;
     }
 
     if (ss3Cats.length > 0) {
-      html += `<optgroup label="SSS 3 Senior Examination &amp; Logistics Fees">` +
+      html += `<optgroup label="SSS 3 WAEC/NECO &amp; Graduation">` +
         ss3Cats.map(c => {
           const priceTag = c.defaultAmount ? ` (₦${c.defaultAmount.toLocaleString()})` : '';
           return `<option value="${c.id}" data-meta="${c.metaType || ''}" data-amount="${c.defaultAmount || ''}" ${c.id === selectedCatId ? 'selected' : ''}>🎓 ${c.name}${priceTag}</option>`;
@@ -2633,10 +2650,11 @@ const RichVineApp = (() => {
     if (classFeesContainer) {
       const isSS3 = /sss\s*3|ss\s*3/i.test(student.currentClass);
       const isJSS3 = /jss\s*3/i.test(student.currentClass);
+      const isPry5or6 = /primary\s*[56]|pry\s*[56]/i.test(student.currentClass);
       const studentPayments = RichVineDB.getPayments({ studentId });
       const specialCats = RichVineDB.getFeeCategories(student.currentClass).filter(c => c.forClass);
 
-      if (isSS3 || isJSS3) {
+      if (isSS3 || isJSS3 || isPry5or6) {
         let itemsHtml = specialCats.map(cat => {
           const totalPaidForCat = RichVineDB.getStudentCatPaidTotal(studentPayments, cat);
           const isPaid = totalPaidForCat > 0;
