@@ -762,10 +762,6 @@
             <select id="cbtAsmSubject" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none"></select>
           </div>
           <div>
-            <label class="block text-[11px] font-semibold text-slate-300 mb-1">Target Class / Arm *</label>
-            <select id="cbtAsmClass" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none"></select>
-          </div>
-          <div>
             <label class="block text-[11px] font-semibold text-slate-300 mb-1">Term</label>
             <select id="cbtAsmTerm" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
               <option value="1st Term">1st Term</option>
@@ -773,7 +769,6 @@
               <option value="3rd Term">3rd Term</option>
             </select>
           </div>
-
           <div>
             <label class="block text-[11px] font-semibold text-slate-300 mb-1">Report Card / Broadsheet Target</label>
             <select id="cbtAsmTargetCat" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
@@ -781,6 +776,23 @@
               <option value="ca2">2nd CA / Midterm (Max 20 Marks)</option>
               <option value="exam">Terminal Exam (Max 60 Marks)</option>
             </select>
+          </div>
+
+          <!-- Multi-Class Target Assignment -->
+          <div class="sm:col-span-2 lg:col-span-3 bg-slate-800/70 border border-slate-700 rounded-xl p-3 space-y-2">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <label class="text-[11px] font-semibold text-slate-200">Assign to Target Class(es) *</label>
+              <div class="flex flex-wrap items-center gap-1">
+                <button type="button" onclick="quickSelectCbtClasses('all')" class="px-2 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-[10px] font-bold text-slate-200">All</button>
+                <button type="button" onclick="quickSelectCbtClasses('primary')" class="px-2 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-[10px] font-bold text-slate-200">Primary</button>
+                <button type="button" onclick="quickSelectCbtClasses('jss')" class="px-2 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-[10px] font-bold text-slate-200">JSS 1-3</button>
+                <button type="button" onclick="quickSelectCbtClasses('sss1')" class="px-2 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-[10px] font-bold text-slate-200">All SSS 1</button>
+                <button type="button" onclick="quickSelectCbtClasses('sss2')" class="px-2 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-[10px] font-bold text-slate-200">All SSS 2</button>
+                <button type="button" onclick="quickSelectCbtClasses('sss3')" class="px-2 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-[10px] font-bold text-slate-200">All SSS 3</button>
+                <button type="button" onclick="quickSelectCbtClasses('clear')" class="px-2 py-0.5 rounded bg-red-500/20 hover:bg-red-500/30 text-[10px] font-bold text-red-300">Clear</button>
+              </div>
+            </div>
+            <div id="cbtAsmClassesContainer" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-1.5 max-h-36 overflow-y-auto pr-1"></div>
           </div>
           <div>
             <label class="block text-[11px] font-semibold text-slate-300 mb-1">Question Format</label>
@@ -829,7 +841,10 @@
               <button type="button" onclick="switchBuilderMode('single')" id="btnModeSingle" class="px-3 py-1 rounded-lg text-xs font-bold bg-rose-600 text-white">Add Single Question</button>
               <button type="button" onclick="switchBuilderMode('bulk')" id="btnModeBulk" class="px-3 py-1 rounded-lg text-xs font-bold bg-slate-700 text-slate-300 hover:text-white">Bulk Paste / Upload File</button>
             </div>
-            <div class="text-xs font-semibold text-slate-300" id="cbtPoolSummaryBadge">Pool: 0 Objective | 0 Theory</div>
+            <div class="flex items-center gap-2">
+              <div class="text-xs font-semibold text-slate-300" id="cbtPoolSummaryBadge">Pool: 0 Objective | 0 Theory</div>
+              <button type="button" onclick="clearQuestionPool()" class="px-2 py-0.5 rounded bg-red-500/20 hover:bg-red-500/30 text-red-300 text-[10px] font-bold">Clear Pool</button>
+            </div>
           </div>
 
           <!-- Single Question Mode -->
@@ -889,11 +904,14 @@
           <!-- Bulk Paste / Upload Mode -->
           <div id="builderBulkWrap" class="p-4 space-y-3 hidden">
             <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-300">
-              <span>Paste formatted questions below OR upload a <code class="text-amber-300">.txt</code> file:</span>
+              <span>Paste unlimited questions below OR upload a <code class="text-amber-300">.txt</code> file (auto-imports immediately):</span>
               <label class="px-3 py-1.5 bg-sky-600/20 hover:bg-sky-600/30 text-sky-300 border border-sky-500/30 rounded-lg cursor-pointer font-semibold transition">
                 <i class="fas fa-upload mr-1"></i> Upload .txt File
-                <input type="file" accept=".txt,.csv" onchange="handleBulkQuestionFile(event)" class="hidden">
+                <input type="file" id="bulkQuestionFileInput" accept=".txt,.csv,text/plain" onchange="handleBulkQuestionFile(event)" class="hidden">
               </label>
+            </div>
+            <div class="text-[11px] text-slate-400 bg-slate-900/60 border border-slate-700/70 rounded-lg px-3 py-2">
+              Supports numbered questions (<code>1.</code>, <code>Q1.</code>, <code>1)</code>) with or without blank lines, options (<code>A.</code>, <code>A)</code>, <code>(A)</code>), answers (<code>Answer: B</code>, <code>Ans: B</code>, or <code>*B.</code>), and <code>[Theory]</code> + <code>Marks: 10</code>.
             </div>
             <textarea id="bulkQuestionsText" rows="6" placeholder="1. What is 12 x 12?&#10;A. 124&#10;B. 144&#10;C. 132&#10;D. 156&#10;Answer: B&#10;&#10;2. Explain the stages of mitosis with diagrams.&#10;[Theory]&#10;Marks: 15" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs font-mono text-slate-200 focus:outline-none focus:border-sky-500"></textarea>
             <div class="flex justify-end">
@@ -2297,10 +2315,68 @@
     // ═══════════════════════════════════════════════════════════════
     let cbtWorkingPool = [];
 
+    const SCHOOL_CLASS_CATALOG = [
+      'Creche / Preparatory I', 'Preparatory II', 'Nursery I', 'Nursery II',
+      'Primary 1', 'Primary 2', 'Primary 3', 'Primary 4', 'Primary 5',
+      'JSS 1', 'JSS 2', 'JSS 3',
+      'SSS 1 Art', 'SSS 1 Commercial', 'SSS 1 Science',
+      'SSS 2 Art', 'SSS 2 Commercial', 'SSS 2 Science',
+      'SSS 3 Art', 'SSS 3 Commercial', 'SSS 3 Science'
+    ];
+
+    function getAllAvailableSchoolClasses() {
+      const set = new Set(SCHOOL_CLASS_CATALOG);
+      if (window.RichVineDB && window.RichVineDB.getStudents) {
+        window.RichVineDB.getStudents().forEach(s => {
+          const c = (s.currentClass || s.class || '').trim();
+          if (c) set.add(c);
+        });
+      }
+      return Array.from(set);
+    }
+
+    function populateCbtClassCheckboxes(selectedList = []) {
+      const container = document.getElementById('cbtAsmClassesContainer');
+      if (!container) return;
+      const allClasses = getAllAvailableSchoolClasses();
+      const selectedSet = new Set(selectedList.map(c => c.toLowerCase()));
+      container.innerHTML = allClasses.map(cls => {
+        const isChecked = selectedSet.has('all') || selectedSet.has(cls.toLowerCase()) ||
+          selectedList.some(sel => window.isClassMatch && window.isClassMatch(cls, sel));
+        return `
+          <label class="flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-slate-900/80 border border-slate-700 hover:border-rose-500/50 cursor-pointer text-[11px] text-slate-200 select-none">
+            <input type="checkbox" class="cbt-class-cb rounded bg-slate-800 border-slate-600 text-rose-500" value="${cls}" ${isChecked ? 'checked' : ''}>
+            <span class="truncate">${cls}</span>
+          </label>
+        `;
+      }).join('');
+    }
+
+    function quickSelectCbtClasses(group) {
+      const cbs = document.querySelectorAll('.cbt-class-cb');
+      cbs.forEach(cb => {
+        const val = cb.value.toLowerCase();
+        if (group === 'all') cb.checked = true;
+        else if (group === 'clear') cb.checked = false;
+        else if (group === 'primary') cb.checked = val.includes('primary') || val.includes('nursery') || val.includes('creche') || val.includes('preparatory');
+        else if (group === 'jss') cb.checked = val.includes('jss');
+        else if (group === 'sss1') cb.checked = val.includes('sss 1');
+        else if (group === 'sss2') cb.checked = val.includes('sss 2');
+        else if (group === 'sss3') cb.checked = val.includes('sss 3');
+      });
+    }
+
+    function clearQuestionPool() {
+      if (cbtWorkingPool.length === 0) return;
+      if (!confirm('Clear all ' + cbtWorkingPool.length + ' questions from this pool?')) return;
+      cbtWorkingPool = [];
+      renderWorkingPoolList();
+      showToast('Question pool cleared.', 'info');
+    }
+
     function loadCbtAssessmentsPanel() {
       const subjFilter = document.getElementById('cbtFilterSubject');
       const modalSubj = document.getElementById('cbtAsmSubject');
-      const modalClass = document.getElementById('cbtAsmClass');
 
       const subjList = teacherSubjects.length ? teacherSubjects : ['Mathematics', 'English Language', 'Basic Science', 'Civic Education', 'Biology', 'Chemistry', 'Physics', 'Economics', 'Computer Studies'];
       if (subjFilter) {
@@ -2310,11 +2386,6 @@
       }
       if (modalSubj) {
         modalSubj.innerHTML = subjList.map(s => `<option value="${s}">${s}</option>`).join('');
-      }
-      if (modalClass) {
-        const clsList = getTeacherClassesList ? getTeacherClassesList() : (hasClassTeacherRole ? [currentTeacher.assignedClass] : ['SSS 1', 'SSS 2', 'SSS 3']);
-        const uniqueClasses = Array.from(new Set([...(clsList || []), 'All']));
-        modalClass.innerHTML = uniqueClasses.map(c => `<option value="${c}">${c === 'All' ? 'All Classes' : c}</option>`).join('');
       }
       renderCbtAssessmentsList();
     }
@@ -2432,7 +2503,10 @@
       document.getElementById('cbtAsmTitle').value = existing ? (existing.title || '') : '';
       document.getElementById('cbtAsmType').value = existing ? (existing.type || 'Class Test') : 'Class Test';
       if (existing && existing.subject) document.getElementById('cbtAsmSubject').value = existing.subject;
-      if (existing && existing.targetClass) document.getElementById('cbtAsmClass').value = existing.targetClass;
+      const defaultSelectedClasses = existing
+        ? (Array.isArray(existing.targetClasses) && existing.targetClasses.length ? existing.targetClasses : [existing.targetClass || 'All'])
+        : getTeacherClassesList();
+      populateCbtClassCheckboxes(defaultSelectedClasses);
       document.getElementById('cbtAsmTerm').value = existing ? (existing.term || '1st Term') : '1st Term';
       document.getElementById('cbtAsmTargetCat').value = existing ? (existing.targetCategory || 'ca1') : 'ca1';
       document.getElementById('cbtAsmFormat').value = existing ? (existing.format || 'objective') : 'objective';
@@ -2560,67 +2634,130 @@
     }
 
     function handleBulkQuestionFile(e) {
-      const file = e.target.files && e.target.files[0];
+      const input = e.target;
+      const file = input.files && input.files[0];
       if (!file) return;
       const reader = new FileReader();
       reader.onload = ev => {
-        document.getElementById('bulkQuestionsText').value = ev.target.result || '';
-        showToast('File loaded! Click "Parse & Add Questions" to import.', 'info');
+        const content = ev.target.result || '';
+        document.getElementById('bulkQuestionsText').value = content;
+        input.value = '';
+        parseAndAddBulkQuestions();
       };
       reader.readAsText(file);
     }
 
     function parseAndAddBulkQuestions() {
-      const raw = (document.getElementById('bulkQuestionsText').value || '').trim();
+      const rawInput = (document.getElementById('bulkQuestionsText').value || '');
+      const raw = rawInput.replace(/^\uFEFF/, '').replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
       if (!raw) {
         showToast('Paste or upload questions first.', 'error');
         return;
       }
 
-      const blocks = raw.split(/\n\s*\n/).map(b => b.trim()).filter(Boolean);
+      // Split into question blocks: supports blank-line separation OR numbered questions (e.g. "1.", "1)", "Q1.", "Q1:")
+      const linesAll = raw.split('\n');
+      const blocks = [];
+      let currentBlock = [];
+      const qStartRegex = /^(?:Q(?:uestion)?\s*\d+[\.\):]|\(?\d+\)?[\.\)])\s+\S/i;
+
+      linesAll.forEach(line => {
+        const trimmed = line.trim();
+        if (!trimmed) {
+          if (currentBlock.length > 0) {
+            blocks.push(currentBlock.join('\n'));
+            currentBlock = [];
+          }
+          return;
+        }
+        if (qStartRegex.test(trimmed) && currentBlock.length > 0) {
+          blocks.push(currentBlock.join('\n'));
+          currentBlock = [trimmed];
+        } else {
+          currentBlock.push(trimmed);
+        }
+      });
+      if (currentBlock.length > 0) blocks.push(currentBlock.join('\n'));
+
       const defaultMarks = Number(document.getElementById('cbtAsmObjMarksPerQ').value || 1);
       let added = 0;
 
-      blocks.forEach(block => {
+      blocks.forEach((block, bIdx) => {
         const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
         if (lines.length === 0) return;
 
-        const isTheory = /\[theory\]/i.test(block);
-        const qText = lines[0].replace(/^\d+[\.\)]\s*/, '').replace(/\[theory\]/i, '').trim();
+        const isTheory = /\[theory\]|^theory\s*[:\-]/i.test(block);
+        let qText = lines[0]
+          .replace(/^(?:Q(?:uestion)?\s*\d+[\.\):]|\(?\d+\)?[\.\)])\s*/i, '')
+          .replace(/\[theory\]/ig, '')
+          .replace(/^theory\s*[:\-]\s*/i, '')
+          .trim();
 
         if (isTheory) {
-          const marksMatch = block.match(/marks\s*[:=]\s*(\d+)/i);
-          cbtWorkingPool.push({
-            id: 'Q-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
-            type: 'theory',
-            text: qText,
-            maxMarks: marksMatch ? Number(marksMatch[1]) : 10
-          });
-          added++;
+          const marksMatch = block.match(/(?:marks?|score)\s*[:=\-]?\s*(\d+)/i) || block.match(/[\[\(](\d+)\s*marks?[\]\)]/i);
+          if (qText) {
+            cbtWorkingPool.push({
+              id: 'Q-' + Date.now() + '-' + bIdx + '-' + Math.random().toString(36).slice(2, 6),
+              type: 'theory',
+              text: qText,
+              maxMarks: marksMatch ? Number(marksMatch[1]) : 10
+            });
+            added++;
+          }
           return;
         }
 
+        // Expand any inline options like "A. 10  B. 12  C. 14  D. 16"
+        const expandedLines = [];
+        lines.slice(1).forEach(line => {
+          const splitInline = line.replace(/\s+(?=\(?[A-Da-d][\.\):]\s+)/g, '\n').split('\n');
+          splitInline.forEach(part => {
+            const p = part.trim();
+            if (p) expandedLines.push(p);
+          });
+        });
+
         const opts = [];
         let ansIdx = 0;
-        lines.slice(1).forEach(line => {
-          const optMatch = line.match(/^([A-Da-d])[\.\)]\s*(.+)$/);
+        let foundAns = false;
+        let explanation = '';
+
+        expandedLines.forEach(line => {
+          const optMatch = line.match(/^(\*)?\s*\(?([A-Da-d])[\.\):]\s*(.+)$/);
           if (optMatch) {
-            opts.push(optMatch[2].trim());
+            let optText = optMatch[3].trim();
+            const hasStar = Boolean(optMatch[1]) || /\*$/.test(optText);
+            if (hasStar) {
+              optText = optText.replace(/\*+$/, '').trim();
+              ansIdx = opts.length;
+              foundAns = true;
+            }
+            opts.push(optText);
           } else {
-            const ansMatch = line.match(/^(?:answer|ans)\s*[:=]\s*([A-Da-d])/i);
+            const ansMatch = line.match(/^(?:answer|ans|correct(?:\s+answer)?|key)\s*[:=\-]?\s*\(?([A-Da-d])\)?/i);
             if (ansMatch) {
               ansIdx = ansMatch[1].toUpperCase().charCodeAt(0) - 65;
+              foundAns = true;
+            } else {
+              const expMatch = line.match(/^(?:explanation|exp|hint|note)\s*[:=\-]\s*(.+)$/i);
+              if (expMatch) {
+                explanation = expMatch[1].trim();
+              } else if (opts.length === 0) {
+                // Multi-line question prompt before options
+                qText += ' ' + line;
+              }
             }
           }
         });
 
         if (opts.length >= 2) {
           cbtWorkingPool.push({
-            id: 'Q-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+            id: 'Q-' + Date.now() + '-' + bIdx + '-' + Math.random().toString(36).slice(2, 6),
             type: 'objective',
             text: qText,
             options: opts,
-            answer: Math.max(0, Math.min(opts.length - 1, ansIdx)),
+            answer: Math.max(0, Math.min(opts.length - 1, foundAns ? ansIdx : 0)),
+            explanation,
             marks: defaultMarks
           });
           added++;
@@ -2630,9 +2767,9 @@
       if (added > 0) {
         document.getElementById('bulkQuestionsText').value = '';
         renderWorkingPoolList();
-        showToast(`Successfully parsed & added ${added} questions!`, 'success');
+        showToast(`Successfully parsed & added ${added} question(s) to pool!`, 'success');
       } else {
-        showToast('Could not parse questions. Check formatting (leave a blank line between questions).', 'error');
+        showToast('Could not parse questions. Ensure each objective question has options A-D and Answer: X.', 'error');
       }
     }
 
@@ -2675,11 +2812,15 @@
     function saveCbtAssessmentFromModal() {
       const title = document.getElementById('cbtAsmTitle').value.trim();
       const subject = document.getElementById('cbtAsmSubject').value;
-      const targetClass = document.getElementById('cbtAsmClass').value;
+      const selectedClasses = Array.from(document.querySelectorAll('.cbt-class-cb:checked')).map(cb => cb.value);
       const deadline = document.getElementById('cbtAsmDeadline').value;
 
       if (!title || !subject || !deadline) {
         showToast('Please enter Assessment Title, Subject, and Expiration Date/Time.', 'error');
+        return;
+      }
+      if (selectedClasses.length === 0) {
+        showToast('Please select at least one target class.', 'error');
         return;
       }
       if (cbtWorkingPool.length === 0) {
@@ -2692,7 +2833,8 @@
         title,
         type: document.getElementById('cbtAsmType').value,
         subject,
-        targetClass,
+        targetClasses: selectedClasses,
+        targetClass: selectedClasses.join(', '),
         term: document.getElementById('cbtAsmTerm').value,
         session: '2026/2027',
         targetCategory: document.getElementById('cbtAsmTargetCat').value,
@@ -2769,11 +2911,15 @@
       document.getElementById('gradingModalSubtitle').textContent = `${asm.subject} (${asm.targetClass}) • Obj Max: ${asm.objectiveTotalMarks || 0} | Theory Max: ${asm.theoryTotalMarks || 0} | Total: ${asm.totalMarks || 0}`;
 
       const subs = window.RichVineDB.getCbtSubmissions({ assessmentId });
-      let students = window.RichVineDB.getStudents ? window.RichVineDB.getStudents(asm.targetClass === 'All' ? {} : { class: asm.targetClass }) : [];
-      if (students.length === 0 && window.RichVineDB && window.RichVineDB.getStudents) {
+      const targets = Array.isArray(asm.targetClasses) && asm.targetClasses.length
+        ? asm.targetClasses
+        : (asm.targetClass ? String(asm.targetClass).split(',').map(s => s.trim()).filter(Boolean) : ['All']);
+      let students = [];
+      if (window.RichVineDB && window.RichVineDB.getStudents) {
         students = window.RichVineDB.getStudents().filter(s => {
-          if (asm.targetClass === 'All') return true;
-          return window.isClassMatch ? window.isClassMatch(s.currentClass || s.class, asm.targetClass) : (s.currentClass === asm.targetClass);
+          if (targets.some(tc => tc.toLowerCase() === 'all')) return true;
+          const sc = s.currentClass || s.class || '';
+          return targets.some(tc => window.isClassMatch ? window.isClassMatch(sc, tc) : sc.toLowerCase() === tc.toLowerCase());
         });
       }
 

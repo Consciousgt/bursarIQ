@@ -213,81 +213,20 @@
     <div class="w-full bg-white relative z-10 rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-5">
       <div class="bg-gradient-to-r from-sky-700 via-sky-600 to-sky-500 px-5 py-4 text-white">
         <div class="flex items-center justify-between">
-          <span class="text-xs font-bold uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-full">Senior College</span>
-          <span class="text-xs font-semibold bg-amber-400 text-slate-900 px-2 py-0.5 rounded-md flex items-center">
-            <i class="fas fa-stopwatch mr-1"></i> Strictly 30 Mins
+          <span class="text-xs font-bold uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-full">All Classes • Primary, JSS &amp; SSS</span>
+          <span class="text-xs font-semibold bg-emerald-400 text-slate-900 px-2 py-0.5 rounded-md flex items-center">
+            <i class="fas fa-shield-alt mr-1"></i> Live CBT Portal
           </span>
         </div>
-        <h2 class="text-lg sm:text-xl font-bold mt-1 flex items-center gap-2">
-          <span id="cbt-exam-subject-heading">General Mathematics</span>
-          <span class="text-xs bg-emerald-400 text-slate-900 font-bold px-2 py-0.5 rounded-full uppercase">JAMB Standard</span>
+        <h2 class="text-lg sm:text-xl font-bold mt-1.5 flex items-center gap-2">
+          <span>Student CBT &amp; Assignments Login</span>
         </h2>
-        <p class="text-xs text-sky-100 mt-0.5" id="cbt-exam-class-subtext">Senior College &bull; All Departments</p>
+        <p class="text-xs text-sky-100 mt-0.5">Sign in with your Student ID or Registration Number to access tests &amp; assignments assigned by your teachers</p>
       </div>
 
       <div class="p-4 sm:p-6 space-y-4">
-        <!-- Highlights -->
-        <div class="grid grid-cols-3 gap-2 text-center">
-          <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-            <div class="text-lg font-black text-sky-600">40</div>
-            <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-tight">Questions</div>
-          </div>
-          <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-            <div class="text-lg font-black text-amber-600">30:00</div>
-            <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-tight">Minutes</div>
-          </div>
-          <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-            <div class="text-lg font-black text-emerald-600">1</div>
-            <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-tight">Attempt Only</div>
-          </div>
-        </div>
-
         <!-- Verification Form -->
         <form id="login-form" class="space-y-4">
-          <!-- Subject & Class Selection (JAMB-Style) -->
-          <div class="p-3.5 bg-slate-50 border-2 border-sky-100 rounded-xl space-y-3">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                <i class="fas fa-layer-group text-sky-600"></i> Exam Subject & Level
-              </span>
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-sky-200 text-sky-800">Multi-Subject CBT</span>
-            </div>
-            
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              <div>
-                <label for="cbt-subject-select" class="block text-[11px] font-bold text-slate-600 uppercase mb-1">
-                  Subject Selection
-                </label>
-                <select id="cbt-subject-select" class="w-full px-3 py-2 rounded-lg border-2 border-slate-200 bg-white font-bold text-slate-800 text-xs focus:border-sky-500 focus:outline-none">
-                  <option value="Mathematics" selected>Mathematics (General)</option>
-                  <option value="English Language">English Language</option>
-                  <option value="Biology">Biology</option>
-                  <option value="Physics">Physics</option>
-                  <option value="Chemistry">Chemistry</option>
-                  <option value="Economics">Economics</option>
-                  <option value="Government">Government</option>
-                  <option value="Commerce">Commerce</option>
-                </select>
-              </div>
-
-              <div>
-                <label for="cbt-class-override" class="block text-[11px] font-bold text-slate-600 uppercase mb-1">
-                  Target Class
-                </label>
-                <select id="cbt-class-override" class="w-full px-3 py-2 rounded-lg border-2 border-slate-200 bg-white font-bold text-slate-800 text-xs focus:border-sky-500 focus:outline-none">
-                  <option value="Auto" selected>Auto-Detect from ID</option>
-                  <option value="SSS 1">SSS 1</option>
-                  <option value="SSS 2">SSS 2</option>
-                  <option value="SSS 3">SSS 3</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="text-[11px] text-slate-500 flex items-center justify-between border-t border-slate-200 pt-2">
-              <span><i class="fas fa-check-circle text-emerald-500 mr-1"></i> 40 Questions &bull; 30 Mins</span>
-              <span class="font-semibold text-sky-700" id="selected-subject-badge">Current: Mathematics</span>
-            </div>
-          </div>
           <div>
             <label for="student-id-input" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
               Enter Student ID or Reg Number
@@ -301,18 +240,18 @@
                 id="student-id-input" 
                 required
                 autocomplete="off"
-                placeholder="e.g. DPS-2026-001 or DPS/2026/001" 
+                placeholder="e.g. DPS/046, STU-0046, or 046" 
                 class="w-full pl-10 pr-4 py-3.5 rounded-xl border-2 border-slate-200 text-slate-800 font-semibold focus:border-sky-500 focus:ring-4 focus:ring-sky-100 outline-none uppercase placeholder:normal-case placeholder:text-slate-400 text-sm transition"
               >
             </div>
             <p class="text-[11px] text-slate-500 mt-1.5 flex items-center">
-              <i class="fas fa-info-circle mr-1 text-sky-600"></i> Use your official De Portal ID. Each student can only take this test once.
+              <i class="fas fa-info-circle mr-1 text-sky-600"></i> Use your official De Portal Schools Student ID or Reg No.
             </p>
             <div class="mt-2 text-[11px] text-slate-500 flex flex-wrap items-center gap-1.5 bg-slate-50 p-2 rounded-lg border border-slate-200">
-              <span class="font-bold text-slate-600">Quick Test IDs:</span>
-              <button type="button" onclick="document.getElementById('student-id-input').value='DPS/2026/001'" class="px-2 py-0.5 rounded bg-sky-100 text-sky-800 hover:bg-sky-200 font-semibold transition cursor-pointer">SSS 1 (001)</button>
-              <button type="button" onclick="document.getElementById('student-id-input').value='DPS/2026/002'" class="px-2 py-0.5 rounded bg-sky-100 text-sky-800 hover:bg-sky-200 font-semibold transition cursor-pointer">SSS 2 (002)</button>
-              <button type="button" onclick="document.getElementById('student-id-input').value='DPS/2026/003'" class="px-2 py-0.5 rounded bg-sky-100 text-sky-800 hover:bg-sky-200 font-semibold transition cursor-pointer">SSS 3 (003)</button>
+              <span class="font-bold text-slate-600">Sample IDs:</span>
+              <button type="button" onclick="document.getElementById('student-id-input').value='DPS/046'" class="px-2 py-0.5 rounded bg-sky-100 text-sky-800 hover:bg-sky-200 font-semibold transition cursor-pointer">Primary 1 (DPS/046)</button>
+              <button type="button" onclick="document.getElementById('student-id-input').value='DPS/116'" class="px-2 py-0.5 rounded bg-sky-100 text-sky-800 hover:bg-sky-200 font-semibold transition cursor-pointer">JSS 1 (DPS/116)</button>
+              <button type="button" onclick="document.getElementById('student-id-input').value='DPS/184'" class="px-2 py-0.5 rounded bg-sky-100 text-sky-800 hover:bg-sky-200 font-semibold transition cursor-pointer">SSS 1 Sci (DPS/184)</button>
             </div>
           </div>
 
@@ -325,8 +264,8 @@
             id="start-exam-btn"
             class="touch-target w-full bg-gradient-to-r from-sky-600 to-sky-500 hover:from-sky-700 hover:to-sky-600 active:scale-[0.99] text-white font-bold py-3.5 px-4 rounded-xl shadow-md shadow-sky-600/30 flex items-center justify-center space-x-2 transition"
           >
-            <i class="fas fa-play text-xs"></i>
-            <span>Verify & Begin Examination</span>
+            <i class="fas fa-sign-in-alt text-xs"></i>
+            <span>Sign In &amp; View My Assessments</span>
           </button>
         </form>
 
@@ -1238,39 +1177,12 @@
           }
         }
 
-        var classOverride = document.getElementById('cbt-class-override') ? document.getElementById('cbt-class-override').value : 'Auto';
-        if (classOverride && classOverride !== 'Auto') {
-          student.currentClass = classOverride;
-        }
-
-        // Check for teacher-assigned CBT assessments for this student's class
+        // Check for teacher-assigned CBT assessments for this student's class (No legacy fallbacks)
         var assignedAssessments = (window.RichVineDB && window.RichVineDB.getAssessments)
           ? window.RichVineDB.getAssessments({ class: student.currentClass })
           : [];
 
-        if (assignedAssessments.length > 0) {
-          showStudentAssessmentHub(student, assignedAssessments);
-          return;
-        }
-
-        // Fallback to Senior Secondary General Practice Bank if no assigned assessments
-        var baseClass = window.CBT_HELPERS ? window.CBT_HELPERS.normalizeSeniorClass(student.currentClass) : null;
-        if (!baseClass) {
-          showLoginAlert(
-            'Hello ' + student.firstName + ' ' + student.lastName + '! No active CBT assignment or test is currently scheduled for your class (' + (student.currentClass || 'Unknown') + '). Please check with your teacher.',
-            'warning'
-          );
-          return;
-        }
-
-        var selectedSubject = document.getElementById('cbt-subject-select') ? document.getElementById('cbt-subject-select').value : 'Mathematics';
-        var existingSubmission = (window.RichVineDB.getCbtSubmissionByStudent && (window.RichVineDB.getCbtSubmissionByStudent(student.id, selectedSubject) || window.RichVineDB.getCbtSubmissionByStudent(student.regNo, selectedSubject))) || null;
-        if (existingSubmission) {
-          showPreviousAttempt(student, existingSubmission);
-          return;
-        }
-
-        prepareNewExam(student, baseClass);
+        showStudentAssessmentHub(student, assignedAssessments);
       });
 
       var hubActiveStudent = null;
@@ -1289,17 +1201,24 @@
         document.getElementById('hub-student-class').textContent = student.currentClass || 'Student';
         document.getElementById('hub-asm-count').textContent = assessments.length + ' Assigned';
 
-        var baseClass = window.CBT_HELPERS ? window.CBT_HELPERS.normalizeSeniorClass(student.currentClass) : null;
         var practiceFallback = document.getElementById('hub-practice-fallback');
-        if (baseClass) {
-          practiceFallback.classList.remove('hidden');
-          var selSubj = document.getElementById('cbt-subject-select') ? document.getElementById('cbt-subject-select').value : 'Mathematics';
-          document.getElementById('hub-practice-subject').textContent = selSubj;
-        } else {
-          practiceFallback.classList.add('hidden');
-        }
+        if (practiceFallback) practiceFallback.classList.add('hidden');
 
         var listEl = document.getElementById('hub-assessments-list');
+        if (!assessments || assessments.length === 0) {
+          listEl.innerHTML = `
+            <div class="bg-white rounded-2xl border border-slate-200 p-8 text-center space-y-2 shadow-sm">
+              <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto text-xl">
+                <i class="fas fa-clipboard-list"></i>
+              </div>
+              <h4 class="text-sm font-black text-slate-800">No CBT Assessments Assigned Yet</h4>
+              <p class="text-xs text-slate-500 max-w-md mx-auto">
+                There are currently no active CBT assignments, tests, or exams scheduled for <strong>${escapeHtml(student.currentClass || 'your class')}</strong>. Please check back later or contact your teacher.
+              </p>
+            </div>
+          `;
+          return;
+        }
         listEl.innerHTML = assessments.map(function (asm) {
           var eff = window.RichVineDB.getAssessmentEffectiveStatus ? window.RichVineDB.getAssessmentEffectiveStatus(asm) : (asm.effectiveStatus || 'Active');
           var existingSub = window.RichVineDB.getCbtSubmissionByStudent ? window.RichVineDB.getCbtSubmissionByStudent(student.id, asm.id) : null;

@@ -2649,11 +2649,16 @@ class RichVineDB {
 
     if (filter.class && filter.class !== "All") {
       list = list.filter(a => {
-        if (!a.targetClass || a.targetClass === "All") return true;
-        if (typeof window !== "undefined" && window.isClassMatch) {
-          return window.isClassMatch(filter.class, a.targetClass) || window.isClassMatch(a.targetClass, filter.class);
-        }
-        return a.targetClass.toLowerCase() === filter.class.toLowerCase();
+        const targets = Array.isArray(a.targetClasses) && a.targetClasses.length > 0
+          ? a.targetClasses
+          : (a.targetClass ? String(a.targetClass).split(",").map(s => s.trim()).filter(Boolean) : ["All"]);
+        if (targets.some(tc => tc.toLowerCase() === "all")) return true;
+        return targets.some(tc => {
+          if (typeof window !== "undefined" && window.isClassMatch) {
+            return window.isClassMatch(filter.class, tc);
+          }
+          return tc.toLowerCase() === filter.class.toLowerCase();
+        });
       });
     }
     if (filter.subject && filter.subject !== "All") {
@@ -2704,9 +2709,16 @@ class RichVineDB {
     const existingIdx = assessmentData.id ? db.cbtAssessments.findIndex(a => a.id === assessmentData.id) : -1;
     const existing = existingIdx !== -1 ? db.cbtAssessments[existingIdx] : null;
 
+    const normalizedClasses = Array.isArray(assessmentData.targetClasses) && assessmentData.targetClasses.length > 0
+      ? assessmentData.targetClasses.map(c => String(c).trim()).filter(Boolean)
+      : (assessmentData.targetClass ? String(assessmentData.targetClass).split(",").map(c => c.trim()).filter(Boolean) : ["All"]);
+    const targetClassDisplay = normalizedClasses.includes("All") ? "All" : normalizedClasses.join(", ");
+
     const record = {
       ...(existing || {}),
       ...assessmentData,
+      targetClasses: normalizedClasses.includes("All") ? ["All"] : normalizedClasses,
+      targetClass: targetClassDisplay,
       id: assessmentData.id || `ASM-${Date.now()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`,
       status: assessmentData.status || (existing ? existing.status : "Active"),
       objectiveCount: objQuestions.length,
