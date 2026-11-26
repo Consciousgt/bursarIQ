@@ -6620,6 +6620,21 @@ const RichVineApp = (() => {
         <option value="${s.id}">${s.name || s.fullName} - ${s.class || ''} (${s.regNo || s.id})</option>
       `).join("");
     }
+
+    // Populate Weekly Performance Class & Subject filters
+    const wkClass = document.getElementById("er-wk-class");
+    if (wkClass && wkClass.options.length <= 1) {
+      const clsList = (typeof ALL_CLASSES !== "undefined" && Array.isArray(ALL_CLASSES))
+        ? ALL_CLASSES
+        : [...new Set(students.map(s => s.class || s.currentClass).filter(Boolean))].sort();
+      wkClass.innerHTML = `<option value="All">All Classes</option>` + clsList.map(c => `<option value="${c}">${c}</option>`).join("");
+    }
+
+    const wkSubject = document.getElementById("er-wk-subject");
+    if (wkSubject && wkSubject.options.length <= 1) {
+      const subList = RichVineDB.getAllSubjects ? RichVineDB.getAllSubjects() : ["Mathematics", "English Language"];
+      wkSubject.innerHTML = `<option value="All">All Subjects</option>` + subList.map(s => `<option value="${s}">${s}</option>`).join("");
+    }
   }
 
   function switchErSubTab(tab) {
@@ -6627,21 +6642,26 @@ const RichVineApp = (() => {
     const viewBs = document.getElementById("er-view-broadsheet");
     const viewRc = document.getElementById("er-view-report");
     const viewLg = document.getElementById("er-view-ledger");
+    const viewWk = document.getElementById("er-view-weekly");
     const btnBs = document.getElementById("er-subtab-broadsheet-btn");
     const btnRc = document.getElementById("er-subtab-report-btn");
     const btnLg = document.getElementById("er-subtab-ledger-btn");
+    const btnWk = document.getElementById("er-subtab-weekly-btn");
 
     if (viewBs) viewBs.classList.toggle("hidden", tab !== "broadsheet");
     if (viewRc) viewRc.classList.toggle("hidden", tab !== "report");
     if (viewLg) viewLg.classList.toggle("hidden", tab !== "ledger");
+    if (viewWk) viewWk.classList.toggle("hidden", tab !== "weekly");
 
     if (btnBs) btnBs.className = tab === "broadsheet" ? "btn-primary" : "btn-secondary";
     if (btnRc) btnRc.className = tab === "report" ? "btn-primary" : "btn-secondary";
     if (btnLg) btnLg.className = tab === "ledger" ? "btn-primary" : "btn-secondary";
+    if (btnWk) btnWk.className = tab === "weekly" ? "btn-primary" : "btn-secondary";
 
     if (tab === "broadsheet") renderBroadsheet();
     else if (tab === "report") renderReportCard();
     else if (tab === "ledger") renderRawScoreLedger();
+    else if (tab === "weekly") renderAdminWeeklyPerformance();
   }
 
   function renderBroadsheet() {
@@ -6675,6 +6695,7 @@ const RichVineApp = (() => {
         <th>Student Name</th>
         <th style="font-family:monospace">Reg No</th>
         ${subjects.map(sub => `<th style="text-align:center;font-size:11px">${sub}</th>`).join("")}
+        <th style="text-align:center;background:#fffbeb;color:#92400e" title="Morning + Afternoon = 2 points/day">Attendance</th>
         <th style="text-align:center;background:#f8fafc">Avg %</th>
         <th style="text-align:center;background:#f8fafc">Overall</th>
       </tr>
@@ -6703,12 +6724,14 @@ const RichVineApp = (() => {
         `;
       }).join("");
 
+      const att = row.attendance || { pointsEarned: 0, total: 0, rate: 0 };
       return `
         <tr>
           <td style="text-align:center">${posBadge}</td>
           <td style="font-weight:700;color:var(--gray-900)">${row.student.name || row.student.fullName}</td>
           <td style="font-family:monospace;font-size:11px;color:#0284c7">${row.student.regNo || row.student.id}</td>
           ${subjCells}
+          <td style="text-align:center;font-size:11px;font-weight:700;background:#fffbeb;color:#92400e">${att.total > 0 ? `${att.pointsEarned}/${att.total} (${att.rate}%)` : '-'}</td>
           <td style="text-align:center;font-weight:800;color:#0284c7;background:#f8fafc">${row.avg}%</td>
           <td style="text-align:center;font-weight:800;background:#f8fafc">
             <span style="padding:2px 6px;border-radius:4px;background:${row.avg >= 60 ? '#ecfdf5' : '#fffbeb'};color:${row.avg >= 60 ? '#059669' : '#b45309'}">${gradeInfo.grade}</span>
@@ -6732,15 +6755,17 @@ const RichVineApp = (() => {
     }
 
     const subjects = broadsheet.subjects;
-    let csv = ["Position,Reg No,Student Name," + subjects.join(",") + ",Average %,Overall Grade"].join("\n");
+    let csv = ["Position,Reg No,Student Name," + subjects.join(",") + ",Attendance,Average %,Overall Grade"].join("\n");
 
     broadsheet.rows.forEach(r => {
       const subjVals = subjects.map(s => {
         const sc = r.subjectScores[s];
         return sc ? `${sc.total}(${sc.grade})` : "-";
       });
+      const att = r.attendance || { pointsEarned: 0, total: 0, rate: 0 };
+      const attStr = att.total > 0 ? `${att.pointsEarned}/${att.total} (${att.rate}%)` : "-";
       const g = RichVineDB.calculateGrade(r.avg).grade;
-      csv += `\n${r.position},"${r.student.regNo || r.student.id}","${r.student.name || r.student.fullName}",${subjVals.join(",")},${r.avg}%,${g}`;
+      csv += `\n${r.position},"${r.student.regNo || r.student.id}","${r.student.name || r.student.fullName}",${subjVals.join(",")},"${attStr}",${r.avg}%,${g}`;
     });
 
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -6836,7 +6861,7 @@ const RichVineApp = (() => {
       return;
     }
 
-    const attSummary = RichVineDB.getStudentAttendanceSummary(studentId, 90);
+    const attSummary = card.attendanceSummary || RichVineDB.getStudentAttendanceSummary(studentId, 120);
     const st = card.student;
 
     const subjectsHtml = card.records.map((r, i) => `
@@ -6898,8 +6923,8 @@ const RichVineApp = (() => {
             <div style="font-size:18px;font-weight:900;color:#a21caf">${card.gradeInfo.grade} (${card.gradeInfo.remark})</div>
           </div>
           <div style="background:#fffbeb;padding:10px;border-radius:8px;border:1px solid #fde68a">
-            <div style="font-size:10px;font-weight:700;color:#92400e;text-transform:uppercase">Term Attendance</div>
-            <div style="font-size:18px;font-weight:900;color:#b45309">${attSummary.present} / ${attSummary.total} (${attSummary.rate}%)</div>
+            <div style="font-size:10px;font-weight:700;color:#92400e;text-transform:uppercase">Term Attendance (2/Day)</div>
+            <div style="font-size:18px;font-weight:900;color:#b45309">${attSummary.pointsEarned ?? attSummary.present} / ${attSummary.total} (${attSummary.rate}%)</div>
           </div>
         </div>
 
@@ -7006,6 +7031,242 @@ const RichVineApp = (() => {
     showToast(`Synced ${synced} CBT examination score(s) to Academic Records!`, "success");
     renderBroadsheet();
     if (currentErSubTab === "ledger") renderRawScoreLedger();
+  }
+
+  function _getFilteredWeeklyRecords() {
+    const cls = document.getElementById("er-wk-class")?.value || "All";
+    const subject = document.getElementById("er-wk-subject")?.value || "All";
+    const week = document.getElementById("er-wk-week")?.value || "All";
+    const term = document.getElementById("er-wk-term")?.value || "1st Term";
+
+    const filters = { term };
+    if (subject !== "All") filters.subject = subject;
+    if (week !== "All") filters.week = week;
+
+    let list = RichVineDB.getWeeklyPerformance ? RichVineDB.getWeeklyPerformance(filters) : [];
+    if (cls !== "All") {
+      list = list.filter(r => {
+        const rc = r.className || "";
+        if (rc.toLowerCase().trim() === cls.toLowerCase().trim()) return true;
+        return typeof window.isClassMatch === "function" && window.isClassMatch(rc, cls);
+      });
+    }
+    return {
+      cls,
+      subject,
+      week,
+      term,
+      list: list.sort((a, b) => Number(a.week || 0) - Number(b.week || 0) || (a.studentName || "").localeCompare(b.studentName || ""))
+    };
+  }
+
+  function renderAdminWeeklyPerformance() {
+    const tbody = document.getElementById("er-wk-tbody");
+    if (!tbody) return;
+    const { cls, subject, week, term, list } = _getFilteredWeeklyRecords();
+
+    const titleEl = document.getElementById("er-wk-table-title");
+    if (titleEl) {
+      const wkLabel = week === "All" ? "All Weeks" : `Week ${week}`;
+      titleEl.innerHTML = `<i class="fas fa-chart-line" style="color:#d97706"></i> &nbsp;Weekly Performance: <strong>${cls}</strong> &bull; ${subject} &bull; ${wkLabel} (${term})`;
+    }
+
+    const totalEl = document.getElementById("er-wk-kpi-total");
+    const notesEl = document.getElementById("er-wk-kpi-notes");
+    const focusEl = document.getElementById("er-wk-kpi-focus");
+    const avgEl = document.getElementById("er-wk-kpi-avg");
+
+    if (totalEl) totalEl.textContent = list.length;
+    let notesSubmitted = 0, highFocus = 0, scoreSum = 0, scoreCount = 0;
+    list.forEach(r => {
+      if (r.notes === "Submitted") notesSubmitted++;
+      if (r.attentiveness === "High") highFocus++;
+      if (r.testScore !== undefined && r.testScore !== "" && !isNaN(Number(r.testScore))) {
+        scoreSum += Number(r.testScore);
+        scoreCount++;
+      }
+    });
+    if (notesEl) notesEl.textContent = list.length ? `${Math.round((notesSubmitted / list.length) * 100)}%` : "0%";
+    if (focusEl) focusEl.textContent = highFocus;
+    if (avgEl) avgEl.textContent = `${scoreCount ? (scoreSum / scoreCount).toFixed(1) : "0"} / 20`;
+
+    if (list.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="12" class="empty-cell">No weekly performance records found for the selected filters.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = list.map((r, idx) => {
+      const notesBadge = r.notes === "Submitted"
+        ? '<span class="status-badge" style="background:#ecfdf5;color:#059669">Submitted</span>'
+        : `<span class="status-badge" style="background:#fef2f2;color:#dc2626">${r.notes || "Missing"}</span>`;
+      const scoreVal = r.testScore !== undefined && r.testScore !== "" ? `${r.testScore} / ${r.testMax || 20}` : "-";
+      return `
+        <tr>
+          <td style="text-align:center;color:#64748b">${idx + 1}</td>
+          <td style="font-weight:700;color:var(--gray-900)">${r.studentName || "Learner"}</td>
+          <td style="font-family:monospace;font-size:11px;color:#0284c7">${r.regNo || r.studentId}</td>
+          <td><span class="status-badge" style="background:#eff6ff;color:#1e40af">${r.className || "-"}</span></td>
+          <td style="font-weight:700;color:#0f172a">${r.subject || "-"}</td>
+          <td style="text-align:center;font-weight:700">Wk ${r.week || "-"}</td>
+          <td style="text-align:center">${notesBadge}</td>
+          <td style="text-align:center">${r.behaviour || "-"}</td>
+          <td style="text-align:center">${r.attentiveness || "-"}</td>
+          <td style="text-align:center;font-weight:800;color:#b45309">${scoreVal}</td>
+          <td style="font-size:11px;color:#475569">${r.teacherRemark || "-"}</td>
+          <td style="font-size:11px;color:#64748b">${r.recordedBy || "-"}</td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  function exportWeeklyPerformanceCsv() {
+    const { cls, subject, week, term, list } = _getFilteredWeeklyRecords();
+    if (list.length === 0) {
+      showToast("No weekly performance records to export", "warning");
+      return;
+    }
+    const header = "S/N,Learner Name,Reg No,Class,Subject,Week,Term,Class Notes,Behaviour,Attentiveness,Weekly Score (/20),Teacher Remark,Recorded By";
+    const rows = list.map((r, i) => [
+      i + 1,
+      `"${(r.studentName || "").replace(/"/g, '""')}"`,
+      `"${r.regNo || r.studentId}"`,
+      `"${r.className || ""}"`,
+      `"${r.subject || ""}"`,
+      r.week || "",
+      `"${r.term || term}"`,
+      `"${r.notes || ""}"`,
+      `"${r.behaviour || ""}"`,
+      `"${r.attentiveness || ""}"`,
+      r.testScore !== undefined && r.testScore !== "" ? r.testScore : "",
+      `"${(r.teacherRemark || "").replace(/"/g, '""')}"`,
+      `"${(r.recordedBy || "").replace(/"/g, '""')}"`
+    ].join(","));
+    const csv = [header, ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `Weekly_Performance_${cls.replace(/\s+/g, "_")}_${subject.replace(/\s+/g, "_")}_Wk${week}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    showToast("Weekly performance CSV exported!", "success");
+  }
+
+  function printWeeklyPerformanceReport() {
+    const { cls, subject, week, term, list } = _getFilteredWeeklyRecords();
+    if (list.length === 0) {
+      showAlert("No weekly performance records found for the selected Class, Subject, and Week.", "warning");
+      return;
+    }
+
+    const cfg = (RichVineDB.getConfig ? RichVineDB.getConfig() : {}) || {};
+    const schoolName = cfg.schoolName || (window.BURSARIQ_CONFIG && window.BURSARIQ_CONFIG.schoolName) || "DE PORTAL SCHOOLS";
+    const schoolMotto = cfg.motto || (window.BURSARIQ_CONFIG && window.BURSARIQ_CONFIG.motto) || "Gateway to Academic Excellence & Moral Integrity";
+    const schoolAddress = cfg.address || (window.BURSARIQ_CONFIG && window.BURSARIQ_CONFIG.schoolAddress) || "5-7 Olukayode Street, Imoro, Ogijo, Ogun State";
+
+    let notesSubmitted = 0, highFocus = 0, scoreSum = 0, scoreCount = 0;
+    list.forEach(r => {
+      if (r.notes === "Submitted") notesSubmitted++;
+      if (r.attentiveness === "High") highFocus++;
+      if (r.testScore !== undefined && r.testScore !== "" && !isNaN(Number(r.testScore))) {
+        scoreSum += Number(r.testScore);
+        scoreCount++;
+      }
+    });
+    const notesRate = Math.round((notesSubmitted / list.length) * 100);
+    const avgScore = scoreCount ? (scoreSum / scoreCount).toFixed(1) : "0";
+    const wkLabel = week === "All" ? "All Weeks" : `Week ${week}`;
+
+    const rowsHtml = list.map((r, idx) => `
+      <tr>
+        <td style="text-align:center">${idx + 1}</td>
+        <td><strong>${r.studentName || "Learner"}</strong></td>
+        <td style="font-family:monospace;font-size:10px">${r.regNo || r.studentId}</td>
+        <td>${r.className || "-"}</td>
+        <td>${r.subject || "-"}</td>
+        <td style="text-align:center">Wk ${r.week || "-"}</td>
+        <td style="text-align:center">${r.notes || "-"}</td>
+        <td style="text-align:center">${r.behaviour || "-"}</td>
+        <td style="text-align:center">${r.attentiveness || "-"}</td>
+        <td style="text-align:center;font-weight:800">${r.testScore !== undefined && r.testScore !== "" ? r.testScore + " / 20" : "-"}</td>
+        <td>${r.teacherRemark || "-"}</td>
+      </tr>
+    `).join("");
+
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Weekly Performance Report — ${cls} (${subject})</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Segoe UI', Arial, sans-serif; background:#fff; color:#0f172a; padding:18px; }
+    .header { text-align:center; border-bottom:3px double #d97706; padding-bottom:12px; margin-bottom:14px; }
+    .header h1 { font-size:22px; color:#b45309; font-weight:900; margin:0; }
+    .header p { font-size:11px; color:#475569; margin:3px 0 0; }
+    .meta-bar { display:flex; justify-content:space-between; flex-wrap:wrap; background:#fffbeb; border:1px solid #fde68a; padding:8px 14px; border-radius:6px; margin-bottom:12px; font-size:12px; font-weight:700; color:#92400e; }
+    .kpi-strip { display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; margin-bottom:14px; text-align:center; }
+    .kpi-box { border:1px solid #e2e8f0; border-radius:6px; padding:8px; background:#f8fafc; }
+    .kpi-box .lbl { font-size:10px; color:#64748b; text-transform:uppercase; font-weight:700; }
+    .kpi-box .val { font-size:16px; font-weight:900; color:#0f172a; margin-top:2px; }
+    table { width:100%; border-collapse:collapse; font-size:11px; }
+    th, td { border:1px solid #cbd5e1; padding:6px 8px; }
+    th { background:#f1f5f9; color:#0f172a; font-weight:800; }
+    .note { margin-top:10px; font-size:10px; color:#64748b; font-style:italic; }
+    .footer { margin-top:26px; display:flex; justify-content:space-between; font-size:12px; color:#475569; padding-top:14px; }
+    @media print { body { padding:8px; } }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>${schoolName}</h1>
+    <p>${schoolMotto} &bull; ${schoolAddress}</p>
+    <div style="font-size:13px;font-weight:800;color:#0f172a;margin-top:6px;text-transform:uppercase;letter-spacing:0.5px">Weekly Class &amp; Subject Academic Performance Report</div>
+  </div>
+  <div class="meta-bar">
+    <div>Class: <strong>${cls}</strong></div>
+    <div>Subject: <strong>${subject}</strong></div>
+    <div>Period: <strong>${wkLabel} &bull; ${term}</strong></div>
+    <div>Printed: <strong>${new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</strong></div>
+  </div>
+  <div class="kpi-strip">
+    <div class="kpi-box"><div class="lbl">Learners Assessed</div><div class="val">${list.length}</div></div>
+    <div class="kpi-box"><div class="lbl">Notes Submitted</div><div class="val" style="color:#059669">${notesRate}%</div></div>
+    <div class="kpi-box"><div class="lbl">High Attentiveness</div><div class="val" style="color:#0284c7">${highFocus}</div></div>
+    <div class="kpi-box"><div class="lbl">Avg Weekly Score</div><div class="val" style="color:#b45309">${avgScore} / 20</div></div>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:28px">#</th>
+        <th>Learner Name</th>
+        <th style="width:82px">Reg No</th>
+        <th>Class</th>
+        <th>Subject</th>
+        <th style="width:50px">Week</th>
+        <th style="width:72px">Notes</th>
+        <th style="width:68px">Conduct</th>
+        <th style="width:68px">Focus</th>
+        <th style="width:68px">Score</th>
+        <th>Teacher Remark</th>
+      </tr>
+    </thead>
+    <tbody>${rowsHtml}</tbody>
+  </table>
+  <div class="note">Note: Weekly assessment scores are tracked for continuous institutional monitoring and do not add up to terminal report card totals.</div>
+  <div class="footer">
+    <div>Subject Teacher Signature: ______________________</div>
+    <div>Class Teacher Signature: ______________________</div>
+    <div>Principal Stamp &amp; Date: ______________________</div>
+  </div>
+</body>
+</html>`;
+
+    if (typeof RichVineReports !== "undefined" && RichVineReports.printHtmlDocument) {
+      RichVineReports.printHtmlDocument(html, `Weekly_Report_${cls.replace(/\s+/g, "_")}_${subject.replace(/\s+/g, "_")}`);
+    } else {
+      window.print();
+    }
   }
 
   function renderRawScoreLedger() {
@@ -7426,6 +7687,9 @@ const RichVineApp = (() => {
     renderReportCard,
     printReportCard,
     syncCbtScoresToExams,
+    renderAdminWeeklyPerformance,
+    exportWeeklyPerformanceCsv,
+    printWeeklyPerformanceReport,
     renderRawScoreLedger,
     openAddScoreModal,
     openEditScoreModal,

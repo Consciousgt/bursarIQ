@@ -1058,6 +1058,24 @@
     const teacherSubjects = Array.isArray(currentTeacher.subjects) ? currentTeacher.subjects : (currentTeacher.subjects ? [currentTeacher.subjects] : []);
     const hasSubjectTeacherRole = teacherSubjects.length > 0;
 
+    function isTeacherAssignedToClass(targetClass) {
+      if (!hasClassTeacherRole || !targetClass) return false;
+      const assigned = [];
+      if (currentTeacher.assignedClass && currentTeacher.assignedClass !== 'None' && currentTeacher.assignedClass !== 'Unassigned') {
+        assigned.push(currentTeacher.assignedClass);
+      }
+      if (Array.isArray(currentTeacher.assignedClasses)) {
+        currentTeacher.assignedClasses.forEach(c => {
+          if (c && c !== 'None' && c !== 'Unassigned') assigned.push(c);
+        });
+      }
+      return assigned.some(ac => {
+        if (ac.toLowerCase().trim() === String(targetClass).toLowerCase().trim()) return true;
+        if (typeof window.isClassMatch === 'function') return window.isClassMatch(targetClass, ac) || window.isClassMatch(ac, targetClass);
+        return false;
+      });
+    }
+
     // Populate Teacher Info Banner
     document.getElementById('teacherGreeting').textContent = 'Welcome, ' + (currentTeacher.name || 'Teacher');
     document.getElementById('teacherNameDisplay').textContent = currentTeacher.name || 'Academic Staff';
@@ -1252,6 +1270,19 @@
         ? classSel.value 
         : currentTeacher.assignedClass;
 
+      if (!hasClassTeacherRole || !isTeacherAssignedToClass(targetClass)) {
+        attendanceStudents = [];
+        attendanceMap = {};
+        document.getElementById('attendanceRosterCount').textContent = '(Restricted)';
+        document.getElementById('statEnrolled').textContent = '0';
+        const tbody = document.getElementById('studentAttendanceTableBody');
+        if (tbody) {
+          tbody.innerHTML = '<tr><td colspan="5" class="py-10 text-center text-amber-300 font-semibold"><i class="fas fa-lock mr-2"></i>Only the assigned Class Teacher for a class can mark daily Morning/Afternoon attendance.</td></tr>';
+        }
+        updateAttendanceStats();
+        return;
+      }
+
       let students = [];
       if (window.RichVineDB && window.RichVineDB.getStudents) {
         students = window.RichVineDB.getStudents({ class: targetClass });
@@ -1392,6 +1423,11 @@
         ? classSel.value 
         : currentTeacher.assignedClass;
 
+      if (!hasClassTeacherRole || !isTeacherAssignedToClass(targetClass)) {
+        showToast('Access Denied: Only the assigned Class Teacher for ' + (targetClass || 'this class') + ' can mark attendance.', 'error');
+        return;
+      }
+
       const records = attendanceStudents.map(st => {
         const entry = attendanceMap[st.id] || { status: 'Present', remark: '' };
         const sName = st.fullName || st.name || ((st.firstName || '') + ' ' + (st.lastName || '')).trim() || 'Student';
@@ -1461,23 +1497,33 @@
         sel.innerHTML = availableClasses.map(c => '<option value="' + c + '">' + c + '</option>').join('');
       });
 
-      // 3. Populate Attendance Class Selector for Class Teachers
+      // 3. Populate Attendance Class Selector ONLY for assigned Class Teachers
       const attClassSel = document.getElementById('attendanceClassSelect');
       const attClassesSet = new Set();
-      if (currentTeacher.assignedClass && currentTeacher.assignedClass !== 'None' && currentTeacher.assignedClass !== 'Unassigned') {
-        attClassesSet.add(currentTeacher.assignedClass);
-      }
-      if (Array.isArray(currentTeacher.assignedClasses)) {
-        currentTeacher.assignedClasses.forEach(c => {
-          if (c && c !== 'None' && c !== 'Unassigned') attClassesSet.add(c);
-        });
-      }
-      if (attClassesSet.size === 0) {
-        availableClasses.forEach(c => attClassesSet.add(c));
+      if (hasClassTeacherRole) {
+        if (currentTeacher.assignedClass && currentTeacher.assignedClass !== 'None' && currentTeacher.assignedClass !== 'Unassigned') {
+          attClassesSet.add(currentTeacher.assignedClass);
+        }
+        if (Array.isArray(currentTeacher.assignedClasses)) {
+          currentTeacher.assignedClasses.forEach(c => {
+            if (c && c !== 'None' && c !== 'Unassigned') attClassesSet.add(c);
+          });
+        }
       }
 
       if (attClassSel) {
-        attClassSel.innerHTML = Array.from(attClassesSet).map(c => '<option value="' + c + '">' + c + '</option>').join('');
+        if (attClassesSet.size === 0) {
+          attClassSel.innerHTML = '<option value="">No Assigned Class</option>';
+          attClassSel.disabled = true;
+        } else {
+          attClassSel.innerHTML = Array.from(attClassesSet).map(c => '<option value="' + c + '">' + c + '</option>').join('');
+          attClassSel.disabled = attClassesSet.size <= 1;
+        }
+      }
+
+      const tabBtnAtt = document.getElementById('tabBtnAttendance');
+      if (tabBtnAtt && !hasClassTeacherRole) {
+        tabBtnAtt.classList.add('hidden');
       }
 
       // 4. Populate Attendance History Class Selector
@@ -2003,36 +2049,44 @@
     function syncCbtToCurrentSubject() {
       const subject = document.getElementById('examSubjectSelect').value;
       const className = document.getElementById('examClassSelect').value;
-      const term = document.getElementById('examTermSelect').value;
 
-      if (!window.RichVineDB || !window.RichVineDB.get) {
+      if (!window.RichVineDB || !window.RichVineDB.getCbtSubmissions) {
         showToast('Database not ready', 'error');
         return;
       }
-      const data = window.RichVineDB.get();
-      const cbtResults = data.cbtResults || [];
+      const submissions = window.RichVineDB.getCbtSubmissions({ subject });
 
       let syncedCount = 0;
       examStudents.forEach(st => {
-        // Find matching CBT result for this student, subject, and class
-        const cbt = cbtResults.find(r => 
-          r.studentId === st.id && 
-          (r.subject || '').toLowerCase().trim() === subject.toLowerCase().trim() &&
-          (r.className === className || (window.isClassMatch && window.isClassMatch(r.className, className)))
-        );
+        const stReg = (st.regNo || st.id || '').toLowerCase();
+        // Find matching CBT submission(s) for this student, subject, and class
+        const matching = submissions.filter(r => {
+          const rId = (r.studentId || '').toLowerCase();
+          const rReg = (r.regNo || '').toLowerCase();
+          const idMatch = rId === (st.id || '').toLowerCase() || (stReg && rReg === stReg);
+          const rClass = r.studentClass || r.className || '';
+          const classMatch = !rClass || rClass === className || (window.isClassMatch && window.isClassMatch(rClass, className));
+          return idMatch && classMatch;
+        });
 
-        if (cbt && cbt.total > 0) {
-          const scaledScore = Math.round((Number(cbt.score || 0) / Number(cbt.total)) * 60);
-          onExamScoreInput(st.id, 'exam', scaledScore);
-          syncedCount++;
-        }
+        matching.forEach(cbt => {
+          const category = cbt.targetCategory || 'exam';
+          const catMax = category === 'exam' ? 60 : 20;
+          const rawScore = cbt.totalScore !== undefined ? Number(cbt.totalScore) : Number(cbt.score || 0);
+          const totalPossible = Number(cbt.totalPossible || cbt.totalQuestions || cbt.total || 1);
+          if (totalPossible > 0) {
+            const scaledScore = Math.min(catMax, Math.max(0, Math.round((rawScore / totalPossible) * catMax)));
+            onExamScoreInput(st.id, category, scaledScore);
+            syncedCount++;
+          }
+        });
       });
 
       if (syncedCount > 0) {
         renderExamScoresTable();
-        showToast(`✅ Synced ${syncedCount} CBT scores for ${subject}! Click Save to publish.`, 'success');
+        showToast(`✅ Synced ${syncedCount} CBT score(s) for ${subject}! Click Publish to save.`, 'success');
       } else {
-        showToast(`No CBT Assessment attempts found for ${subject} in ${className}.`, 'info');
+        showToast(`No CBT Assessment submissions found for ${subject} in ${className}.`, 'info');
       }
     }
 
@@ -2932,7 +2986,12 @@
       } else {
         const rows = students.length > 0 ? students : subs.map(s => ({ id: s.studentId, regNo: s.regNo, fullName: s.studentName }));
         tbody.innerHTML = rows.map((st, idx) => {
-          const sub = subs.find(s => s.studentId === st.id || (st.regNo && s.regNo === st.regNo));
+          const stIdLower = String(st.id || '').toLowerCase();
+          const stRegLower = String(st.regNo || '').toLowerCase();
+          const sub = subs.find(s =>
+            String(s.studentId || '').toLowerCase() === stIdLower ||
+            (stRegLower && String(s.regNo || '').toLowerCase() === stRegLower)
+          );
           const sName = st.fullName || `${st.firstName || ''} ${st.lastName || ''}`.trim() || sub?.studentName || 'Student';
           const objScore = sub ? Number(sub.objectiveScore !== undefined ? sub.objectiveScore : (sub.score || 0)) : 0;
           const thyScore = sub && sub.theoryScore !== undefined && sub.theoryScore !== null ? Number(sub.theoryScore) : '';
@@ -3028,6 +3087,18 @@
     // Initialize selectors and default tab
     initSubjectAndClassSelectors();
     switchMasterTab(activeMasterTab);
+
+    // Activate realtime cloud sync so CBT submissions & assessments appear live in Teacher Portal
+    if (window.RichVineFirebase && window.RichVineFirebase.initRealtimeSync) {
+      window.RichVineFirebase.initRealtimeSync({
+        onCbtChange: () => {
+          if (activeMasterTab === 'cbt') renderCbtAssessmentsList();
+        },
+        onCbtAssessmentsChange: () => {
+          if (activeMasterTab === 'cbt') renderCbtAssessmentsList();
+        }
+      });
+    }
   </script>
 
   <script>

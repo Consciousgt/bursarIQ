@@ -3184,7 +3184,7 @@
     </div>
 
     <!-- Sub-navigation tabs -->
-    <div style="display:flex;gap:8px;margin-bottom:18px;border-bottom:2px solid var(--gray-200);padding-bottom:10px">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;border-bottom:2px solid var(--gray-200);padding-bottom:10px">
       <button id="er-subtab-broadsheet-btn" class="btn-primary" onclick="RichVineApp.switchErSubTab('broadsheet')">
         <i class="fas fa-table"></i> Class Broadsheet
       </button>
@@ -3193,6 +3193,9 @@
       </button>
       <button id="er-subtab-ledger-btn" class="btn-secondary" onclick="RichVineApp.switchErSubTab('ledger')">
         <i class="fas fa-list-alt"></i> Raw Scores Ledger
+      </button>
+      <button id="er-subtab-weekly-btn" class="btn-secondary" onclick="RichVineApp.switchErSubTab('weekly')">
+        <i class="fas fa-chart-line"></i> Weekly Performance
       </button>
     </div>
 
@@ -3315,6 +3318,118 @@
               </thead>
               <tbody id="er-ledger-tbody">
                 <tr><td colspan="10" class="empty-cell">No score records found.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUBTAB 4: Weekly Performance (Non-Report-Card Monitoring & Printable Report) -->
+    <div id="er-view-weekly" class="space-y-4 hidden">
+      <div class="panel" style="padding:14px 18px">
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;justify-content:space-between">
+          <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+            <div>
+              <label style="font-size:11px;font-weight:700;color:var(--gray-600);display:block;margin-bottom:4px">CLASS:</label>
+              <select id="er-wk-class" class="form-control" onchange="RichVineApp.renderAdminWeeklyPerformance()" style="width:185px">
+                <option value="All">All Classes</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:700;color:var(--gray-600);display:block;margin-bottom:4px">SUBJECT:</label>
+              <select id="er-wk-subject" class="form-control" onchange="RichVineApp.renderAdminWeeklyPerformance()" style="width:170px">
+                <option value="All">All Subjects</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:700;color:var(--gray-600);display:block;margin-bottom:4px">WEEK:</label>
+              <select id="er-wk-week" class="form-control" onchange="RichVineApp.renderAdminWeeklyPerformance()" style="width:120px">
+                <option value="All">All Weeks</option>
+                <option value="1">Week 1</option>
+                <option value="2">Week 2</option>
+                <option value="3">Week 3</option>
+                <option value="4">Week 4</option>
+                <option value="5">Week 5</option>
+                <option value="6">Week 6</option>
+                <option value="7">Week 7</option>
+                <option value="8">Week 8</option>
+                <option value="9">Week 9</option>
+                <option value="10">Week 10</option>
+                <option value="11">Week 11</option>
+                <option value="12">Week 12</option>
+                <option value="13">Week 13</option>
+                <option value="14">Week 14</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:700;color:var(--gray-600);display:block;margin-bottom:4px">TERM:</label>
+              <select id="er-wk-term" class="form-control" onchange="RichVineApp.renderAdminWeeklyPerformance()" style="width:125px">
+                <option value="1st Term" selected>1st Term</option>
+                <option value="2nd Term">2nd Term</option>
+                <option value="3rd Term">3rd Term</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="btn-secondary" onclick="RichVineApp.exportWeeklyPerformanceCsv()">
+              <i class="fas fa-file-csv"></i> Export CSV
+            </button>
+            <button class="btn-primary" style="background:#d97706;border-color:#d97706" onclick="RichVineApp.printWeeklyPerformanceReport()">
+              <i class="fas fa-print"></i> Print Weekly Report
+            </button>
+          </div>
+        </div>
+        <div style="margin-top:10px;padding:8px 12px;border-radius:6px;background:#fffbeb;border:1px solid #fde68a;font-size:11px;color:#92400e;font-weight:600">
+          <i class="fas fa-info-circle"></i> Weekly assessments are monitored for class &amp; subject progress only and do <strong>not</strong> add up to terminal report card totals.
+        </div>
+      </div>
+
+      <!-- Weekly KPI Strip -->
+      <div class="kpi-grid" style="grid-template-columns:repeat(auto-fit, minmax(170px, 1fr));gap:12px">
+        <div class="kpi-card">
+          <div class="kpi-label">Records Matched</div>
+          <div class="kpi-value" id="er-wk-kpi-total">0</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Class Notes Submitted</div>
+          <div class="kpi-value" id="er-wk-kpi-notes" style="color:#059669">0%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">High Attentiveness</div>
+          <div class="kpi-value" id="er-wk-kpi-focus" style="color:#0284c7">0</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Avg Weekly Score</div>
+          <div class="kpi-value" id="er-wk-kpi-avg" style="color:#d97706">0 / 20</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <h3 id="er-wk-table-title"><i class="fas fa-chart-line" style="color:#d97706"></i> &nbsp;Weekly Class &amp; Subject Performance</h3>
+        </div>
+        <div class="panel-body">
+          <div class="table-wrap">
+            <table id="er-weekly-table">
+              <thead>
+                <tr>
+                  <th style="width:40px;text-align:center">#</th>
+                  <th>Learner Name</th>
+                  <th>Reg No</th>
+                  <th>Class</th>
+                  <th>Subject</th>
+                  <th style="text-align:center">Week</th>
+                  <th style="text-align:center">Class Notes</th>
+                  <th style="text-align:center">Behaviour</th>
+                  <th style="text-align:center">Focus</th>
+                  <th style="text-align:center">Score (/20)</th>
+                  <th>Teacher Remark</th>
+                  <th>Teacher</th>
+                </tr>
+              </thead>
+              <tbody id="er-wk-tbody">
+                <tr><td colspan="12" class="empty-cell">No weekly performance records found for the selected filters.</td></tr>
               </tbody>
             </table>
           </div>

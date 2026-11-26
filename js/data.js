@@ -3656,18 +3656,34 @@ RichVineDB.getStudentAttendanceSummary = function(studentId, days) {
   const data = RichVineDB.get();
   const att = data.attendance || [];
   const cutoff = new Date();
-  cutoff.setDate(cutoff.getDate() - (days || 30));
-  let present = 0, absent = 0, late = 0, total = 0;
+  cutoff.setDate(cutoff.getDate() - (days || 120));
+  let present = 0, absent = 0, late = 0, excused = 0, total = 0;
   att.forEach(session => {
-    if (new Date(session.date) < cutoff) return;
+    if (session.date && new Date(session.date) < cutoff) return;
     const rec = (session.records || []).find(r => r.studentId === studentId);
     if (!rec) return;
     total++;
     if (rec.status === 'Present') present++;
     else if (rec.status === 'Absent') absent++;
     else if (rec.status === 'Late') late++;
+    else if (rec.status === 'Excused') excused++;
   });
-  return { present, absent, late, total, rate: total ? Math.round((present / total) * 100) : 0 };
+  // Morning + Afternoon = 2 sessions (2 attendance points) per full school day
+  const pointsEarned = present + late;
+  const daysAttended = Math.round((pointsEarned / 2) * 10) / 10;
+  const totalDays = Math.round((total / 2) * 10) / 10;
+  return {
+    present,
+    absent,
+    late,
+    excused,
+    total,
+    pointsEarned,
+    totalPossiblePoints: total,
+    daysAttended,
+    totalDays,
+    rate: total ? Math.round((pointsEarned / total) * 100) : 0
+  };
 };
 
 
@@ -3716,17 +3732,20 @@ RichVineDB.saveWeeklyPerformance = function(record) {
   );
 
   const now = new Date().toISOString();
+  let savedRecord;
   if (idx !== -1) {
-    data.weeklyPerformance[idx] = { ...data.weeklyPerformance[idx], ...record, updatedAt: now };
+    savedRecord = { ...data.weeklyPerformance[idx], ...record, id: data.weeklyPerformance[idx].id || record.id || ('WKP-' + Date.now() + '-' + Math.floor(Math.random() * 10000)), updatedAt: now };
+    data.weeklyPerformance[idx] = savedRecord;
   } else {
     const id = record.id || ('WKP-' + Date.now() + '-' + Math.floor(Math.random() * 10000));
-    data.weeklyPerformance.push({ ...record, id, createdAt: now, updatedAt: now });
+    savedRecord = { ...record, id, createdAt: now, updatedAt: now };
+    data.weeklyPerformance.push(savedRecord);
   }
 
   RichVineDB.save(data);
 
   if (typeof window !== "undefined" && window.RichVineFirebase && window.RichVineFirebase.saveWeeklyPerformance) {
-    window.RichVineFirebase.saveWeeklyPerformance(record);
+    window.RichVineFirebase.saveWeeklyPerformance(savedRecord);
   }
   return true;
 };
@@ -3930,7 +3949,8 @@ RichVineDB.getClassBroadsheet = function(className, term, session) {
     });
     const totals = Object.values(subjectScores).filter(Boolean).map(s => s.total);
     const avg = totals.length ? Math.round(totals.reduce((a, b) => a + b, 0) / totals.length) : 0;
-    return { student, subjectScores, avg, subjects: totals.length };
+    const attendance = RichVineDB.getStudentAttendanceSummary(student.id, 120);
+    return { student, subjectScores, avg, subjects: totals.length, attendance };
   });
   rows.sort((a, b) => b.avg - a.avg);
   rows.forEach((row, i) => { row.position = i + 1; row.positionLabel = i + 1 + RichVineDB._getOrdinalSuffix(i + 1); });
@@ -3946,6 +3966,7 @@ RichVineDB.getStudentReportCard = function(studentId, term, session) {
   const myRow = broadsheet.rows.find(r => r.student.id === studentId);
   const totalScore = records.reduce((sum, r) => sum + (r.total || 0), 0);
   const avg = records.length ? Math.round(totalScore / records.length) : 0;
+  const attendanceSummary = RichVineDB.getStudentAttendanceSummary(studentId, 120);
   return {
     student,
     term,
@@ -3955,7 +3976,8 @@ RichVineDB.getStudentReportCard = function(studentId, term, session) {
     position: myRow ? myRow.position : '-',
     positionLabel: myRow ? myRow.positionLabel : '-',
     classSize: broadsheet.rows.length,
-    gradeInfo: RichVineDB.calculateGrade(avg)
+    gradeInfo: RichVineDB.calculateGrade(avg),
+    attendanceSummary
   };
 };
 

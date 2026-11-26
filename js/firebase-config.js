@@ -1369,6 +1369,42 @@ window.RichVineFirebase = {
       }
       this._setSyncStatus("synced", "Cloud Synced");
     }, e => console.warn("[Realtime] examRecords sync warning:", e.message));
+
+    // 14. Listen for Weekly Performance Realtime
+    onSnapshot(collection(db, "weeklyPerformance"), snap => {
+      const localDb = window.RichVineDB ? window.RichVineDB.get() : null;
+      if (!localDb) return;
+      let changed = false;
+      if (!localDb.weeklyPerformance) localDb.weeklyPerformance = [];
+      const tombstoneSet = new Set(Object.keys(localDb._tombstones || {}));
+
+      snap.docChanges().forEach(change => {
+        const d = change.doc.data();
+        const id = change.doc.id;
+        if (tombstoneSet.has(id)) return;
+
+        if (change.type === "added" || change.type === "modified") {
+          const idx = localDb.weeklyPerformance.findIndex(r => r && r.id === id);
+          if (idx !== -1) {
+            localDb.weeklyPerformance[idx] = { ...localDb.weeklyPerformance[idx], ...d, id };
+          } else {
+            localDb.weeklyPerformance.push({ id, ...d });
+          }
+          changed = true;
+        } else if (change.type === "removed") {
+          localDb.weeklyPerformance = localDb.weeklyPerformance.filter(r => r && r.id !== id);
+          changed = true;
+        }
+      });
+
+      if (changed && window.RichVineDB) {
+        window.RichVineDB.save(localDb);
+        this._scheduleRefresh(() => {
+          if (window.RichVineApp && window.RichVineApp.renderAdminWeeklyPerformance) window.RichVineApp.renderAdminWeeklyPerformance();
+        });
+      }
+      this._setSyncStatus("synced", "Cloud Synced");
+    }, e => console.warn("[Realtime] weeklyPerformance sync warning:", e.message));
   }
 };
 
